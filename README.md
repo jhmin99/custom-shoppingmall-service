@@ -13,6 +13,8 @@
 ## [요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
 
 ## 요구사항 분석 (기능 , 비기능)
+- 기능
+- 비기능
 
 ## 기술 선택
 
