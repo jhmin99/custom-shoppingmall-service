@@ -12,7 +12,7 @@
 
 ## [고객 요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
 
-## [요구사항 분석 및 구체화](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D)
+## [요구사항 분석 및 구체화](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D-%EB%B0%8F-%EA%B5%AC%EC%B2%B4%ED%99%94)
 
 ## 기술 선택
 
