@@ -14,7 +14,7 @@
 
 |Dev|Qa|Prod|
 |---|-----|---|
-|- 코드 작성 <br> - 단위 테스트 <br> - 기능 테스트 <br> - 코드, API 문서화 <br> - CI (커밋 시 빌드 및 테스트, 정적코드 분석 자동화)|- 기능 테스트 <br> - 성능 부하 테스트 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br> - 보안 테스트 <br> - 로깅 및 모니터링 <br> - 배포 준비|- CD (main 브랜치로 merge 완료 시, CI서버가 build, test 후 배포 자동화) <br> - 성능 모니터링 <br> - 로깅 및 모니터링 <br> - 업데이트 및 유지보수|
+|- 코드 작성 <br> - 단위 테스트 <br> - 기능 테스트 <br> - 코드, API 문서화 <br> - CI (커밋 시 빌드 및 테스트, 정적코드 분석 자동화)|- 기능 테스트 <br> - 성능 부하 테스트 <br> - 보안 테스트 <br> - 로깅 및 모니터링 <br> - 배포 준비|- CD (main 브랜치로 merge 완료 시, CI서버가 build, test 후 배포 자동화) <br> - 성능 모니터링 <br> - 로깅 및 모니터링 <br> - 업데이트 및 유지보수|
 
 ## [고객 요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EA%B3%A0%EA%B0%9D-%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
 
