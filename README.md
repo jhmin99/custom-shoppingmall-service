@@ -10,7 +10,7 @@
 - [커밋컨벤션](https://github.com/jhmin99/shoppingmall/wiki#%EC%BB%A4%EB%B0%8B-%EC%BB%A8%EB%B2%A4%EC%85%98)을 지키고, [Git Flow 브랜치 전략](https://github.com/jhmin99/shoppingmall/wiki#git-flow-%EB%B8%8C%EB%9E%9C%EC%B9%98-%EC%A0%84%EB%9E%B5)을 사용
 - 문제 발생 시, 디버깅과 공식문서 및 책을 통해 해결
 
-## 단계별 프로젝트 계획
+## 단계별 계획
 
 |Dev|Qa|Prod|
 |---|---|---|
