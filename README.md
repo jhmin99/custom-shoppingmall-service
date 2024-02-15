@@ -10,6 +10,12 @@
 - [커밋컨벤션](https://github.com/jhmin99/shoppingmall/wiki#%EC%BB%A4%EB%B0%8B-%EC%BB%A8%EB%B2%A4%EC%85%98)을 지키고, [Git Flow 브랜치 전략](https://github.com/jhmin99/shoppingmall/wiki#git-flow-%EB%B8%8C%EB%9E%9C%EC%B9%98-%EC%A0%84%EB%9E%B5)을 사용
 - 문제 발생 시, 디버깅과 공식문서 및 책을 통해 해결
 
+## 단계별 프로젝트 계획
+
+|Dev|Qa|Prod|
+|---|---|---|
+|코드작성 <br> 단위테스트 <br> 기능테스트 <br> 코드, API 문서화 <br> CI (커밋 시 빌드 및 테스트, 정적코드 분석 자동화)|기능테스트 <br> 성능 부하 테스트 <br> 보안 테스트 <br> 로깅 및 모니터링 <br> 배포 준비|CD (main 브랜치로 merge 완료 시, CI서버가 build, test 후 배포 자동화) <br> 성능 모니터링 <br> 로깅 및 모니터링 <br> 업데이트 및 유지보수|
+
 ## [고객 요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EA%B3%A0%EA%B0%9D-%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
 
 ## [요구사항 분석 및 구체화](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D-%EB%B0%8F-%EA%B5%AC%EC%B2%B4%ED%99%94)
