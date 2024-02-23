@@ -25,7 +25,7 @@
 ## 아키텍쳐 설계
 
 ## ERD 설계 (진행 중)
-![shoppingmall (4)](https://github.com/jhmin99/shoppingmall/assets/158474415/b800e28e-4d24-4763-9883-79613259852a)
+![shoppingmall (5)](https://github.com/jhmin99/shoppingmall/assets/158474415/1bbe98c4-81c8-4e0f-bb27-4acb97791b90)
 
 erdcloud [https://www.erdcloud.com/d/uj7b3fD4CztW6xcnw]
 
