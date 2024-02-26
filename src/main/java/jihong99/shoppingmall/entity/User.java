@@ -83,13 +83,16 @@ public class User {
 
     // 등록 날짜
     @CreatedDate
+    @Column(updatable = false)
     private LocalDate registrationDate;
 
     // 생성 시간
     @CreationTimestamp
+    @Column(updatable = false)
     private Timestamp creationTime;
 
     // 마지막 업데이트 시간
     @UpdateTimestamp
+    @Column(insertable = false)
     private Timestamp lastModifiedTime;
 }
