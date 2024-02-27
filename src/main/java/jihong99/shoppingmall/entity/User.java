@@ -4,16 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jihong99.shoppingmall.entity.base.BaseEntity;
+import jihong99.shoppingmall.entity.enums.Tier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 
@@ -22,7 +21,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends BaseEntity {
 
     // 회원 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,13 +85,5 @@ public class User {
     @Column(updatable = false)
     private LocalDate registrationDate;
 
-    // 생성 시간
-    @CreationTimestamp
-    @Column(updatable = false)
-    private Timestamp creationTime;
 
-    // 마지막 업데이트 시간
-    @UpdateTimestamp
-    @Column(insertable = false)
-    private Timestamp lastModifiedTime;
 }
