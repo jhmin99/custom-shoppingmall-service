@@ -1,19 +1,15 @@
 package jihong99.shoppingmall.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter @Setter
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -23,12 +19,30 @@ public class Image extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;
 
+    // 상품 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    // 리뷰 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private Review review;
+
+    // 이벤트 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
+
+    // 상품문의 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "item_inquiry_id")
+    private ItemInquiry itemInquiry;
+
     // 이미지 이름
-    @NotNull
     private String name;
 
     // 이미지 경로
-    @NotNull
     private String url;
 
     // 이미지 설명

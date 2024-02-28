@@ -1,19 +1,15 @@
 package jihong99.shoppingmall.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter @Setter
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -24,24 +20,19 @@ public class Item extends BaseEntity {
     private Long itemId;
 
     // 상품 이름
-    @NotNull
     private String name;
 
     // 상품 가격
-    @NotNull
     private Integer price;
 
     // 재고
-    @NotNull
     private Integer inventory;
 
     // 키워드
-    @NotNull
     private String keyword;
 
     // 등록 날짜
     @CreatedDate
-    @Column(updatable = false)
     private LocalDate registrationDate;
 
 }

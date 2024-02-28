@@ -1,21 +1,16 @@
 package jihong99.shoppingmall.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter @Setter
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -25,14 +20,20 @@ public class Review extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
+    // 회원 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // 상품 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
     // 별점
-    @NotNull
-    @Min(value = 0 , message = "별점은 0보다 작을 수 없습니다")
-    @Max(value = 5, message = "별점은 5보다 클 수 없습니다")
     private Integer rating;
 
     // 리뷰 제목
-    @NotNull
     private String title;
 
     // 리뷰 내용
@@ -46,7 +47,6 @@ public class Review extends BaseEntity {
     private Integer characterCount;
 
     // 사진 첨부 여부
-    @NotNull
     private Boolean hasPhoto;
 
     // 등록 날짜

@@ -1,17 +1,11 @@
 package jihong99.shoppingmall.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Orders extends BaseEntity {
@@ -19,4 +13,15 @@ public class Orders extends BaseEntity {
     // 주문 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
+
+    // 회원 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // 결제 번호 (fk)
+    @OneToOne
+    @JoinColumn(name = "payment_id", unique = true)
+    private Payment payment;
+
 }

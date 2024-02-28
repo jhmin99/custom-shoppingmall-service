@@ -1,18 +1,11 @@
 package jihong99.shoppingmall.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem extends BaseEntity {
@@ -21,6 +14,16 @@ public class CartItem extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartItemId;
 
+    // 상품 번호 (fk)
+    @OneToOne
+    @JoinColumn(name = "item_id", unique = true)
+    private Item item;
+
+    // 장바구니 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+
     /**
      * 수량
      * default : 1
@@ -28,7 +31,6 @@ public class CartItem extends BaseEntity {
     private Integer quantity;
 
     // 가격
-    @NotNull
     private Long price;
 
 }
