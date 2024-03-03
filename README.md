@@ -1,5 +1,11 @@
-# J-Hong shop
+# HongShopping
 여러 쇼핑몰들이 입점 가능하며 검색 기능, 카테고리 분류, 가격 비교 등의 편의 기능을 제공합니다   
+
+## Main Function
+
+## How To Start
+
+## Project Inforamtion
 
 
 ## 프로젝트 목표
@@ -16,7 +22,7 @@
 |---|-----|---|
 |- 코드 작성 <br> - 단위 테스트 <br> - 기능 테스트 <br> - 코드, API 문서화 <br> - CI 구축|- 기능 테스트 <br> - 부하 테스트 <br> - 보안 테스트 <br> - 로깅 및 모니터링 <br> - 배포 준비|- CD 구축 <br> - 성능 모니터링 <br> - 로깅 및 모니터링 <br> - 업데이트 및 유지보수|
 
-## [고객 요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EA%B3%A0%EA%B0%9D-%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+## [요구사항](https://github.com/jhmin99/shoppingmall/wiki#%EA%B3%A0%EA%B0%9D-%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
 
 ## [요구사항 분석 및 구체화](https://github.com/jhmin99/shoppingmall/wiki#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD-%EB%B6%84%EC%84%9D-%EB%B0%8F-%EA%B5%AC%EC%B2%B4%ED%99%94)
 
