@@ -82,5 +82,5 @@
 ## 🚀 How To Start
 
 ## 🚀 Project Inforamtion
-[wiki 바로가기](https://github.com/jhmin99/shoppingmall/wiki)
+:octocat: [wiki 바로가기](https://github.com/jhmin99/shoppingmall/wiki)
 
