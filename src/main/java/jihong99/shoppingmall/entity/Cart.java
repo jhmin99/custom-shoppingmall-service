@@ -14,10 +14,16 @@ public class Cart extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
+    // 카테고리 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     /**
      * 예상 총 금액
      * default : 0
      */
     private Long estimatedTotalPrice;
+
 
 }
