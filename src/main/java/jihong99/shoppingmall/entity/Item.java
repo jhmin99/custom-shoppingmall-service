@@ -19,6 +19,11 @@ public class Item extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemId;
 
+    // 카테고리 번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     // 상품 이름
     private String name;
 
