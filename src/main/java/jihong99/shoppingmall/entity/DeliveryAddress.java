@@ -25,6 +25,9 @@ public class DeliveryAddress extends BaseEntity {
     // 수령인 핸드폰 번호
     private String phoneNumber;
 
+    // 수령인 우편번호
+    private Integer zipCode;
+
     // 수령인 주소
     private String address;
 
