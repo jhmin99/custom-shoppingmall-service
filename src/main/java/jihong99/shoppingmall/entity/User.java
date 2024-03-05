@@ -30,7 +30,8 @@ public class User extends BaseEntity {
 
     // 회원 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "user_id")
+    private Long id;
 
     // 장바구니 번호 (fk)
     @OneToOne
@@ -43,7 +44,7 @@ public class User extends BaseEntity {
     private WishList wishList;
 
     // 아이디
-    private String id;
+    private String identification;
 
     // 비밀번호
     private String password;
@@ -80,5 +81,34 @@ public class User extends BaseEntity {
     @CreatedDate
     private LocalDate registrationDate;
 
+    // 장바구니 생성
+    public void createCart(Cart cart){
+        this.cart = cart;
+    }
+
+    // 찜 생성
+    public void createWishList(WishList wishList){
+        this.wishList = wishList;
+    }
+
+    // 핸드폰 번호 수정
+    public void updatePhoneNumber(String phoneNumber){
+        this.phoneNumber = phoneNumber;
+    }
+
+    // 포인트 업데이트
+    public void updatePoint(Integer point){
+        this.point = point;
+    }
+
+    // 등급 업데이트
+    public void updateTier(Tier tier){
+        this.tier = tier;
+    }
+
+    // 다음 등급까지 남은 금액 업데이트
+    public void updateAmountToNextTier(Integer amountToNextTier){
+        this.amountToNextTier = amountToNextTier;
+    }
 
 }
