@@ -15,7 +15,7 @@ public class DeliveryAddress extends BaseEntity {
     private Long deliveryAddressId;
 
     // 회원 번호
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

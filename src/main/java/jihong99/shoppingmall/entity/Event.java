@@ -20,7 +20,7 @@ public class Event extends BaseEntity {
     private Long eventId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

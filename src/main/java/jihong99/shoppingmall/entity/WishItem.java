@@ -15,12 +15,12 @@ public class WishItem extends BaseEntity {
     private Long wishItemId;
 
     // 상품 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", unique = true)
     private Item item;
 
     // 찜 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;
 }

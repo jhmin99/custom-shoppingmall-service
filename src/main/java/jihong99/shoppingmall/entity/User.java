@@ -34,12 +34,12 @@ public class User extends BaseEntity {
     private Long id;
 
     // 장바구니 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
     // 찜 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;
 

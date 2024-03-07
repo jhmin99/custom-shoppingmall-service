@@ -22,7 +22,7 @@ public class Payment extends BaseEntity {
     private Long paymentId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

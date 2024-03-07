@@ -21,12 +21,12 @@ public class ItemInquiry extends BaseEntity {
     private Long itemInquiryId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     // 상품 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 

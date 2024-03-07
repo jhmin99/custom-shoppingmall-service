@@ -15,12 +15,12 @@ public class UserAlarm extends BaseEntity {
     private Long userAlarmId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     // 알림 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alarm_id")
     private Alarm alarm;
 
