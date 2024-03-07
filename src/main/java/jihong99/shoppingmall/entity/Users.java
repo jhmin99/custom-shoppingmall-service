@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(
-        name = "User",
+        name = "Users",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "UniqueCartAndWishList",
@@ -26,7 +26,7 @@ import java.time.LocalDate;
                 )
         }
 )
-public class User extends BaseEntity {
+public class Users extends BaseEntity {
 
     // 회원 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

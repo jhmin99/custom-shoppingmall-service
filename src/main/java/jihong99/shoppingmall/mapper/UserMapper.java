@@ -1,13 +1,13 @@
 package jihong99.shoppingmall.mapper;
 
 import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.entity.User;
+import jihong99.shoppingmall.entity.Users;
 
 public class UserMapper {
 
-    public static User mapToUser(SignUpDto signUpDto) {
+    public static Users mapToUser(SignUpDto signUpDto) {
 
-        return User.builder()
+        return Users.builder()
                 .identification(signUpDto.getIdentification())
                 .password(signUpDto.getPassword())
                 .name(signUpDto.getName())

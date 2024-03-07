@@ -22,7 +22,7 @@ public class ItemInventoryAlert extends BaseEntity {
     // 회원 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 상품 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)

@@ -17,7 +17,7 @@ public class UserAlarm extends BaseEntity {
     // 회원 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 알림 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)

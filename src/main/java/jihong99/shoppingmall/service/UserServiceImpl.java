@@ -2,7 +2,7 @@ package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Cart;
-import jihong99.shoppingmall.entity.User;
+import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.WishList;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
@@ -24,30 +24,30 @@ public class UserServiceImpl implements IUserService{
         if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }else{
-            User user = UserMapper.mapToUser(signUpDto);
+            Users users = UserMapper.mapToUser(signUpDto);
             // 회원 생성 시 장바구니 및 찜 함께 생성
-            createCartAndWishList(user);
+            createCartAndWishList(users);
             // 회원 부가정보 추가 생성
-            createAdditionalUserInfo(user);
+            createAdditionalUserInfo(users);
 
-            userRepository.save(user);
+            userRepository.save(users);
         }
 
     }
 
     // 객체 User에 종속되어 있으므로 static은 적합하지 않음
-    private void createAdditionalUserInfo(User user) {
-        user.updatePoint(0);
-        user.updateTier(IRON);
-        user.updateAmountToNextTier(50000);
+    private void createAdditionalUserInfo(Users users) {
+        users.updatePoint(0);
+        users.updateTier(IRON);
+        users.updateAmountToNextTier(50000);
     }
 
-    private void createCartAndWishList(User user) {
+    private void createCartAndWishList(Users users) {
         Cart cart = new Cart();
         WishList wishList = new WishList();
 
-        user.createCart(cart);
-        user.createWishList(wishList);
+        users.createCart(cart);
+        users.createWishList(wishList);
     }
 
     @Override

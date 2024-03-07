@@ -24,7 +24,7 @@ public class Payment extends BaseEntity {
     // 회원 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 결제 수단
     @Enumerated(EnumType.STRING)

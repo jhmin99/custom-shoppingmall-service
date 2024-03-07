@@ -17,7 +17,7 @@ public class DeliveryAddress extends BaseEntity {
     // 회원 번호
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 수령인 이름
     private String name;
