@@ -5,9 +5,9 @@ public interface IUserService {
 
     void signUpAccount(SignUpDto signUpDto);
 
-    boolean isIdentificationVerified(String identification);
+    void checkDuplicateIdentification(String identification);
 
-    boolean checkDuplicateIdentification(String identification);
+    boolean isIdentificationExist(String identification);
 
     boolean matchPassword(String password, String confirmPassword);
 

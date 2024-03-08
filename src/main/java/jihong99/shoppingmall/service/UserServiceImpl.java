@@ -24,7 +24,8 @@ public class UserServiceImpl implements IUserService{
         if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }else{
-            Users users = UserMapper.mapToUser(signUpDto);
+            UserMapper userMapper = new UserMapper();
+            Users users = userMapper.mapToUser(signUpDto);
             // 회원 생성 시 장바구니 및 찜 함께 생성
             createCartAndWishList(users);
             // 회원 부가정보 추가 생성
@@ -51,17 +52,15 @@ public class UserServiceImpl implements IUserService{
     }
 
     @Override
-    public boolean isIdentificationVerified(String identification) {
-        boolean isVerified = false;
-        if(checkDuplicateIdentification(identification)){
+    public void checkDuplicateIdentification(String identification) {
+        if(isIdentificationExist(identification)){
             throw new DuplicateIdentificationException("중복된 아이디가 존재합니다.");
         }
-        isVerified = true;
-        return isVerified;
+
     }
 
     @Override
-    public boolean checkDuplicateIdentification(String identification) {
+    public boolean isIdentificationExist(String identification) {
         return userRepository.findByIdentification(identification).isPresent();
     }
 
