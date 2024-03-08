@@ -5,7 +5,7 @@ import jihong99.shoppingmall.entity.Users;
 
 public class UserMapper {
 
-    public static Users mapToUser(SignUpDto signUpDto) {
+    public Users mapToUser(SignUpDto signUpDto) {
 
         return Users.builder()
                 .identification(signUpDto.getIdentification())
