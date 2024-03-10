@@ -11,6 +11,8 @@ import jihong99.shoppingmall.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeParseException;
+
 import static jihong99.shoppingmall.entity.enums.Tier.*;
 
 @Service
@@ -25,13 +27,18 @@ public class UserServiceImpl implements IUserService{
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }else{
             UserMapper userMapper = new UserMapper();
-            Users users = userMapper.mapToUser(signUpDto);
-            // 회원 생성 시 장바구니 및 찜 함께 생성
-            createCartAndWishList(users);
-            // 회원 부가정보 추가 생성
-            createAdditionalUserInfo(users);
+            try{
+                Users users = userMapper.mapToUser(signUpDto);
+                // 회원 생성 시 장바구니 및 찜 함께 생성
+                createCartAndWishList(users);
+                // 회원 부가정보 추가 생성
+                createAdditionalUserInfo(users);
 
-            userRepository.save(users);
+                userRepository.save(users);
+            }catch (DateTimeParseException e){
+                throw new DateTimeParseException("생년월일이 올바르지 않습니다.", signUpDto.getBirthDate(),
+                        e.getErrorIndex());
+            }
         }
 
     }

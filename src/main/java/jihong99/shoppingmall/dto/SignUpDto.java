@@ -4,11 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
 
 @Data
+@AllArgsConstructor
 public class SignUpDto {
 
     /**
@@ -43,7 +44,8 @@ public class SignUpDto {
 
     // 생년월일
     @NotNull(message = "생년월일은 필수 항목입니다.")
-    private LocalDate birthDate;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "생년월일은 xxxx-xx-xx 형식이어야 합니다.")
+    private String birthDate;
 
     // 핸드폰 번호
     @NotNull(message = "핸드폰 번호는 필수 항목입니다.")

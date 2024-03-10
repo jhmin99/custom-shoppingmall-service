@@ -14,4 +14,6 @@ public class UserConstants {
     public static final String  STATUS_400 = "400";
     public static final String  MESSAGE_400_duplicatedId = "중복된 아이디가 존재합니다.";
     public static final String  MESSAGE_400_MissMatchPw = "비밀번호가 일치하지 않습니다.";
+    public static final String  MESSAGE_400_WrongBirthDate = "생년월일이 올바르지 않습니다.";
+
 }

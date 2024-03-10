@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.format.DateTimeParseException;
+
 @RestController
 @Validated
 @RequiredArgsConstructor
@@ -83,7 +85,11 @@ public class UserController {
      *  내용 : 비밀번호 불일치
      *  응답코드 : 400
      *
-     *  3. Exception (GolbalExceptionHandler로 처리)
+     *  3. DateTimeParseException
+     *  내용 : 생년월일 String -> LocalDate 변환 불가
+     *  응답코드 : 400
+     *
+     *  4. Exception (GolbalExceptionHandler로 처리)
      *  내용 : 내부 서버 에러 발생
      *  응답코드 : 500
      */
@@ -99,6 +105,10 @@ public class UserController {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_MissMatchPw));
+        }catch (DateTimeParseException e){ // 생년월일 String -> LocalDate 변환 불가
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_WrongBirthDate));
         }
     }
 
