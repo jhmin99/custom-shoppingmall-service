@@ -22,7 +22,11 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-
+				'**/ShoppingmallApplication.*',
+				'**/entity/base/BaseEntity.*',
+				'**/entity/enums/*',
+				'**/constants/*',
+				'**/config/*'
 			])
 		}))
 	}
@@ -45,6 +49,11 @@ jacocoTestCoverageVerification {
 			element = 'CLASS' // 커버리지 적용 단위
 
 			excludes = [
+					'**/ShoppingmallApplication.*',
+					'**/entity/base/BaseEntity.*',
+					'**/entity/enums/*',
+					'**/constants/*',
+					'**/config/*'
 			]
 
 			/**
