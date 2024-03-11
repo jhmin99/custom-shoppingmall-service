@@ -7,9 +7,4 @@ public interface IUserService {
 
     void checkDuplicateIdentification(String identification);
 
-    boolean isIdentificationExist(String identification);
-
-    boolean matchPassword(String password, String confirmPassword);
-
-
 }
