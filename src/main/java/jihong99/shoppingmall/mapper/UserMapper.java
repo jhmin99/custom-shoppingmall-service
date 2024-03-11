@@ -2,7 +2,8 @@ package jihong99.shoppingmall.mapper;
 
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.utils.BirthDateParser;
+
+import java.time.LocalDate;
 
 
 public class UserMapper {
@@ -11,7 +12,7 @@ public class UserMapper {
                 .identification(signUpDto.getIdentification())
                 .password(signUpDto.getPassword())
                 .name(signUpDto.getName())
-                .birthDate(BirthDateParser.birthDateStrToLocalDate(signUpDto.getBirthDate()))
+                .birthDate(LocalDate.parse(signUpDto.getBirthDate()))
                 .phoneNumber(signUpDto.getPhoneNumber())
                 .build();
     }
