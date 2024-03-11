@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,28 +30,23 @@ public class UserController {
     private final IUserService iuserService;
 
     /**
-     * 아이디 중복 확인
-     * POST 요청을 통해 중복된 아이디인지 확인합니다.
      *
-     * @param signUpDto 회원가입에 필요한 정보를 포함한 DTO 객체
-     * @return ResponseEntity<ResponseDto> 아이디 중복 결과를 포함한 응답 객체
-     *
-     *  success
-     *  응답코드 : 200
-     *  아이디 사용가능 정상 응답
-     *
-     *  exception
-     *  1. MethodArgumentNotValidException (GlobalExceptionHandler로 처리)
-     *  내용 : 유효성 검사 실패 (SignUpDto의 identification 필드만 검사 , groups : {IdentificationValidation.class})
-     *  응답코드 : 400
-     *
-     *  2. DuplcateIdentificationException
-     *  내용 : 중복 아이디 존재
-     *  응답코드 : 400
-     *
-     *  3. Exception (GolbalExceptionHandler로 처리)
-     *  내용 : 내부 서버 에러 발생
-     *  응답코드 : 500
+     * Check Duplicate ID
+     * This endpoint is used to check if the provided ID is already in use.
+     * @param signUpDto DTO object containing necessary information for user registration
+     * @return ResponseEntity<ResponseDto> Response object containing the result of the ID duplication check
+     * @success
+     * Valid response indicating that the ID is available for use
+     * Response Code: 200
+     * @exception MethodArgumentNotValidException
+     * Validation failed (Validating only the identification field of SignUpDto, groups: {IdentificationValidation.class})
+     * Response Code: 400
+     * @exception DuplicateIdentificationException
+     * Duplicate ID exists
+     * Response Code: 400
+     * @exception Exception
+     * Internal server error occurred
+     * Response Code: 500
      */
     @PostMapping("/users/check-id")
     public ResponseEntity<ResponseDto> verifyIdentification(@RequestBody @Validated(IdentificationValidation.class) SignUpDto signUpDto) {
@@ -59,40 +55,34 @@ public class UserController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new ResponseDto(UserConstants.STATUS_200, UserConstants.MESSAGE_200_verifiedId));
-        } catch (DuplicateIdentificationException e) { // 중복 아이디 존재
+        } catch (DuplicateIdentificationException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_duplicatedId));
         }
     }
+
     /**
-     * 회원가입
-     * POST 요청을 통해 새로운 사용자를 등록합니다.
-     *
-     * @param signUpDto 회원가입에 필요한 정보를 포함한 DTO 객체
-     * @return ResponseEntity<ResponseDto> 회원가입 결과를 포함한 응답 객체
-     *
-     *  success
-     *  응답코드 : 201
-     *  회원 객체 정상 생성
-     *
-     *  exception
-     *  1. MethodArgumentNotValidException (GlobalExceptionHandler로 처리)
-     *  내용 : 유효성 검사 실패
-     *  응답코드 : 400
-     *
-     *  2. PasswordMismatchExcetpion
-     *  내용 : 비밀번호 불일치
-     *  응답코드 : 400
-     *
-     *  3. DateTimeParseException
-     *  내용 : 생년월일 String -> LocalDate 변환 불가
-     *  응답코드 : 400
-     *
-     *  4. Exception (GolbalExceptionHandler로 처리)
-     *  내용 : 내부 서버 에러 발생
-     *  응답코드 : 500
-     */
+     * User Registration
+     * Registers a new user via a POST request.
+     * @param signUpDto DTO object containing necessary information for user registration
+     * @return ResponseEntity<ResponseDto> Response object containing the result of the user registration
+     * @success
+     * User object successfully created
+     * Response Code: 201
+     * @exception MethodArgumentNotValidException
+     * Validation failed
+     * Response Code: 400
+     * @exception PasswordMismatchException
+     * Password mismatch
+     * Response Code: 400
+     * @exception DateTimeParseException
+     * Unable to convert the birthdate string to LocalDate
+     * Response Code: 400
+     * @exception Exception
+     * Internal server error occurred
+     * Response Code: 500
+     **/
     @PostMapping("/users")
     public ResponseEntity<ResponseDto> signUp(@RequestBody @Valid SignUpDto signUpDto){
 
@@ -101,11 +91,11 @@ public class UserController {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(new ResponseDto(UserConstants.STATUS_201, UserConstants.MESSAGE_201_createUser));
-        }catch(PasswordMismatchException e) { // 비밀번호 불일치
+        }catch(PasswordMismatchException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_MissMatchPw));
-        }catch (DateTimeParseException e){ // 생년월일 String -> LocalDate 변환 불가
+        }catch (DateTimeParseException e){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_WrongBirthDate));

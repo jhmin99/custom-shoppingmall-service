@@ -1,15 +1,15 @@
 package jihong99.shoppingmall.mapper;
-
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Users;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.time.format.DateTimeParseException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
+    /**
+     * Tests the mapping of a SignUpDto to a Users entity when the input data is valid.
+     */
     @Test
     public void mapToUserSuccess(){
         // given
@@ -30,7 +30,9 @@ class UserMapperTest {
         Assertions.assertThat(mappedUser.getPhoneNumber()).isEqualTo("01012341234");
     }
 
-
+    /**
+     * Tests the scenario where a DateTimeParseException is thrown when parsing the birth date.
+     */
     @Test
     public void mapToUserBirthDateParseError(){
         // given

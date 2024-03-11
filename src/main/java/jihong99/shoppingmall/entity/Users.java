@@ -9,11 +9,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
-
-@Entity
-@Getter @Builder
-@AllArgsConstructor @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "Users",
         uniqueConstraints = {
@@ -26,89 +21,156 @@ import java.time.LocalDate;
                 )
         }
 )
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Users extends BaseEntity {
 
-    // 회원 번호
+    /**
+     * Primary key for the user entity
+     */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
-    // 장바구니 번호 (fk)
+    /**
+     * The cart associated with the user.
+     * It is a foreign key referencing the cart entity.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    // 찜 번호 (fk)
+    /**
+     * The wish list associated with the user.
+     * It is a foreign key referencing the wish list entity.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;
 
-    // 아이디
+    /**
+     * The user's identification.
+     */
     private String identification;
 
-    // 비밀번호
+    /**
+     * The user's password.
+     */
     private String password;
 
-    // 이름
+    /**
+     * The user's name.
+     */
     private String name;
 
-    // 생년월일
+    /**
+     * The user's date of birth.
+     */
     private LocalDate birthDate;
 
-    // 핸드폰 번호
+    /**
+     * The user's phone number.
+     */
     private String phoneNumber;
 
     /**
-     * 포인트
-     * default : 0
+     * The user's points.
+     * Default value: 0
      */
     private Integer point;
 
     /**
-     * 등급
-     * default : IRON
+     * The user's tier.
+     * Default value: IRON
      */
     @Enumerated(EnumType.STRING)
     private Tier tier;
 
     /**
-     * 다음 등급까지 남은 금액
-     * default : 50000
+     * The remaining amount until the next tier.
+     * Default value: 50000
      */
     private Integer amountToNextTier;
 
-    // 등록 날짜
+    /**
+     * The registration date of the user.
+     */
     @CreatedDate
     private LocalDate registrationDate;
 
-    // 장바구니 생성
-    public void createCart(Cart cart){
+
+    /**
+     * Constructs a new user with the provided information.
+     *
+     * @param identification The user's identification
+     * @param password The user's password
+     * @param name The user's name
+     * @param birthDate The user's birth date
+     * @param phoneNumber The user's phone number
+     */
+    @Builder
+    public Users(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
+        this.identification = identification;
+        this.password = password;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
+
+    }
+
+    /**
+     * Updates the user's shopping cart.
+     *
+     * @param cart The new shopping cart to be associated with the user
+     */
+    public void updateCart(Cart cart){
         this.cart = cart;
     }
 
-    // 찜 생성
-    public void createWishList(WishList wishList){
+    /**
+     * Updates the user's wishlist.
+     *
+     * @param wishList The new wishlist to be associated with the user
+     */
+    public void updateWishList(WishList wishList){
         this.wishList = wishList;
     }
 
-    // 핸드폰 번호 수정
+    /**
+     * Updates the user's phone number.
+     *
+     * @param phoneNumber The new phone number to be associated with the user
+     */
     public void updatePhoneNumber(String phoneNumber){
         this.phoneNumber = phoneNumber;
     }
 
-    // 포인트 업데이트
+    /**
+     * Updates the user's point balance.
+     *
+     * @param point The new point balance to be associated with the user
+     */
     public void updatePoint(Integer point){
         this.point = point;
     }
 
-    // 등급 업데이트
+    /**
+     * Updates the user's tier.
+     *
+     * @param tier The new tier to be associated with the user
+     */
     public void updateTier(Tier tier){
         this.tier = tier;
     }
 
-    // 다음 등급까지 남은 금액 업데이트
+    /**
+     * Updates the amount of money remaining until the next tier.
+     *
+     * @param amountToNextTier The new amount to be associated with the user
+     */
     public void updateAmountToNextTier(Integer amountToNextTier){
         this.amountToNextTier = amountToNextTier;
     }
-
 }
