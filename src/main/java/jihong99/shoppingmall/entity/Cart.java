@@ -30,7 +30,7 @@ public class Cart extends BaseEntity {
      *
      * @param estimatedTotalPrice The estimated total price of items in the cart
      */
-    @Builder
+
     public Cart(Long estimatedTotalPrice){
         this.estimatedTotalPrice = estimatedTotalPrice;
     }}

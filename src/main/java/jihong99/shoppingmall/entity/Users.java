@@ -117,7 +117,6 @@ public class Users extends BaseEntity {
         this.name = name;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
-
     }
 
     /**
