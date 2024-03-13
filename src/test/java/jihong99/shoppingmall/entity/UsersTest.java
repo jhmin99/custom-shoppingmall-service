@@ -1,5 +1,4 @@
 package jihong99.shoppingmall.entity;
-
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -9,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.time.LocalDate;
-
 import static jihong99.shoppingmall.entity.enums.Tier.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -44,7 +41,7 @@ class UsersTest {
      * Test for creating a user using the builder pattern
      */
     @Test
-    public void userBuilderTest(){
+    public void userBuilder_Success(){
         // given
         // when
         // then
@@ -57,19 +54,18 @@ class UsersTest {
         assertThat(users.getBirthDate().getDayOfMonth()).isEqualTo(30);
         assertThat(users.getPhoneNumber()).isEqualTo("01012341234");
 
-        LOGGER.info(users.toString());
     }
 
     /**
      * Test for creating a user and saving it using jpa
      */
     @Test
-    public void userCreationTest(){
+    public void userCreation_Success(){
         // given
         // when
         Users savedUser = userRepository.save(users);
         // then
-        assertThat(savedUser.getRegistrationDate()).isNotNull();
+        assertThat(savedUser.getRegistrationDate()).isEqualTo(LocalDate.now());
         LOGGER.info(savedUser.getRegistrationDate().toString());
 
         assertThat(savedUser.getCreationTime()).isNotNull();
@@ -83,7 +79,7 @@ class UsersTest {
      * Test for updating cart method
      */
     @Test
-    public void updateCartTest(){
+    public void updateCart_Success(){
         // given
         Cart cart = new Cart(0L);
         // when
@@ -97,7 +93,7 @@ class UsersTest {
      * Test for updating wish list method
      */
     @Test
-    public void updateWishListTest(){
+    public void updateWishList_Success(){
         // given
         WishList wishList = new WishList();
         // when
@@ -110,20 +106,19 @@ class UsersTest {
      * Test for updating phone number method
      */
     @Test
-    public void updatePhoneNumberTest(){
+    public void updatePhoneNumber_Success(){
         // given
         // when
         users.updatePhoneNumber("123412340000");
         // then
         assertThat(users.getPhoneNumber()).isEqualTo("123412340000");
-
     }
 
     /**
      * Test for updating point method
      */
     @Test
-    public void updatePointTest(){
+    public void updatePoint_Success(){
         // given
         // when
         users.updatePoint(0);
@@ -135,7 +130,7 @@ class UsersTest {
      * Test for updating tier method
      */
     @Test
-    public void updateTierTest(){
+    public void updateTier_Success(){
         // given
         // when
         users.updateTier(IRON);
@@ -147,7 +142,7 @@ class UsersTest {
      * Test for updating amount to next tier test
      */
     @Test
-    public void updateAmountToNextTierTest(){
+    public void updateAmountToNextTier_Success(){
         // given
         // when
         users.updateAmountToNextTier(50000);

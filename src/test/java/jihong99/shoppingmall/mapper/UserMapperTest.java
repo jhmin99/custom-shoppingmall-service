@@ -11,7 +11,7 @@ class UserMapperTest {
      * Tests the mapping of a SignUpDto to a Users entity when the input data is valid.
      */
     @Test
-    public void mapToUserSuccess(){
+    public void mapToUser_Success(){
         // given
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
@@ -34,7 +34,7 @@ class UserMapperTest {
      * Tests the scenario where a DateTimeParseException is thrown when parsing the birth date.
      */
     @Test
-    public void mapToUserBirthDateParseError(){
+    public void mapToUser_BirthDateParseError(){
         // given
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-15-30", "01012341234");
