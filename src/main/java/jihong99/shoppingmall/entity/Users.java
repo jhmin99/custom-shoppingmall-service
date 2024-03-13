@@ -38,7 +38,7 @@ public class Users extends BaseEntity {
      * The cart associated with the user.
      * It is a foreign key referencing the cart entity.
      */
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
@@ -46,7 +46,7 @@ public class Users extends BaseEntity {
      * The wish list associated with the user.
      * It is a foreign key referencing the wish list entity.
      */
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;
 

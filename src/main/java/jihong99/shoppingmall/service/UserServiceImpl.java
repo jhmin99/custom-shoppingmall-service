@@ -1,4 +1,5 @@
 package jihong99.shoppingmall.service;
+import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Cart;
 import jihong99.shoppingmall.entity.Users;
@@ -6,7 +7,9 @@ import jihong99.shoppingmall.entity.WishList;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.mapper.UserMapper;
+import jihong99.shoppingmall.repository.CartRepository;
 import jihong99.shoppingmall.repository.UserRepository;
+import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.format.DateTimeParseException;
@@ -17,6 +20,8 @@ import static jihong99.shoppingmall.entity.enums.Tier.*;
 public class UserServiceImpl implements IUserService{
 
     private UserRepository userRepository;
+    private CartRepository cartRepository;
+    private WishListRepository wishListRepository;
 
     /**
      * Register a new user.
@@ -32,6 +37,7 @@ public class UserServiceImpl implements IUserService{
      * @throws DateTimeParseException Thrown if the birth date format is invalid
      */
     @Override
+    @Transactional
     public void signUpAccount(SignUpDto signUpDto) {
         if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
             throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
@@ -86,6 +92,8 @@ public class UserServiceImpl implements IUserService{
         Cart cart = new Cart(0L);
         WishList wishList = new WishList();
 
+        cartRepository.save(cart);
+        wishListRepository.save(wishList);
         users.updateCart(cart);
         users.updateWishList(wishList);
     }
