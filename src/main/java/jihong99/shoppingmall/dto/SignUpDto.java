@@ -49,7 +49,6 @@ public class SignUpDto {
 
     // 핸드폰 번호
     @NotNull(message = "핸드폰 번호는 필수 항목입니다.")
+    @Pattern(regexp = "\\d{11}", message = "핸드폰번호는 숫자로만 이루어진 11자리 문자열이어야 합니다.")
     private String phoneNumber;
-
-
 }
