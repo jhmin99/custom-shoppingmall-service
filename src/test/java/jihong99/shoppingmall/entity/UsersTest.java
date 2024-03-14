@@ -53,6 +53,13 @@ class UsersTest {
         assertThat(users.getBirthDate().getDayOfMonth()).isEqualTo(30);
         assertThat(users.getPhoneNumber()).isEqualTo("01012341234");
 
+        LOGGER.info(Users.builder()
+                .identification("abc1233")
+                .password("abcd1233!@")
+                .name("민지홍")
+                .birthDate(LocalDate.parse("1999-12-30"))
+                .phoneNumber("01012341234")
+                .build().toString());
     }
 
     /**
