@@ -172,4 +172,17 @@ public class Users extends BaseEntity {
     public void updateAmountToNextTier(Integer amountToNextTier){
         this.amountToNextTier = amountToNextTier;
     }
+
+    /**
+     * @return A string that contains identification, name, birthDate, and phoneNumber.
+     */
+    @Override
+    public String toString() {
+        return "Users{" +
+                "identification='" + identification + '\'' +
+                ", name='" + name + '\'' +
+                ", birthDate=" + birthDate +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }
