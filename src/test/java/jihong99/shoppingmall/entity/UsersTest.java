@@ -46,14 +46,21 @@ class UsersTest {
         // when
         // then
         assertThat(users.getId()).isNull();
-        assertThat(users.getIdentification()).isEqualTo("abc12`33");
+        assertThat(users.getIdentification()).isEqualTo("abc1233");
         assertThat(users.getPassword()).isEqualTo("abcd1233!@");
         assertThat(users.getName()).isEqualTo("민지홍");
         assertThat(users.getBirthDate().getYear()).isEqualTo(1999);
         assertThat(users.getBirthDate().getMonthValue()).isEqualTo(12);
         assertThat(users.getBirthDate().getDayOfMonth()).isEqualTo(30);
         assertThat(users.getPhoneNumber()).isEqualTo("01012341234");
-        LOGGER.info(Users.builder().toString());
+
+        LOGGER.info(Users.builder()
+                .identification("abc1233")
+                .password("abcd1233!@")
+                .name("민지홍")
+                .birthDate(LocalDate.parse("1999-12-30"))
+                .phoneNumber("01012341234")
+                .build().toString());
     }
 
     /**
