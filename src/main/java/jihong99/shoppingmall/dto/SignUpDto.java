@@ -5,10 +5,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 
-@Data
+@Getter
 @AllArgsConstructor
 public class SignUpDto {
 
