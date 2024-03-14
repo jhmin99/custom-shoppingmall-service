@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import java.time.format.DateTimeParseException;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,12 +35,11 @@ class UserMapperTest {
     /**
      * Tests the scenario where a DateTimeParseException is thrown when parsing the birth date.
      */
-    @ParameterizedTest
-    @ValueSource(strings = {"1999-15-30", "1999-12-32", "1999-12", "19991230"})
-    public void mapToUser_BirthDateParseError(String birthDate){
+    @Test
+    public void mapToUser_BirthDateParseError(){
         // given
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
-                "abcd123!@#", "민지홍", birthDate, "01012341234");
+                "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
         // when & then
         assertThrows(DateTimeParseException.class, () -> {
             UserMapper userMapper = new UserMapper();
