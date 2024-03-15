@@ -21,7 +21,6 @@ public class SignUpDto {
      */
     @NotNull(message = "아이디는 필수 항목입니다.", groups = {IdentificationValidation.class, SignUpValidation.class})
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,10}$", message = "아이디는 영문, 숫자로만 이루어지며, 영문, 숫자를 모두 포함하는 6-10자리 문자열입니다.", groups = {IdentificationValidation.class, SignUpValidation.class})
-    @Size(min = 6, max = 10, message = "아이디는 6-10자리 문자열 입니다.", groups = {IdentificationValidation.class, SignUpValidation.class})
     private String identification;
 
     /**
@@ -32,7 +31,6 @@ public class SignUpDto {
      */
     @NotNull(message = "비밀번호는 필수 항목입니다.", groups = {SignUpValidation.class})
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*])[a-zA-Z\\d!@#$%^&*]{8,15}$", message = "비밀번호는 영문, 숫자, 특수문자를 모두 포함하는 8-15자리 문자열입니다. ( 특수문자는 !@#$%^&*만 유효 )", groups = {SignUpValidation.class})
-    @Size(min = 8, max = 15, message = "비밀번호는 8-15자리 문자열 입니다.", groups = {SignUpValidation.class})
     private String password;
 
     // 비밀번호와 일치하는지 확인
