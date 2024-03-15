@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.controller;
 
-import jakarta.validation.Valid;
 import jihong99.shoppingmall.constants.UserConstants;
 import jihong99.shoppingmall.dto.ResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
@@ -8,6 +7,7 @@ import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
+import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,7 +71,7 @@ public class UserController {
      * User object successfully created
      * Response Code: 201
      * @exception MethodArgumentNotValidException
-     * Validation failed
+     * Validation failed (groups: {SignUpValidation.class})
      * Response Code: 400
      * @exception PasswordMismatchException
      * Password mismatch
@@ -84,7 +84,7 @@ public class UserController {
      * Response Code: 500
      **/
     @PostMapping("/users")
-    public ResponseEntity<ResponseDto> signUp(@RequestBody @Valid SignUpDto signUpDto){
+    public ResponseEntity<ResponseDto> signUp(@RequestBody @Validated(SignUpValidation.class) SignUpDto signUpDto){
 
         try {
             iuserService.signUpAccount(signUpDto);
