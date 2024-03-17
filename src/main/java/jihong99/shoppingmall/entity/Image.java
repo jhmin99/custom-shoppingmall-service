@@ -20,22 +20,22 @@ public class Image extends BaseEntity {
     private Long imageId;
 
     // 상품 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
     // 리뷰 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
 
     // 이벤트 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
     // 상품문의 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_inquiry_id")
     private ItemInquiry itemInquiry;
 

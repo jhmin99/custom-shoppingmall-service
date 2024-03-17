@@ -15,12 +15,12 @@ public class CartItem extends BaseEntity {
     private Long cartItemId;
 
     // 상품 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", unique = true)
     private Item item;
 
     // 장바구니 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 

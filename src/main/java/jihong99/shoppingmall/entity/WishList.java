@@ -8,12 +8,14 @@ import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
 @Entity
-@Getter @Builder
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class WishList extends BaseEntity {
 
-    // 찜 번호
+    /**
+     * Primary key for the wish list entity
+     */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wishListId;
+
 }

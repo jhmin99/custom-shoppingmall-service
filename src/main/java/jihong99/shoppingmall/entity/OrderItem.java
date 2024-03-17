@@ -16,12 +16,12 @@ public class OrderItem extends BaseEntity {
     private Long orderItemId;
 
     // 주문 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Orders orders;
 
     // 상품 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 

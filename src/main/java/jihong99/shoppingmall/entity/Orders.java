@@ -15,12 +15,12 @@ public class Orders extends BaseEntity {
     private Long orderId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 결제 번호 (fk)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", unique = true)
     private Payment payment;
 

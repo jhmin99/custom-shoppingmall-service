@@ -15,12 +15,12 @@ public class UserCoupon extends BaseEntity {
     private Long userCouponId;
 
     // 회원 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     // 쿠폰 번호 (fk)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
