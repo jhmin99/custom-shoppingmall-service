@@ -86,7 +86,7 @@ class UserServiceImplTest {
         PasswordMismatchException passwordMismatchException = assertThrows(PasswordMismatchException.class, () -> {
             userService.signUpAccount(signUpDto);
         });
-        assertThat(passwordMismatchException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+        assertThat(passwordMismatchException.getMessage()).isEqualTo("Passwords do not match.");
     }
 
     /**
@@ -103,7 +103,7 @@ class UserServiceImplTest {
         DateTimeParseException dateTimeParseException = assertThrows(DateTimeParseException.class, () -> {
             userService.signUpAccount(signUpDto);
         });
-        assertThat(dateTimeParseException.getMessage()).isEqualTo("생년월일이 올바르지 않습니다.");
+        assertThat(dateTimeParseException.getMessage()).isEqualTo("Invalid birth date.");
     }
 
     /**
@@ -155,7 +155,7 @@ class UserServiceImplTest {
         DuplicateIdentificationException duplicateIdentificationException = assertThrows(DuplicateIdentificationException.class, () -> {
             userService.checkDuplicateIdentification(signUpDto.getIdentification());
         });
-        assertThat(duplicateIdentificationException.getMessage()).isEqualTo("중복된 아이디가 존재합니다.");
+        assertThat(duplicateIdentificationException.getMessage()).isEqualTo("The ID already exists.");
     }
 
 }

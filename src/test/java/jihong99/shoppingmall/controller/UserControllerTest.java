@@ -95,7 +95,7 @@ class UserControllerTest {
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isBadRequest())
                         .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                        .andExpect(jsonPath("$.identification").value("아이디는 필수 항목입니다."));
+                        .andExpect(jsonPath("$.identification").value("ID is a required field."));
     }
 
     /**
@@ -115,7 +115,7 @@ class UserControllerTest {
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isBadRequest())
                         .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                        .andExpect(jsonPath("$.identification").value("아이디는 영문, 숫자로만 이루어지며, 영문, 숫자를 모두 포함하는 6-10자리 문자열입니다."));
+                        .andExpect(jsonPath("$.identification").value("ID must consist of alphabets and numbers, containing both, with a length of 6-10 characters."));
     }
 
 
