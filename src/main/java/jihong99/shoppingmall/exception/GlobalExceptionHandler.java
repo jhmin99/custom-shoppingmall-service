@@ -21,7 +21,13 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
+    /**
+     * Handle global exceptions.
+     *
+     * @param exception The exception to be handled.
+     * @param webRequest The web request.
+     * @return The ResponseEntity containing the ErrorResponseDto.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception, WebRequest webRequest) {
         ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
@@ -33,10 +39,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handle MethodArgumentNotValid Exception
+     *
+     * @param exception The exception to be handled.
+     * @param headers The HTTP headers.
+     * @param status The HTTP status code.
+     * @param request The web request.
+     * @return The ResponseEntity containing the ValidationErrors.
+     * Format: { fieldName1 : validationMsg1, fieldName2 : validationMsg2 ...}
+     */
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, String> validationErrors = new HashMap<>();
-        List<ObjectError> validationErrorList = ex.getBindingResult().getAllErrors();
+        List<ObjectError> validationErrorList = exception.getBindingResult().getAllErrors();
 
         validationErrorList.forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
