@@ -40,7 +40,7 @@ public class UserServiceImpl implements IUserService{
     @Transactional
     public void signUpAccount(SignUpDto signUpDto) {
         if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
-            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException("Passwords do not match.");
         }else{
             UserMapper userMapper = new UserMapper();
             try{
@@ -50,7 +50,7 @@ public class UserServiceImpl implements IUserService{
 
                 userRepository.save(users);
             }catch (DateTimeParseException e){
-                throw new DateTimeParseException("생년월일이 올바르지 않습니다.", signUpDto.getBirthDate(),
+                throw new DateTimeParseException("Invalid birth date.", signUpDto.getBirthDate(),
                         e.getErrorIndex());
             }
         }
@@ -69,7 +69,7 @@ public class UserServiceImpl implements IUserService{
     @Override
     public void checkDuplicateIdentification(String identification) {
         if(isIdentificationExist(identification)){
-            throw new DuplicateIdentificationException("중복된 아이디가 존재합니다.");
+            throw new DuplicateIdentificationException("The ID already exists.");
         }
     }
 
