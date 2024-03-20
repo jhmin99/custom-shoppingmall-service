@@ -75,6 +75,25 @@ class UserServiceImplTest {
     }
 
     /**
+     * Test method while signing up a new user account throws DuplicateIdentificationException
+     */
+    @Test
+    @Transactional
+    public void signUpAccount_DuplicateIdentificationException(){
+        // given
+        Users users = Users.builder()
+                .identification("abc123")
+                .build();
+        userRepository.save(users);
+        // when & then
+        SignUpDto signUpDto = new SignUpDto("abc123","abcd123!@#","abcd123!@#",
+                "민지홍","1999-12-30","01012341234");
+        assertThrows(DuplicateIdentificationException.class,()->{
+                    userService.signUpAccount(signUpDto);
+                });
+    }
+
+    /**
      * Test method while signing up a new user account throws PasswordMismatchException
      */
     @Test

@@ -160,6 +160,29 @@ class UserControllerTest {
     }
 
     /**
+     * Tests handling of a bad request when encountering a DuplicateIdentificationException.
+     * @throws Exception if an error occurs during the test.
+     */
+    @Test
+    @Transactional
+    public void signUp_Return_BadRequest_Handles_DuplicateIdentificationException() throws Exception{
+        // given
+        SignUpDto signUpDto1 = new SignUpDto("abc123","abcd123!@#",
+                "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto1);
+        // when & then
+        SignUpDto signUpDto2 = new SignUpDto("abc123","abcd123!@#",
+                "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
+
+        mockMvc.perform(post("/api/users")
+                .contentType("application/json")
+                .content(asJsonString(signUpDto2)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_duplicatedId));
+
+    }
+
+    /**
      * Tests handling of a bad request when encountering a PasswordMismatchException.
      * @throws Exception if an error occurs during the test.
      */
