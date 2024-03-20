@@ -14,10 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeParseException;
 
@@ -73,6 +70,9 @@ public class UserController {
      * @exception MethodArgumentNotValidException
      * Validation failed (groups: {SignUpValidation.class})
      * Response Code: 400
+     * @exception DuplicateIdentificationException
+     * Duplicate ID exists
+     * Response Code: 400
      * @exception PasswordMismatchException
      * Password mismatch
      * Response Code: 400
@@ -91,6 +91,10 @@ public class UserController {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(new ResponseDto(UserConstants.STATUS_201, UserConstants.MESSAGE_201_createUser));
+        }catch (DuplicateIdentificationException e){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_duplicatedId));
         }catch(PasswordMismatchException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -101,6 +105,8 @@ public class UserController {
                     .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_WrongBirthDate));
         }
     }
+
+
 
 
 }

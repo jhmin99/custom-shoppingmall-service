@@ -13,6 +13,8 @@ import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
+
 import static jihong99.shoppingmall.entity.enums.Tier.*;
 
 @Service
@@ -33,13 +35,17 @@ public class UserServiceImpl implements IUserService{
      * </p>
      * @param signUpDto The DTO object containing the necessary information for user registration
      *
+     * @throws DuplicateIdentificationException Thrown if the identification already exists
      * @throws PasswordMismatchException Thrown if the passwords provided do not match
      * @throws DateTimeParseException Thrown if the birth date format is invalid
      */
     @Override
     @Transactional
     public void signUpAccount(SignUpDto signUpDto) {
-        if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
+        Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
+        if(findUser.isPresent()){
+            throw new DuplicateIdentificationException("The ID already exists.");
+        }if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
             throw new PasswordMismatchException("Passwords do not match.");
         }else{
             UserMapper userMapper = new UserMapper();
@@ -72,6 +78,7 @@ public class UserServiceImpl implements IUserService{
             throw new DuplicateIdentificationException("The ID already exists.");
         }
     }
+
 
 
     /**
