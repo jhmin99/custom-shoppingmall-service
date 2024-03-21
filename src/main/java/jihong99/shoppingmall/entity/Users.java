@@ -1,8 +1,10 @@
 package jihong99.shoppingmall.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
-import jihong99.shoppingmall.entity.enums.Tier;
+import jihong99.shoppingmall.entity.enums.Roles;
+import jihong99.shoppingmall.entity.enums.Tiers;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -58,6 +60,7 @@ public class Users extends BaseEntity {
     /**
      * The user's password.
      */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     /**
@@ -86,13 +89,19 @@ public class Users extends BaseEntity {
      * Default value: IRON
      */
     @Enumerated(EnumType.STRING)
-    private Tier tier;
+    private Tiers tier;
 
     /**
      * The remaining amount until the next tier.
      * Default value: 50000
      */
     private Integer amountToNextTier;
+
+    /**
+     * Role: "user"
+     */
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 
     /**
      * The registration date of the user.
@@ -160,15 +169,28 @@ public class Users extends BaseEntity {
      *
      * @param tier The new tier to be associated with the user
      */
-    public void updateTier(Tier tier){
+    public void updateTier(Tiers tier){
         this.tier = tier;
     }
+
+    /**
+     * Updates the user's role.
+     * @param role
+     */
+    public void updateRole(Roles role){ this.role = role;}
+
+    /**
+     * Updates the user's password.
+     * @param password
+     */
+    public void updatePassword(String password){this.password = password;}
 
     /**
      * Updates the amount of money remaining until the next tier.
      *
      * @param amountToNextTier The new amount to be associated with the user
      */
+
     public void updateAmountToNextTier(Integer amountToNextTier){
         this.amountToNextTier = amountToNextTier;
     }
