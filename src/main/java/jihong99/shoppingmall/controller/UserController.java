@@ -1,8 +1,8 @@
 package jihong99.shoppingmall.controller;
-
 import jihong99.shoppingmall.constants.UserConstants;
 import jihong99.shoppingmall.dto.ResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
+import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.service.IUserService;
@@ -106,7 +106,11 @@ public class UserController {
         }
     }
 
-
-
-
+    //test
+    @GetMapping("/users")
+    public ResponseEntity<UserDetailsDto> userDetails(@RequestParam Long id){
+        UserDetailsDto userDetailsDto = iuserService.getUserDetails(id);
+        return ResponseEntity.ok()
+                .body(userDetailsDto);
+    }
 }

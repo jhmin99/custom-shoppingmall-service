@@ -1,6 +1,7 @@
 package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.SignUpDto;
+import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Cart;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.WishList;
@@ -81,6 +82,13 @@ public class UserServiceImpl implements IUserService{
         }
     }
 
+    @Override
+    public UserDetailsDto getUserDetails(Long id) {
+        Users findUser = userRepository.findById(id).get();
+        UserDetailsDto userDetailsDto = new UserDetailsDto(findUser.getIdentification(), findUser.getName());
+        return userDetailsDto;
+    }
+
     /**
      * @param user
      * Generate additional user information
@@ -89,7 +97,7 @@ public class UserServiceImpl implements IUserService{
         user.updatePoint(0);
         user.updateTier(IRON);
         user.updateAmountToNextTier(50000);
-        user.updateRole(Roles.ROLE_USER);
+        user.updateRole(Roles.USER);
     }
 
     /**
@@ -134,4 +142,6 @@ public class UserServiceImpl implements IUserService{
     private boolean matchPassword(String password, String confirmPassword) {
         return password.equals(confirmPassword);
     }
+
+
 }
