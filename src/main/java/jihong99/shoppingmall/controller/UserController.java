@@ -1,5 +1,6 @@
 package jihong99.shoppingmall.controller;
 import jihong99.shoppingmall.constants.UserConstants;
+import jihong99.shoppingmall.dto.LoginDto;
 import jihong99.shoppingmall.dto.ResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.dto.UserDetailsDto;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,6 @@ import java.time.format.DateTimeParseException;
 public class UserController {
 
     private final IUserService iuserService;
-
     /**
      *
      * Check Duplicate ID
@@ -108,9 +109,23 @@ public class UserController {
 
     //test
     @GetMapping("/users")
-    public ResponseEntity<UserDetailsDto> userDetails(@RequestParam Long id){
+    public ResponseEntity<UserDetailsDto> userDetails(@RequestParam(name = "id") Long id){
         UserDetailsDto userDetailsDto = iuserService.getUserDetails(id);
         return ResponseEntity.ok()
                 .body(userDetailsDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseDto> login(@RequestBody LoginDto loginDto){
+        try{
+            iuserService.loginByIdentificationAndPassword(loginDto);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(UserConstants.STATUS_200, "login success"));
+        }catch (BadCredentialsException e){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto(UserConstants.STATUS_400, "login failed"));
+        }
     }
 }

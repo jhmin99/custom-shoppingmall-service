@@ -1,5 +1,6 @@
 package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
+import jihong99.shoppingmall.dto.LoginDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Cart;
@@ -13,6 +14,10 @@ import jihong99.shoppingmall.repository.CartRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.format.DateTimeParseException;
@@ -28,6 +33,7 @@ public class UserServiceImpl implements IUserService{
     private CartRepository cartRepository;
     private WishListRepository wishListRepository;
     private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
 
     /**
      * Register a new user.
@@ -89,6 +95,14 @@ public class UserServiceImpl implements IUserService{
         return userDetailsDto;
     }
 
+    @Override
+    public void loginByIdentificationAndPassword(LoginDto loginDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getIdentification(), loginDto.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
     /**
      * @param user
      * Generate additional user information
@@ -99,6 +113,7 @@ public class UserServiceImpl implements IUserService{
         user.updateAmountToNextTier(50000);
         user.updateRole(Roles.USER);
     }
+
 
     /**
      * @param user
