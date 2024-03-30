@@ -2,6 +2,7 @@ package jihong99.shoppingmall.config.auth;
 import jihong99.shoppingmall.config.auth.filters.CustomCsrfCookieFilter;
 import jihong99.shoppingmall.config.auth.providers.CustomUsernamePwdAuthenticationProvider;
 import jihong99.shoppingmall.repository.UserRepository;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -37,18 +38,23 @@ public class SecurityConfig {
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
-                .securityContext((context) -> context
+                .securityContext(httpSecuritySecurityContextConfigurer -> httpSecuritySecurityContextConfigurer
                         .requireExplicitSave(false))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
-                .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/api/users","/api/users/check-id","/api/login")
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                )
+                .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler)
+                        .ignoringRequestMatchers("/api/users","/api/users/check-id","/api/login") //public API urls
+                        .ignoringRequestMatchers(PathRequest.toH2Console())
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                        .addFilterAfter(new CustomCsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
                 .authorizeHttpRequests(requests -> requests
-                                .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "api/users/**").authenticated()
+                                .requestMatchers(HttpMethod.POST, "api/logout").authenticated()
                                 .requestMatchers("/resources/**").denyAll()
                                 .requestMatchers("/**").permitAll()
                         )
+                .addFilterAfter(new CustomCsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions((frameOptionsConfig -> frameOptionsConfig.disable()))) // access h2 console
                 .httpBasic(withDefaults());
         return http.build();
@@ -64,4 +70,5 @@ public class SecurityConfig {
         CustomUsernamePwdAuthenticationProvider authenticationProvider = new CustomUsernamePwdAuthenticationProvider(userRepository, passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
+
 }
