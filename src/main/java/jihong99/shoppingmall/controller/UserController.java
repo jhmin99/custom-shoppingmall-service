@@ -1,23 +1,25 @@
 package jihong99.shoppingmall.controller;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jihong99.shoppingmall.constants.UserConstants;
-import jihong99.shoppingmall.dto.LoginDto;
-import jihong99.shoppingmall.dto.ResponseDto;
-import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.dto.UserDetailsDto;
+import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.format.DateTimeParseException;
 
 @RestController
@@ -25,7 +27,7 @@ import java.time.format.DateTimeParseException;
 @RequiredArgsConstructor
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
-
+    private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final IUserService iuserService;
     /**
      *
@@ -110,13 +112,21 @@ public class UserController {
     //test
     @GetMapping("/users")
     public ResponseEntity<UserDetailsDto> userDetails(@RequestParam(name = "id") Long id){
+        String authName = SecurityContextHolder.getContext().getAuthentication().getName();
         UserDetailsDto userDetailsDto = iuserService.getUserDetails(id);
-        return ResponseEntity.ok()
-                .body(userDetailsDto);
+        LOGGER.info(authName);
+        LOGGER.info(userDetailsDto.getIdentification());
+        if(authName.equals(userDetailsDto.getIdentification())){
+            return ResponseEntity.ok()
+                    .body(userDetailsDto);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+
+
     @PostMapping("/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<ResponseDto> login(@RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response){
         try{
             iuserService.loginByIdentificationAndPassword(loginDto);
             return ResponseEntity
@@ -128,4 +138,21 @@ public class UserController {
                     .body(new ResponseDto(UserConstants.STATUS_400, "login failed"));
         }
     }
+
+    @PostMapping("/logout")
+    public String logout(){
+        // 현재 사용자의 인증 정보를 가져옴
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LOGGER.info(authentication.toString());
+        // 인증 정보가 있는 경우 로그아웃 처리
+        if (authentication != null) {
+            // 현재 세션을 무효화하여 로그아웃 처리
+            SecurityContextHolder.clearContext();
+            return "로그아웃되었습니다.";
+        } else {
+            // 인증 정보가 없는 경우 로그인되지 않았으므로 에러 메시지 반환
+            return "로그인되어 있지 않습니다.";
+        }
+    }
+
 }
