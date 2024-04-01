@@ -43,18 +43,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 )
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers("/api/users","/api/users/check-id","/api/login") //public API urls
                         .ignoringRequestMatchers(PathRequest.toH2Console())
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
-                .authorizeHttpRequests(requests -> requests
-                                .requestMatchers(HttpMethod.GET, "api/users/**").authenticated()
-                                .requestMatchers(HttpMethod.POST, "api/logout").authenticated()
-                                .requestMatchers("/resources/**").denyAll()
-                                .requestMatchers("/**").permitAll()
-                        )
                 .addFilterAfter(new CustomCsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests(requests -> requests
+                                .requestMatchers(HttpMethod.GET, "api/users").authenticated()
+                                .requestMatchers(HttpMethod.POST, "api/logout").authenticated()
+                                .requestMatchers("api/users", "api/users/check-id", "api/login").permitAll()
+                        )
                 .headers(headers -> headers.frameOptions((frameOptionsConfig -> frameOptionsConfig.disable()))) // access h2 console
                 .httpBasic(withDefaults());
         return http.build();
