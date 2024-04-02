@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CustomCsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
-                                .requestMatchers(HttpMethod.GET, "api/users").authenticated()
+                                .requestMatchers(HttpMethod.GET, "api/users/**").authenticated()
                                 .requestMatchers(HttpMethod.POST, "api/logout").authenticated()
                                 .requestMatchers("api/users", "api/users/check-id", "api/login").permitAll()
                         )
