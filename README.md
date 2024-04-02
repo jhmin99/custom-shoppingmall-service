@@ -3,6 +3,9 @@
 
 ## 🚀 How To Start
 
+## 🚀 Go To Client Repository
+:octocat: [클라이언트 레포지토리 바로가기](https://github.com/jhmin99/HongShopping-Front)
+
 ## 🚀 Project Information
 :octocat: [wiki 바로가기](https://github.com/jhmin99/shoppingmall/wiki)
 
