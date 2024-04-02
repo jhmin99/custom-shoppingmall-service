@@ -111,8 +111,8 @@ public class UserController {
 
     //test
     @GetMapping("/users")
-    public ResponseEntity<UserDetailsDto> userDetails(@RequestParam(name = "id") Long id){
-        String authName = SecurityContextHolder.getContext().getAuthentication().getName();
+    public ResponseEntity<UserDetailsDto> userDetails(Authentication authentication, @RequestParam(name = "id") Long id){
+        String authName = authentication.getName();
         UserDetailsDto userDetailsDto = iuserService.getUserDetails(id);
         LOGGER.info(authName);
         LOGGER.info(userDetailsDto.getIdentification());
