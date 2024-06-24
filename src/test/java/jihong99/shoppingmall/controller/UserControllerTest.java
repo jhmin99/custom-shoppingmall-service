@@ -152,7 +152,7 @@ class UserControllerTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
         // when & then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isCreated())
@@ -174,7 +174,7 @@ class UserControllerTest {
         SignUpDto signUpDto2 = new SignUpDto("abc123","abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                 .contentType("application/json")
                 .content(asJsonString(signUpDto2)))
                 .andExpect(status().isBadRequest())
@@ -192,7 +192,7 @@ class UserControllerTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "a222123!@#", "민지홍", "1999-12-30", "01012341234");
         // when & then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isBadRequest())
@@ -209,7 +209,7 @@ class UserControllerTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "abcd123!@#", "민지홍", birthDate, "01012341234");
         // when & then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isBadRequest())
@@ -259,7 +259,7 @@ class UserControllerTest {
 
         SignUpDto signUpDto = new SignUpDto(actualIdentification, actualPassword, actualConfirmPassword, actualName, actualBirthDate, actualPhoneNumber);
         // when & then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                         .andExpect(status().isBadRequest())
@@ -280,7 +280,7 @@ class UserControllerTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
         // when & then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/signup")
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isInternalServerError())
