@@ -86,7 +86,7 @@ public class UserController {
      * Internal server error occurred
      * Response Code: 500
      **/
-    @PostMapping("/users")
+    @PostMapping("/signup")
     public ResponseEntity<ResponseDto> signUp(@RequestBody @Validated(SignUpValidation.class) SignUpDto signUpDto){
 
         try {
