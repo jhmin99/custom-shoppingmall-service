@@ -10,14 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import static jihong99.shoppingmall.entity.enums.Tier.*;
+import static jihong99.shoppingmall.entity.enums.Roles.*;
+import static jihong99.shoppingmall.entity.enums.Tiers.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +29,6 @@ class UserServiceImplTest {
     @Autowired
     private UserServiceImpl userService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImplTest.class);
     @BeforeEach
     public void setUp(){
 
@@ -63,6 +61,7 @@ class UserServiceImplTest {
         assertThat(findUser.getPoint()).isEqualTo(0);
         assertThat(findUser.getTier()).isEqualTo(IRON);
         assertThat(findUser.getAmountToNextTier()).isEqualTo(50000);
+        assertThat(findUser.getRole()).isEqualTo(USER);
 
         assertThat(findUser.getCart()).isNotNull();
         assertThat(findUser.getCart().getEstimatedTotalPrice()).isEqualTo(0L);
