@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
-import static jihong99.shoppingmall.entity.enums.Tier.*;
+
+import static jihong99.shoppingmall.entity.enums.Roles.*;
+import static jihong99.shoppingmall.entity.enums.Tiers.*;
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -154,6 +156,15 @@ class UsersTest {
         users.updateAmountToNextTier(50000);
         // then
         assertThat(users.getAmountToNextTier()).isEqualTo(50000);
+    }
+
+    @Test
+    public void updateRole_Success(){
+        // given
+        // when
+        users.updateRole(USER);
+        // then
+        assertThat(users.getRole()).isEqualTo(USER);
     }
 
 }

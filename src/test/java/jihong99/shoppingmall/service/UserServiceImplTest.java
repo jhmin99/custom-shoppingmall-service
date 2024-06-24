@@ -1,5 +1,6 @@
 package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
+import jihong99.shoppingmall.dto.LoginDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
@@ -9,15 +10,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import static jihong99.shoppingmall.entity.enums.Tier.*;
+import static jihong99.shoppingmall.entity.enums.Roles.*;
+import static jihong99.shoppingmall.entity.enums.Tiers.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,8 +35,9 @@ class UserServiceImplTest {
     private UserRepository userRepository;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImplTest.class);
     @BeforeEach
     public void setUp(){
 
@@ -38,6 +45,7 @@ class UserServiceImplTest {
 
     @AfterEach
     public void tearDown(){
+        userRepository.deleteAll();
     }
 
     /**
@@ -55,7 +63,7 @@ class UserServiceImplTest {
         // then
         assertThat(findUser.getId()).isNotNull();
         assertThat(findUser.getIdentification()).isEqualTo("abcd123");
-        assertThat(findUser.getPassword()).isEqualTo("abcd123!@#");
+        assertThat(passwordEncoder.matches("abcd123!@#", findUser.getPassword())).isTrue();
         assertThat(findUser.getName()).isEqualTo("민지홍");
         assertThat(findUser.getBirthDate()).isEqualTo(LocalDate.parse("1999-12-30"));
         assertThat(findUser.getPhoneNumber()).isEqualTo("01012341234");
@@ -63,6 +71,7 @@ class UserServiceImplTest {
         assertThat(findUser.getPoint()).isEqualTo(0);
         assertThat(findUser.getTier()).isEqualTo(IRON);
         assertThat(findUser.getAmountToNextTier()).isEqualTo(50000);
+        assertThat(findUser.getRole()).isEqualTo(USER);
 
         assertThat(findUser.getCart()).isNotNull();
         assertThat(findUser.getCart().getEstimatedTotalPrice()).isEqualTo(0L);
@@ -72,6 +81,25 @@ class UserServiceImplTest {
         assertThat(findUser.getCreationTime()).isNotNull();
         assertThat(findUser.getLastModifiedTime()).isNotNull();
 
+    }
+
+    /**
+     * Test method while signing up a new user account throws DuplicateIdentificationException
+     */
+    @Test
+    @Transactional
+    public void signUpAccount_DuplicateIdentificationException(){
+        // given
+        Users users = Users.builder()
+                .identification("abc123")
+                .build();
+        userRepository.save(users);
+        // when & then
+        SignUpDto signUpDto = new SignUpDto("abc123","abcd123!@#","abcd123!@#",
+                "민지홍","1999-12-30","01012341234");
+        assertThrows(DuplicateIdentificationException.class,()->{
+                    userService.signUpAccount(signUpDto);
+                });
     }
 
     /**
@@ -157,5 +185,55 @@ class UserServiceImplTest {
         });
         assertThat(duplicateIdentificationException.getMessage()).isEqualTo("The ID already exists.");
     }
+
+    /**
+     * Test method for successfully logging in a user account.
+     */
+    @Test
+    @Transactional
+    public void loginByIdentificationAndPassword_Success() {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+
+        LoginDto loginDto = new LoginDto("abcd123", "abcd123!@#");
+
+        // when
+        userService.loginByIdentificationAndPassword(loginDto);
+
+        // then
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assertThat(authentication).isNotNull();
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(authentication.getPrincipal()).isEqualTo("abcd123");
+    }
+
+    /**
+     * Test method for unsuccessful login due to wrong credentials.
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "'abcd123', 'wrongPassword'",  // wrong password
+            "'wrongId', 'abcd123!@#'",     // wrong identification
+            "'wrongId', 'wrongPassword'",   // wrong identification and password
+            "'', 'abcd123!@#'", // empty identification
+            "'abcd123', ''", // empty password
+    })
+    @Transactional
+    public void loginByIdentificationAndPassword_BadCredentialsException(String identification, String password) {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+
+        LoginDto loginDto = new LoginDto(identification, password);
+
+        // when & then
+        assertThrows(BadCredentialsException.class, () -> {
+            userService.loginByIdentificationAndPassword(loginDto);
+        });
+    }
+
 
 }

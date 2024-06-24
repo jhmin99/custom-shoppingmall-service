@@ -1,5 +1,5 @@
 package jihong99.shoppingmall.entity.enums;
 
-public enum Tier {
+public enum Tiers {
     IRON, BRONZE, SILVER, GOLD
 }
