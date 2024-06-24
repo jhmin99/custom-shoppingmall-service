@@ -95,6 +95,14 @@ public class UserServiceImpl implements IUserService{
         return userDetailsDto;
     }
 
+    /**
+     * Authenticates a user by their identification and password.
+     * <p>This method uses the provided login details to authenticate the user.
+     * If the authentication is successful, the user's authentication information
+     * is stored in the SecurityContext.</p>
+     * @param loginDto The DTO object containing the user's login information
+     * @throws org.springframework.security.authentication.BadCredentialsException Thrown if the authentication fails due to incorrect credentials
+     */
     @Override
     public void loginByIdentificationAndPassword(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
