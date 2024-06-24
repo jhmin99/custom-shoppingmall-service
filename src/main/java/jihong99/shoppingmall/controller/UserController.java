@@ -125,6 +125,25 @@ public class UserController {
 
 
 
+
+    /**
+     * Authenticates a user by their identification and password.
+     *
+     * <p>This endpoint processes the login of a user by verifying their credentials.
+     * If the authentication is successful, a success message is returned.
+     * Otherwise, an error message is returned.</p>
+     *
+     * @param loginDto DTO object containing the user's login information
+     * @param request HttpServletRequest object
+     * @param response HttpServletResponse object
+     * @return ResponseEntity<ResponseDto> Response object containing the result of the login attempt
+     * @success
+     * Valid response indicating that the login was successful
+     * Response Code: 200
+     * @exception BadCredentialsException
+     * Thrown if the credentials provided are invalid
+     * Response Code: 400
+     */
     @PostMapping("/login")
     public ResponseEntity<ResponseDto> login(@RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response){
         try{
@@ -138,7 +157,6 @@ public class UserController {
                     .body(new ResponseDto(UserConstants.STATUS_400, "login failed"));
         }
     }
-
     @PostMapping("/logout")
     public String logout(){
         // 현재 사용자의 인증 정보를 가져옴
