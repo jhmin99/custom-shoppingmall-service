@@ -1,6 +1,7 @@
 package jihong99.shoppingmall.controller;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.UserConstants;
+import jihong99.shoppingmall.dto.LoginDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
 import jihong99.shoppingmall.repository.UserRepository;
@@ -285,6 +286,47 @@ class UserControllerTest {
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof Exception));
+    }
+
+    /**
+     * Tests the successful login process.
+     * @throws Exception if an error occurs during the test.
+     */
+    @Test
+    @Transactional
+    public void login_Return_OK() throws Exception {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#",
+                "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+
+        LoginDto loginDto = new LoginDto("abcd123", "abcd123!@#");
+
+        // when & then
+        mockMvc.perform(post("/api/login")
+                        .contentType("application/json")
+                        .content(asJsonString(loginDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusMessage").value("login success"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'', 'password'",         // empty identification
+            "'abcd123', ''",          // empty password
+            "'wrongId', 'wrongPassword'" // wrong credentials
+    })
+    @Transactional
+    public void login_Return_BadRequest_Handles_BadCredentialsException(String identification, String password) throws Exception {
+        // given
+        LoginDto loginDto = new LoginDto(identification, password);
+
+        // when & then
+        mockMvc.perform(post("/api/login")
+                        .contentType("application/json")
+                        .content(asJsonString(loginDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusMessage").value("login failed"));
     }
 
 }
