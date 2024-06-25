@@ -1,8 +1,10 @@
 package jihong99.shoppingmall.config.auth;
 
-import jihong99.shoppingmall.config.auth.filters.CustomCsrfCookieFilter;
-import jihong99.shoppingmall.config.auth.providers.CustomUsernamePwdAuthenticationProvider;
+import jihong99.shoppingmall.config.auth.filters.CsrfCookieFilter;
+import jihong99.shoppingmall.config.auth.filters.JwtAuthenticationFilter;
+import jihong99.shoppingmall.config.auth.providers.UsernamePwdAuthenticationProvider;
 import jihong99.shoppingmall.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,19 +19,26 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CorsConfig corsConfig;
     private final UserRepository userRepository;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CsrfCookieFilter csrfCookieFilter;
 
-    public SecurityConfig(CorsConfig corsConfig, UserRepository userRepository) {
-        this.corsConfig = corsConfig;
-        this.userRepository = userRepository;
-    }
-
+    /**
+     * Configures the security filter chain for the application.
+     *
+     * <p>This method sets up the security context, session management, CORS, CSRF, and request authorization configurations.
+     * It also adds custom filters for CSRF and JWT authentication.</p>
+     *
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain object
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
@@ -39,12 +48,13 @@ public class SecurityConfig {
                 .securityContext(httpSecuritySecurityContextConfigurer -> httpSecuritySecurityContextConfigurer
                         .requireExplicitSave(false))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**") // public API urls
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .addFilterAfter(new CustomCsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(csrfCookieFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/logout").authenticated()
@@ -53,14 +63,28 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Creates a PasswordEncoder bean.
+     *
+     * <p>This method returns a BCryptPasswordEncoder to be used for encoding passwords.</p>
+     *
+     * @return the PasswordEncoder bean
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Creates an AuthenticationManager bean.
+     *
+     * <p>This method sets up an AuthenticationManager with a custom UsernamePwdAuthenticationProvider.</p>
+     *
+     * @return the AuthenticationManager bean
+     */
     @Bean
     public AuthenticationManager authenticationManager() {
-        CustomUsernamePwdAuthenticationProvider authenticationProvider = new CustomUsernamePwdAuthenticationProvider(userRepository, passwordEncoder());
+        UsernamePwdAuthenticationProvider authenticationProvider = new UsernamePwdAuthenticationProvider(userRepository, passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
 }
