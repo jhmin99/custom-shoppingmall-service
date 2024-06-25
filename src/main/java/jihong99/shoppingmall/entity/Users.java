@@ -109,15 +109,22 @@ public class Users extends BaseEntity {
     @CreatedDate
     private LocalDate registrationDate;
 
+    /**
+     * The refresh token for the user.
+     *
+     * <p>This field stores the refresh token issued to the user. The refresh token is used to obtain
+     * a new access token without requiring the user to re-authenticate. It is stored as a plain string.</p>
+     */
+    private String refreshToken;
 
     /**
      * Constructs a new user with the provided information.
      *
-     * @param identification The user's identification
-     * @param password The user's password
-     * @param name The user's name
-     * @param birthDate The user's birth date
-     * @param phoneNumber The user's phone number
+     * @param identification the user's identification
+     * @param password the user's password
+     * @param name the user's name
+     * @param birthDate the user's birth date
+     * @param phoneNumber the user's phone number
      */
     @Builder
     public Users(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
@@ -128,76 +135,38 @@ public class Users extends BaseEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Updates the user's shopping cart.
-     *
-     * @param cart The new shopping cart to be associated with the user
-     */
     public void updateCart(Cart cart){
         this.cart = cart;
     }
 
-    /**
-     * Updates the user's wishlist.
-     *
-     * @param wishList The new wishlist to be associated with the user
-     */
     public void updateWishList(WishList wishList){
         this.wishList = wishList;
     }
 
-    /**
-     * Updates the user's phone number.
-     *
-     * @param phoneNumber The new phone number to be associated with the user
-     */
     public void updatePhoneNumber(String phoneNumber){
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Updates the user's point balance.
-     *
-     * @param point The new point balance to be associated with the user
-     */
     public void updatePoint(Integer point){
         this.point = point;
     }
 
-    /**
-     * Updates the user's tier.
-     *
-     * @param tier The new tier to be associated with the user
-     */
     public void updateTier(Tiers tier){
         this.tier = tier;
     }
 
-    /**
-     * Updates the user's role.
-     * @param role
-     */
     public void updateRole(Roles role){ this.role = role;}
 
-    /**
-     * Updates the user's password.
-     * @param password
-     */
     public void updatePassword(String password){this.password = password;}
-
-    /**
-     * Updates the amount of money remaining until the next tier.
-     *
-     * @param amountToNextTier The new amount to be associated with the user
-     */
 
     public void updateAmountToNextTier(Integer amountToNextTier){
         this.amountToNextTier = amountToNextTier;
     }
 
-    /**
-     * @return A string that contains identification, name, birthDate, and phoneNumber.
-     */
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+
     @Override
     public String toString() {
         return "Users{" +
