@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.service;
-import jihong99.shoppingmall.dto.LoginDto;
+import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.dto.UserDetailsDto;
+import jihong99.shoppingmall.entity.Users;
 
 public interface IUserService {
 
@@ -9,8 +9,11 @@ public interface IUserService {
 
     void checkDuplicateIdentification(String identification);
 
-    UserDetailsDto getUserDetails(Long id);
 
-    void loginByIdentificationAndPassword(LoginDto loginDto);
+    Users loginByIdentificationAndPassword(LoginRequestDto loginRequestDto);
+
+    String generateAccessToken(Users user);
+
+    String generateRefreshToken(Users user);
 
 }
