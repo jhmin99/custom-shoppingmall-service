@@ -1,6 +1,8 @@
 package jihong99.shoppingmall.service;
+
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.LoginDto;
+import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
+import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Cart;
@@ -15,105 +17,116 @@ import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.time.format.DateTimeParseException;
+
 import java.util.Optional;
 
 import static jihong99.shoppingmall.entity.enums.Tiers.*;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements IUserService{
+public class UserServiceImpl implements IUserService {
 
-    private UserRepository userRepository;
-    private CartRepository cartRepository;
-    private WishListRepository wishListRepository;
-    private PasswordEncoder passwordEncoder;
-    private AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final WishListRepository wishListRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     /**
-     * Register a new user.
+     * Registers a new user account.
      *
-     * <p>
-     * This method processes the registration of a new user by storing the provided user information
-     * and creating a shopping cart, wishlist, and additional user information.
-     *
-     * </p>
-     * @param signUpDto The DTO object containing the necessary information for user registration
-     *
-     * @throws DuplicateIdentificationException Thrown if the identification already exists
-     * @throws PasswordMismatchException Thrown if the passwords provided do not match
-     * @throws DateTimeParseException Thrown if the birth date format is invalid
+     * @param signUpDto the data transfer object containing user sign up details
+     * @throws DuplicateIdentificationException if the identification is already in use
+     * @throws PasswordMismatchException if the password and confirmation password do not match
      */
     @Override
     @Transactional
     public void signUpAccount(SignUpDto signUpDto) {
         Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
-        if(findUser.isPresent()){
+        if (findUser.isPresent()) {
             throw new DuplicateIdentificationException("The ID already exists.");
-        }if(!matchPassword(signUpDto.getPassword(), signUpDto.getConfirmPassword())){
-            throw new PasswordMismatchException("Passwords do not match.");
-        }else{
-            UserMapper userMapper = new UserMapper();
-            try{
-                Users user = userMapper.mapToUser(signUpDto);
-                encodePassword(user, signUpDto.getPassword());
-                createCartAndWishList(user);
-                createAdditionalUserInfo(user);
-                userRepository.save(user);
-            }catch (DateTimeParseException e){
-                throw new DateTimeParseException("Invalid birth date.", signUpDto.getBirthDate(),
-                        e.getErrorIndex());
-            }
         }
-
+        if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+            throw new PasswordMismatchException("Passwords do not match.");
+        }
+        UserMapper userMapper = new UserMapper();
+        Users user = userMapper.mapToUser(signUpDto);
+        encodePassword(user, signUpDto.getPassword());
+        createCartAndWishList(user);
+        createAdditionalUserInfo(user);
+        userRepository.save(user);
     }
 
     /**
-     * Checks for duplicate identification.
+     * Checks if the provided identification is already in use.
      *
-     * <p>This method checks if the provided identification already exists in the repository.</p>
-     *
-     * @param identification
-     * @throws DuplicateIdentificationException Thrown if the given identification already exists
+     * @param identification the identification to check
+     * @throws DuplicateIdentificationException if the identification is already in use
      */
     @Override
     public void checkDuplicateIdentification(String identification) {
-        if(isIdentificationExist(identification)){
+        if (isIdentificationExist(identification)) {
             throw new DuplicateIdentificationException("The ID already exists.");
         }
     }
 
-    @Override
-    public UserDetailsDto getUserDetails(Long id) {
-        Users findUser = userRepository.findById(id).get();
-        UserDetailsDto userDetailsDto = new UserDetailsDto(findUser.getIdentification(), findUser.getName());
-        return userDetailsDto;
-    }
-
     /**
-     * Authenticates a user by their identification and password.
-     * <p>This method uses the provided login details to authenticate the user.
-     * If the authentication is successful, the user's authentication information
-     * is stored in the SecurityContext.</p>
-     * @param loginDto The DTO object containing the user's login information
-     * @throws org.springframework.security.authentication.BadCredentialsException Thrown if the authentication fails due to incorrect credentials
+     * Authenticates a user using their identification and password.
+     *
+     * @param loginRequestDto the data transfer object containing login details
+     * @return the authenticated user
+     * @throws BadCredentialsException if the authentication fails
      */
     @Override
-    public void loginByIdentificationAndPassword(LoginDto loginDto) {
+    @Transactional
+    public Users loginByIdentificationAndPassword(LoginRequestDto loginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getIdentification(), loginDto.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getIdentification(), loginRequestDto.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetailsDto userDetailsDto = (UserDetailsDto) authentication.getPrincipal();
+        Users user = userDetailsDto.getUser();
+
+        String refreshToken = generateRefreshToken(user);
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return user;
     }
 
     /**
-     * @param user
-     * Generate additional user information
+     * Generates an access token for the user.
+     *
+     * @param user the user for whom to generate the access token
+     * @return the generated access token
+     */
+    @Override
+    public String generateAccessToken(Users user) {
+        return jwtTokenProvider.generateAccessToken(user);
+    }
+
+    /**
+     * Generates a refresh token for the user.
+     *
+     * @param user the user for whom to generate the refresh token
+     * @return the generated refresh token
+     */
+    @Override
+    public String generateRefreshToken(Users user) {
+        return jwtTokenProvider.generateRefreshToken(user);
+    }
+
+    /**
+     * Creates additional user information such as points, tier, and role.
+     *
+     * @param user the user for whom to create additional information
      */
     private void createAdditionalUserInfo(Users user) {
         user.updatePoint(0);
@@ -122,15 +135,14 @@ public class UserServiceImpl implements IUserService{
         user.updateRole(Roles.USER);
     }
 
-
     /**
-     * @param user
-     * Create a shopping cart and wishlist simultaneously upon user creation
+     * Creates a shopping cart and wishlist for the user.
+     *
+     * @param user the user for whom to create the cart and wishlist
      */
     private void createCartAndWishList(Users user) {
         Cart cart = new Cart(0L);
         WishList wishList = new WishList();
-
         cartRepository.save(cart);
         wishListRepository.save(wishList);
         user.updateCart(cart);
@@ -138,9 +150,10 @@ public class UserServiceImpl implements IUserService{
     }
 
     /**
-     * @param user
-     * @param password
-     * Encode a password with PasswordEncoder
+     * Encodes the user's password.
+     *
+     * @param user the user whose password to encode
+     * @param password the password to encode
      */
     private void encodePassword(Users user, String password) {
         String hashPassword = passwordEncoder.encode(password);
@@ -148,23 +161,12 @@ public class UserServiceImpl implements IUserService{
     }
 
     /**
+     * Checks if the identification exists in the repository.
      *
-     * @param identification
-     * @return true if the given identification already exists in the userRepository, false otherwise
+     * @param identification the identification to check
+     * @return true if the identification exists, false otherwise
      */
     private boolean isIdentificationExist(String identification) {
         return userRepository.findByIdentification(identification).isPresent();
     }
-
-    /**
-     *
-     * @param password
-     * @param confirmPassword
-     * @return true if two passwords match, false otherwise
-     */
-    private boolean matchPassword(String password, String confirmPassword) {
-        return password.equals(confirmPassword);
-    }
-
-
 }
