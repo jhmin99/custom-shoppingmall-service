@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeParseException;
 
+import static jihong99.shoppingmall.constants.UserConstants.*;
+
+
 @RestController
 @Validated
 @RequiredArgsConstructor
@@ -56,11 +59,11 @@ public class UserController {
             iuserService.checkDuplicateIdentification(signUpDto.getIdentification());
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto(UserConstants.STATUS_200, UserConstants.MESSAGE_200_verifiedId));
+                    .body(new ResponseDto(STATUS_200, MESSAGE_200_verifiedId));
         } catch (DuplicateIdentificationException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_duplicatedId));
+                    .body(new ResponseDto(STATUS_400, MESSAGE_400_duplicatedId));
         }
     }
 
@@ -90,19 +93,19 @@ public class UserController {
             iuserService.signUpAccount(signUpDto);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(new ResponseDto(UserConstants.STATUS_201, UserConstants.MESSAGE_201_createUser));
+                    .body(new ResponseDto(STATUS_201, MESSAGE_201_createUser));
         } catch (DuplicateIdentificationException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_duplicatedId));
+                    .body(new ResponseDto(STATUS_400, MESSAGE_400_duplicatedId));
         } catch (PasswordMismatchException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_MissMatchPw));
+                    .body(new ResponseDto(STATUS_400, MESSAGE_400_MissMatchPw));
         } catch (DateTimeParseException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(UserConstants.STATUS_400, UserConstants.MESSAGE_400_WrongBirthDate));
+                    .body(new ResponseDto(STATUS_400, MESSAGE_400_WrongBirthDate));
         }
     }
 
@@ -133,11 +136,11 @@ public class UserController {
 
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new LoginResponseDto(UserConstants.STATUS_200, "login success", accessToken, refreshToken, user.getId()));
+                    .body(new LoginResponseDto(STATUS_200, MESSAGE_200_LoginSuccess, accessToken, refreshToken, user.getId()));
         }catch (BadCredentialsException e){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new LoginResponseDto(UserConstants.STATUS_400, "login failed", null, null, null));
+                    .body(new LoginResponseDto(STATUS_400, MESSAGE_400_LoginFailed, null, null, null));
         }
     }
     /**
@@ -145,17 +148,18 @@ public class UserController {
      *
      * <p>Processes logout by invalidating the current user's authentication information.</p>
      *
-     * @return Logout message
+     * @return ResponseEntity with a logout message
      */
     @PostMapping("/logout")
-    public String logout() {
+    public ResponseEntity<ResponseDto> logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LOGGER.info(authentication.toString());
         if (authentication != null) {
+            LOGGER.info("User logged out: {}", authentication.getName());
             SecurityContextHolder.clearContext();
-            return "You have been logged out.";
+            return ResponseEntity.ok(new ResponseDto(STATUS_200, MESSAGE_200_LogoutSuccess));
         } else {
-            return "You are not logged in.";
+            LOGGER.info("Logout attempt with no user logged in.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(STATUS_400, MESSAGE_400_LogoutFailed));
         }
     }
 }
