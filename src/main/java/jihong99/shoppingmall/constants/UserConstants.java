@@ -10,6 +10,7 @@ public class UserConstants {
     public static final String  MESSAGE_201_createUser = "User has been created successfully.";
     public static final String  STATUS_200 = "200";
     public static final String  MESSAGE_200_verifiedId = "The ID is available for use.";
+    public static final String  MESSAGE_200_fetchSuccess = "Fetch success";
     public static final String MESSAGE_200_LoginSuccess = "Logged in successfully.";
     public static final String MESSAGE_200_LogoutSuccess = "Logged out successfully.";
     public static final String  STATUS_400 = "400";
@@ -17,5 +18,6 @@ public class UserConstants {
     public static final String  MESSAGE_400_MissMatchPw = "Passwords do not match.";
     public static final String  MESSAGE_400_WrongBirthDate = "Invalid birth date.";
     public static final String  MESSAGE_400_LoginFailed = "Login failed.";
-    public static final String MESSAGE_400_LogoutFailed = "you are not logged in.";
+    public static final String MESSAGE_400_LogoutFailed = "You are not logged in.";
+    public static final String  MESSAGE_400_NoUserFound = "User not found.";
 }
