@@ -7,6 +7,7 @@ import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
+import jihong99.shoppingmall.exception.UserNotFoundException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
@@ -136,11 +137,11 @@ public class UserController {
 
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new LoginResponseDto(STATUS_200, MESSAGE_200_LoginSuccess, accessToken, refreshToken, user.getId()));
+                    .body(LoginResponseDto.success(accessToken, refreshToken, user.getId()));
         }catch (BadCredentialsException e){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new LoginResponseDto(STATUS_400, MESSAGE_400_LoginFailed, null, null, null));
+                    .body(LoginResponseDto.error(STATUS_400, MESSAGE_400_LoginFailed));
         }
     }
     /**
@@ -162,4 +163,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(STATUS_400, MESSAGE_400_LogoutFailed));
         }
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<MyPageResponseDto> getUserDetails(@RequestParam Long userId) {
+        try{
+            MyPageResponseDto userDetails = iuserService.getUserDetails(userId);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(userDetails);
+        }catch (UserNotFoundException e){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(MyPageResponseDto.error(STATUS_400, MESSAGE_400_NoUserFound));
+        }
+
+    }
+
 }
