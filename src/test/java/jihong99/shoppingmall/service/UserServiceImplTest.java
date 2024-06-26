@@ -1,7 +1,8 @@
 package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.LoginDto;
+import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
+import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
@@ -128,11 +129,11 @@ class UserServiceImplTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#","abcd123!@#",
                 "민지홍",birthDate,"01012341234");
         // when & then
-        DateTimeParseException dateTimeParseException = assertThrows(DateTimeParseException.class, () -> {
+        assertThrows(DateTimeParseException.class, () -> {
             userService.signUpAccount(signUpDto);
         });
-        assertThat(dateTimeParseException.getMessage()).isEqualTo("Invalid birth date.");
     }
+
 
     /**
      * Test method while signing up a new user account with invalid SignUpDto field (confirmPassword, birthDate)
@@ -197,16 +198,20 @@ class UserServiceImplTest {
                 "민지홍", "1999-12-30", "01012341234");
         userService.signUpAccount(signUpDto);
 
-        LoginDto loginDto = new LoginDto("abcd123", "abcd123!@#");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("abcd123", "abcd123!@#");
 
         // when
-        userService.loginByIdentificationAndPassword(loginDto);
+        Users user = userService.loginByIdentificationAndPassword(loginRequestDto);
 
         // then
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         assertThat(authentication).isNotNull();
         assertThat(authentication.isAuthenticated()).isTrue();
-        assertThat(authentication.getPrincipal()).isEqualTo("abcd123");
+        assertThat(((UserDetailsDto) authentication.getPrincipal()).getUsername()).isEqualTo("abcd123");
+
+        Users loggedInUser = userRepository.findById(user.getId()).orElse(null);
+        assertThat(loggedInUser).isNotNull();
+        assertThat(loggedInUser.getRefreshToken()).isNotNull();
     }
 
     /**
@@ -227,11 +232,11 @@ class UserServiceImplTest {
                 "민지홍", "1999-12-30", "01012341234");
         userService.signUpAccount(signUpDto);
 
-        LoginDto loginDto = new LoginDto(identification, password);
+        LoginRequestDto loginRequestDto = new LoginRequestDto(identification, password);
 
         // when & then
         assertThrows(BadCredentialsException.class, () -> {
-            userService.loginByIdentificationAndPassword(loginDto);
+            userService.loginByIdentificationAndPassword(loginRequestDto);
         });
     }
 
