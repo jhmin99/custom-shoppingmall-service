@@ -1,11 +1,12 @@
 package jihong99.shoppingmall.controller;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.UserConstants;
-import jihong99.shoppingmall.dto.LoginDto;
+import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.UserServiceImpl;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,6 +14,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -38,6 +43,11 @@ class UserControllerTest {
                 .setValidator(new LocalValidatorFactoryBean())
                 .setControllerAdvice(GlobalExceptionHandler.class)
                 .build();
+    }
+
+    @AfterEach
+    void tearDown(){
+        userRepository.deleteAll();
     }
 
 
@@ -300,14 +310,18 @@ class UserControllerTest {
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
         userService.signUpAccount(signUpDto);
 
-        LoginDto loginDto = new LoginDto("abcd123", "abcd123!@#");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("abcd123", "abcd123!@#");
 
         // when & then
         mockMvc.perform(post("/api/login")
                         .contentType("application/json")
-                        .content(asJsonString(loginDto)))
+                        .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value("login success"));
+                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_LoginSuccess))
+                .andExpect(jsonPath("$.userId").isNotEmpty())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+
     }
 
     @ParameterizedTest
@@ -319,14 +333,38 @@ class UserControllerTest {
     @Transactional
     public void login_Return_BadRequest_Handles_BadCredentialsException(String identification, String password) throws Exception {
         // given
-        LoginDto loginDto = new LoginDto(identification, password);
+        LoginRequestDto loginRequestDto = new LoginRequestDto(identification, password);
 
         // when & then
         mockMvc.perform(post("/api/login")
                         .contentType("application/json")
-                        .content(asJsonString(loginDto)))
+                        .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value("login failed"));
+                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_LoginFailed));
     }
 
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void logout_Return_OK() throws Exception {
+        // Set up the security context with a mock user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
+
+        // Perform logout and check the response
+        mockMvc.perform(post("/api/logout"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_LogoutSuccess));
+    }
+
+    @Test
+    public void logout_Return_BadRequest_WhenNotLoggedIn() throws Exception {
+        // Clear the security context to simulate no user logged in
+        SecurityContextHolder.clearContext();
+
+        // Perform logout and check the response
+        mockMvc.perform(post("/api/logout"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_LogoutFailed));
+    }
 }
