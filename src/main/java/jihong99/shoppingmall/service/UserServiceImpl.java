@@ -3,16 +3,20 @@ package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.dto.LoginRequestDto;
+import jihong99.shoppingmall.dto.MyPageResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Cart;
+import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.WishList;
 import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
+import jihong99.shoppingmall.exception.UserNotFoundException;
 import jihong99.shoppingmall.mapper.UserMapper;
 import jihong99.shoppingmall.repository.CartRepository;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.AllArgsConstructor;
@@ -25,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static jihong99.shoppingmall.entity.enums.Tiers.*;
 
@@ -35,6 +40,7 @@ public class UserServiceImpl implements IUserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final DeliveryAddressRepository deliveryAddressRepository;
     private final WishListRepository wishListRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -121,6 +127,18 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String generateRefreshToken(Users user) {
         return jwtTokenProvider.generateRefreshToken(user);
+    }
+
+    @Override
+    public MyPageResponseDto getUserDetails(Long userId) {
+        Users findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        Set<DeliveryAddress> deliveryAddresses = getDeliveryAddresses(findUser);
+        return MyPageResponseDto.success(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(),deliveryAddresses);
+    }
+
+    private Set<DeliveryAddress> getDeliveryAddresses(Users findUser) {
+        return deliveryAddressRepository.findByUsersIdentification(findUser.getIdentification());
     }
 
     /**
