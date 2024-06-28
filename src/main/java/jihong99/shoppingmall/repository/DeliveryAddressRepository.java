@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Set;
 
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
-    Set<DeliveryAddress> findByUsersIdentification(String identification);
+    Set<DeliveryAddress> findByUsersId(Long id);
+
 }
