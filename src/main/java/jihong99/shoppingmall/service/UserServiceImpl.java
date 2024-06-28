@@ -16,10 +16,9 @@ import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.UserNotFoundException;
 import jihong99.shoppingmall.mapper.UserMapper;
 import jihong99.shoppingmall.repository.CartRepository;
-import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.repository.WishListRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,16 +33,16 @@ import java.util.Set;
 import static jihong99.shoppingmall.entity.enums.Tiers.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
-    private final DeliveryAddressRepository deliveryAddressRepository;
     private final WishListRepository wishListRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final IDeliveryAddressService deliveryAddressService;
 
     /**
      * Registers a new user account.
@@ -129,17 +128,21 @@ public class UserServiceImpl implements IUserService {
         return jwtTokenProvider.generateRefreshToken(user);
     }
 
+    /**
+     * Retrieves the user details along with their delivery addresses.
+     *
+     * @param userId the ID of the user whose details are to be retrieved
+     * @return the user details and delivery addresses
+     * @throws UserNotFoundException if the user with the specified ID is not found
+     */
     @Override
     public MyPageResponseDto getUserDetails(Long userId) {
         Users findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-        Set<DeliveryAddress> deliveryAddresses = getDeliveryAddresses(findUser);
-        return MyPageResponseDto.success(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(),deliveryAddresses);
+        Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
+        return MyPageResponseDto.success(findUser,deliveryAddresses);
     }
 
-    private Set<DeliveryAddress> getDeliveryAddresses(Users findUser) {
-        return deliveryAddressRepository.findByUsersIdentification(findUser.getIdentification());
-    }
 
     /**
      * Creates additional user information such as points, tier, and role.
