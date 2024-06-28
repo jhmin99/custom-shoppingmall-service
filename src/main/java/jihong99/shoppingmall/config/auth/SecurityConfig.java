@@ -43,6 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
         http
                 .securityContext(httpSecuritySecurityContextConfigurer -> httpSecuritySecurityContextConfigurer
@@ -51,14 +52,16 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**") // public API urls
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                        .ignoringRequestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token") // public API urls
+                        .csrfTokenRepository(csrfTokenRepository))
                 .addFilterAfter(csrfCookieFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/logout").authenticated()
-                        .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**").permitAll())
+                        .requestMatchers(HttpMethod.POST, "/api/logout", "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").authenticated())
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())); // access h2 console
         return http.build();
     }

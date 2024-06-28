@@ -2,11 +2,11 @@ package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jihong99.shoppingmall.constants.UserConstants;
 import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
+import jihong99.shoppingmall.exception.UserNotFoundException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
@@ -136,11 +136,11 @@ public class UserController {
 
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new LoginResponseDto(STATUS_200, MESSAGE_200_LoginSuccess, accessToken, refreshToken, user.getId()));
+                    .body(LoginResponseDto.success(accessToken, refreshToken, user.getId()));
         }catch (BadCredentialsException e){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(new LoginResponseDto(STATUS_400, MESSAGE_400_LoginFailed, null, null, null));
+                    .body(LoginResponseDto.error(STATUS_400, MESSAGE_400_LoginFailed));
         }
     }
     /**
@@ -162,4 +162,31 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(STATUS_400, MESSAGE_400_LogoutFailed));
         }
     }
+    /**
+     * Retrieves user details based on the provided user ID.
+     *
+     * @param userId The ID of the user whose details are being requested
+     * @return ResponseEntity<MyPageResponseDto> containing the user's details
+     * @success Valid response containing the user's details
+     * Response Code: 200
+     * @exception UserNotFoundException Thrown if the user with the given ID is not found
+     * Response Code: 404
+     * @exception Exception Internal server error occurred
+     * Response Code: 500
+     */
+    @GetMapping("/users")
+    public ResponseEntity<MyPageResponseDto> getUserDetails(@RequestParam Long userId) {
+        try{
+            MyPageResponseDto userDetails = iuserService.getUserDetails(userId);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(userDetails);
+        }catch (UserNotFoundException e){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(MyPageResponseDto.error(STATUS_404, MESSAGE_404_NoUserFound));
+        }
+
+    }
+
 }
