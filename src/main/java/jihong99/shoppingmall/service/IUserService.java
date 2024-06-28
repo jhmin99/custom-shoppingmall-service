@@ -1,5 +1,6 @@
 package jihong99.shoppingmall.service;
 import jihong99.shoppingmall.dto.LoginRequestDto;
+import jihong99.shoppingmall.dto.MyPageResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Users;
 
@@ -15,5 +16,7 @@ public interface IUserService {
     String generateAccessToken(Users user);
 
     String generateRefreshToken(Users user);
+
+    MyPageResponseDto getUserDetails(Long userId);
 
 }

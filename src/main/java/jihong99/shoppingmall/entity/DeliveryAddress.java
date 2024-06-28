@@ -12,7 +12,8 @@ public class DeliveryAddress extends BaseEntity {
 
     // 배송지 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long deliveryAddressId;
+    @Column(name = "deliveryAddressId")
+    private Long id;
 
     // 회원 번호
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,17 +35,17 @@ public class DeliveryAddress extends BaseEntity {
     // 수령인 주소 상세
     private String addressDetail;
 
-    // 우편번호 수정
+
+    public void updateName(String name){this.name = name;}
+    public void updatePhoneNumber(String phoneNumber){this.phoneNumber = phoneNumber;}
     public void updateZipCode(Integer zipCode){
         this.zipCode = zipCode;
     }
 
-    // 주소 수정
     public void updateAddress(String address){
         this.address = address;
     }
 
-    // 주소 상세 수정
     public void updateAddressDetail(String addressDetail){
         this.addressDetail = addressDetail;
     }
