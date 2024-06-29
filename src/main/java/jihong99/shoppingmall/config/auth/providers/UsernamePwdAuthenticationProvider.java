@@ -3,7 +3,7 @@ package jihong99.shoppingmall.config.auth.providers;
 import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,10 +12,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UsernamePwdAuthenticationProvider implements AuthenticationProvider {
 
     private final UserRepository userRepository;
