@@ -1,11 +1,12 @@
 package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.LoginRequestDto;
-import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.dto.UserDetailsDto;
+import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
+import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
+import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,9 +36,15 @@ class UserServiceImplTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
+    @Autowired
     private UserServiceImpl userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private IDeliveryAddressService deliveryAddressService;
 
     @BeforeEach
     public void setUp(){
@@ -47,6 +54,7 @@ class UserServiceImplTest {
     @AfterEach
     public void tearDown(){
         userRepository.deleteAll();
+        deliveryAddressRepository.deleteAll();
     }
 
     /**
@@ -240,5 +248,99 @@ class UserServiceImplTest {
         });
     }
 
+    @Test
+    @Transactional
+    public void getUserDetails_Success_Without_DeliveryAddress() {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+        Users findUser = userRepository.findByIdentification("abcd123").get();
+
+        // when
+        MyPageResponseDto myPageResponseDto = userService.getUserDetails(findUser.getId());
+
+        // then
+        assertThat(myPageResponseDto).isNotNull();
+        assertThat(myPageResponseDto.getIdentification()).isEqualTo("abcd123");
+        assertThat(myPageResponseDto.getName()).isEqualTo("민지홍");
+        assertThat(myPageResponseDto.getBirthDate()).isEqualTo(LocalDate.parse("1999-12-30"));
+        assertThat(myPageResponseDto.getPhoneNumber()).isEqualTo("01012341234");
+        assertThat(myPageResponseDto.getDeliveryAddresses().isEmpty()).isTrue(); // Assuming delivery addresses are empty
+
+    }
+    @Test
+    @Transactional
+    public void getUserDetails_With_DeliveryAddresses() {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+        Users findUser = userRepository.findByIdentification("abcd123").get();
+        DeliveryAddressDto deliveryAddress1 = new DeliveryAddressDto(findUser.getId(),1L,"지홍민1","01012341234"
+                ,14235,"abc로 123길", "101-1234");
+        deliveryAddressService.addDeliveryAddress(deliveryAddress1);
+        DeliveryAddressDto deliveryAddress2 = new DeliveryAddressDto(findUser.getId(),2L,"지홍민2","01012341234"
+                ,14235,"abc로 123길", "101-1234");
+        deliveryAddressService.addDeliveryAddress(deliveryAddress2);
+
+        // when
+        MyPageResponseDto myPageResponseDto = userService.getUserDetails(findUser.getId());
+
+        // then
+        assertThat(myPageResponseDto).isNotNull();
+        assertThat(myPageResponseDto.getIdentification()).isEqualTo("abcd123");
+        assertThat(myPageResponseDto.getName()).isEqualTo("민지홍");
+        assertThat(myPageResponseDto.getBirthDate()).isEqualTo(LocalDate.parse("1999-12-30"));
+        assertThat(myPageResponseDto.getPhoneNumber()).isEqualTo("01012341234");
+        assertThat(myPageResponseDto.getDeliveryAddresses()).isNotNull();
+        assertThat(myPageResponseDto.getDeliveryAddresses().size()).isEqualTo(2);
+        assertThat(myPageResponseDto.getDeliveryAddresses().isEmpty()).isFalse(); // Assuming delivery addresses are not empty
+    }
+    @Test
+    public void getUserDetails_UserNotFoundException() {
+        // given
+        Long invalidUserId = -1L;
+
+        // when & then
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getUserDetails(invalidUserId);
+        });
+    }
+
+    @Test
+    @Transactional
+    public void generateAccessToken() {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+        Users findUser = userRepository.findByIdentification("abcd123").get();
+
+        // when
+        String accessToken = userService.generateAccessToken(findUser);
+
+        // then
+        assertThat(accessToken).isNotNull();
+        assertThat(jwtTokenProvider.validateToken(accessToken)).isTrue();
+    }
+
+
+    @Test
+    @Transactional
+    public void generateRefreshToken() {
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#", "abcd123!@#",
+                "민지홍", "1999-12-30", "01012341234");
+        userService.signUpAccount(signUpDto);
+        Users findUser = userRepository.findByIdentification("abcd123").get();
+
+        // when
+        String refreshToken = userService.generateRefreshToken(findUser);
+
+        // then
+        assertThat(refreshToken).isNotNull();
+        assertThat(jwtTokenProvider.validateToken(refreshToken)).isTrue();
+    }
 
 }

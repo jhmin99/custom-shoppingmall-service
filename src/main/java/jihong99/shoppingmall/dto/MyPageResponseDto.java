@@ -16,7 +16,6 @@ import static jihong99.shoppingmall.constants.UserConstants.*;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class MyPageResponseDto {
     private String statusCode;
     private String statusMessage;

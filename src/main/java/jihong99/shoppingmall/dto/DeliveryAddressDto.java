@@ -22,8 +22,6 @@ public class DeliveryAddressDto {
 
     /**
      * Delivery address ID.
-     *
-     * <p>This field is optional and can be null for new addresses.</p>
      */
     private Long id;
 
