@@ -3,7 +3,6 @@ package jihong99.shoppingmall.config.auth;
 import jihong99.shoppingmall.config.auth.filters.CsrfCookieFilter;
 import jihong99.shoppingmall.config.auth.filters.JwtAuthenticationFilter;
 import jihong99.shoppingmall.config.auth.providers.UsernamePwdAuthenticationProvider;
-import jihong99.shoppingmall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,21 +12,23 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import static jihong99.shoppingmall.entity.enums.Roles.*;
+import static jihong99.shoppingmall.entity.enums.Roles.SUPER_ADMIN;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CorsConfig corsConfig;
-    private final UserRepository userRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CsrfCookieFilter csrfCookieFilter;
+    private final UsernamePwdAuthenticationProvider authenticationProvider;
 
     /**
      * Configures the security filter chain for the application.
@@ -58,24 +59,14 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/logout", "/api/users/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/users/**").authenticated())
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, "/api/logout", "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers("/api/admin/**").hasRole(ADMIN.name())
+                        .requestMatchers("/api/super-admin/**").hasRole(SUPER_ADMIN.name()))
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())); // access h2 console
         return http.build();
-    }
-
-    /**
-     * Creates a PasswordEncoder bean.
-     *
-     * <p>This method returns a BCryptPasswordEncoder to be used for encoding passwords.</p>
-     *
-     * @return the PasswordEncoder bean
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     /**
@@ -87,7 +78,6 @@ public class SecurityConfig {
      */
     @Bean
     public AuthenticationManager authenticationManager() {
-        UsernamePwdAuthenticationProvider authenticationProvider = new UsernamePwdAuthenticationProvider(userRepository, passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
 }
