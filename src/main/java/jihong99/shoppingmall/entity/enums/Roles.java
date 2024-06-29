@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
  * authorization purposes.</p>
  */
 public enum Roles implements GrantedAuthority {
-    USER, ADMIN;
+    USER, ADMIN, SUPER_ADMIN;
 
     /**
      * Returns the authority granted to the role.
@@ -21,6 +21,6 @@ public enum Roles implements GrantedAuthority {
      */
     @Override
     public String getAuthority() {
-        return name();
+        return "ROLE_" + name();
     }
 }
