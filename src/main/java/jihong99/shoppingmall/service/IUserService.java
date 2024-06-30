@@ -19,4 +19,6 @@ public interface IUserService {
 
     MyPageResponseDto getUserDetails(Long userId);
 
+    void signUpAdminAccount(SignUpDto signUpDto);
+
 }
