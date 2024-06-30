@@ -143,6 +143,30 @@ public class UserServiceImpl implements IUserService {
         return MyPageResponseDto.success(findUser,deliveryAddresses);
     }
 
+    /**
+     * Registers a new admin account.
+     *
+     * @param signUpDto the data transfer object containing admin sign up details
+     * @throws DuplicateIdentificationException if the identification is already in use
+     * @throws PasswordMismatchException if the password and confirmation password do not match
+     */
+    @Override
+    @Transactional
+    public void signUpAdminAccount(SignUpDto signUpDto) {
+        Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
+        if (findUser.isPresent()) {
+            throw new DuplicateIdentificationException("The ID already exists.");
+        }
+        if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+            throw new PasswordMismatchException("Passwords do not match.");
+        }
+        UserMapper userMapper = new UserMapper();
+        Users user = userMapper.mapToUser(signUpDto);
+        encodePassword(user, signUpDto.getPassword());
+        user.updateRole(Roles.ADMIN);
+        userRepository.save(user);
+    }
+
 
     /**
      * Creates additional user information such as points, tier, and role.
