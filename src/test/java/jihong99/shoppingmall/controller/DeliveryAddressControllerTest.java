@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.constants.UserConstants;
+import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
@@ -71,7 +71,7 @@ class DeliveryAddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(addressDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_201_createDeliveryAddress));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_201_createDeliveryAddress));
     }
 
     /**
@@ -88,7 +88,7 @@ class DeliveryAddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(addressDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_404_NoUserFound));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_UserNotFound));
     }
 
     /**
@@ -112,7 +112,7 @@ class DeliveryAddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(addressDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_UpdateDeliveryAddressSuccess));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_UpdateDeliveryAddressSuccess));
     }
 
     /**
@@ -133,7 +133,7 @@ class DeliveryAddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(addressDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_404_NoDeliveryAddressFound));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_DeliveryAddressNotFound));
     }
 
     /**
@@ -155,7 +155,7 @@ class DeliveryAddressControllerTest {
         // when & then
         mockMvc.perform(delete("/api/users/delivery-address/{addressId}", addressId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_DeleteDeliveryAddressSuccess));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_DeleteDeliveryAddressSuccess));
     }
 
     /**
@@ -168,6 +168,6 @@ class DeliveryAddressControllerTest {
         // when & then
         mockMvc.perform(delete("/api/users/delivery-address/{addressId}", -1L))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_404_NoDeliveryAddressFound));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_DeliveryAddressNotFound));
     }
 }
