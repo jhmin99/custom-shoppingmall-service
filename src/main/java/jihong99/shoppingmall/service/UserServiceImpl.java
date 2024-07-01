@@ -2,10 +2,7 @@ package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
-import jihong99.shoppingmall.dto.LoginRequestDto;
-import jihong99.shoppingmall.dto.MyPageResponseDto;
-import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.dto.UserDetailsDto;
+import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Cart;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
@@ -13,12 +10,14 @@ import jihong99.shoppingmall.entity.WishList;
 import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.mapper.UserMapper;
 import jihong99.shoppingmall.repository.CartRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -133,12 +132,12 @@ public class UserServiceImpl implements IUserService {
      *
      * @param userId the ID of the user whose details are to be retrieved
      * @return the user details and delivery addresses
-     * @throws UserNotFoundException if the user with the specified ID is not found
+     * @throws NotFoundException if the user with the specified ID is not found
      */
     @Override
     public MyPageResponseDto getUserDetails(Long userId) {
         Users findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
         Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
         return MyPageResponseDto.success(findUser,deliveryAddresses);
     }
@@ -213,5 +212,10 @@ public class UserServiceImpl implements IUserService {
      */
     private boolean isIdentificationExist(String identification) {
         return userRepository.findByIdentification(identification).isPresent();
+    }
+
+    @Override
+    public Page<UserSummaryDto> getUsers(Pageable pageable) {
+        return userRepository.findAllUserSummaries(pageable);
     }
 }
