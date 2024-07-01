@@ -5,7 +5,7 @@ import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DeliveryAddressNotFoundException;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.mapper.DeliveryAddressMapper;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
@@ -37,13 +37,13 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
      * Adds a new delivery address for the specified user.
      *
      * @param requestDto The DTO object containing the delivery address details.
-     * @throws UserNotFoundException If the user with the specified ID is not found.
+     * @throws NotFoundException If the user with the specified ID is not found.
      */
     @Override
     @Transactional
     public void addDeliveryAddress(DeliveryAddressDto requestDto) {
         Users findUser = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + requestDto.getUserId()));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + requestDto.getUserId()));
         DeliveryAddressMapper deliveryAddressMapper = new DeliveryAddressMapper();
         DeliveryAddress deliveryAddress = deliveryAddressMapper.mapToDeliveryAddress(findUser, requestDto);
         deliveryAddressRepository.save(deliveryAddress);

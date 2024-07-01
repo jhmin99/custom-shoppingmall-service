@@ -15,23 +15,18 @@ import java.time.LocalDate;
 @EntityListeners(AuditingEntityListener.class)
 public class Item extends BaseEntity {
 
-    // 상품 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long itemId;
+    @Column(name = "item_id")
+    private Long id;
 
-    // 상품 이름
     private String name;
 
-    // 상품 가격
     private Integer price;
 
-    // 재고
     private Integer inventory;
 
-    // 키워드
     private String keyword;
 
-    // 등록 날짜
     @CreatedDate
     private LocalDate registrationDate;
 

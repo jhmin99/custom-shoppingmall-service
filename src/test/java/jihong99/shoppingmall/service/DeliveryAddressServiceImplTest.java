@@ -5,7 +5,7 @@ import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DeliveryAddressNotFoundException;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -127,7 +127,7 @@ class DeliveryAddressServiceImplTest {
         DeliveryAddressDto dto = new DeliveryAddressDto(-1L, null, "Test Name", "01012345678", 12345, "Test Address", "Test Detail");
 
         // when & then
-        assertThrows(UserNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             deliveryAddressService.addDeliveryAddress(dto);
         });
     }

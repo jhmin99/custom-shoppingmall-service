@@ -5,13 +5,12 @@ import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.mapper.DeliveryAddressMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static jihong99.shoppingmall.constants.UserConstants.*;
+import static jihong99.shoppingmall.constants.Constants.*;
 
 
 @Getter

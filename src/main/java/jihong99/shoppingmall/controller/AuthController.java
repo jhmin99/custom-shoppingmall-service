@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import java.util.Map;
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
 
-    private final IAuthService authService;
+    private final IAuthService iauthService;
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     /**
@@ -36,11 +36,11 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
         try {
-            Map<String, String> response = authService.refreshAccessToken(refreshToken);
+            Map<String, String> response = iauthService.refreshAccessToken(refreshToken);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }

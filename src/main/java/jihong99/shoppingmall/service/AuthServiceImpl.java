@@ -2,7 +2,7 @@ package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class AuthServiceImpl implements IAuthService {
      * @param refreshToken The refresh token provided by the client.
      * @return A map containing the new access token.
      * @throws IllegalArgumentException If the refresh token is invalid.
-     * @throws UserNotFoundException If no user is found with the identification extracted from the refresh token.
+     * @throws NotFoundException If no user is found with the identification extracted from the refresh token.
      */
     @Override
     public Map<String, String> refreshAccessToken(String refreshToken) {
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements IAuthService {
 
         String identification = jwtTokenProvider.getIdentificationFromToken(refreshToken);
         Users user = userRepository.findByIdentification(identification)
-                .orElseThrow(() -> new UserNotFoundException("User not found with identification: " + identification));
+                .orElseThrow(() -> new NotFoundException("User not found with identification: " + identification));
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(user);
 

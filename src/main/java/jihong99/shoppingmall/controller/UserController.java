@@ -6,16 +6,20 @@ import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeParseException;
 
-import static jihong99.shoppingmall.constants.UserConstants.*;
+import static jihong99.shoppingmall.constants.Constants.*;
 
 
 @RestController
@@ -169,23 +173,45 @@ public class UserController {
      * @return ResponseEntity<MyPageResponseDto> containing the user's details
      * @success Valid response containing the user's details
      * Response Code: 200
-     * @exception UserNotFoundException Thrown if the user with the given ID is not found
+     * @exception NotFoundException Thrown if the user with the given ID is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
      */
     @GetMapping("/users")
+    @PreAuthorize("hasRole('USER') and #userId == principal.user.id")
     public ResponseEntity<MyPageResponseDto> getUserDetails(@RequestParam Long userId) {
         try{
             MyPageResponseDto userDetails = iuserService.getUserDetails(userId);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(userDetails);
-        }catch (UserNotFoundException e){
+        }catch (NotFoundException e){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(MyPageResponseDto.error(STATUS_404, MESSAGE_404_NoUserFound));
+                    .body(MyPageResponseDto.error(STATUS_404, MESSAGE_404_UserNotFound));
         }
+
+    }
+
+    /**
+     * Retrieves a summary list of users.
+     *
+     * @param page the page number to retrieve (for pagination)
+     * @param size the number of users to retrieve per page (maximum 10)
+     * @return a paginated response containing the user summaries
+     */
+    @GetMapping("/admin/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PaginatedResponseDto<UserSummaryDto>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserSummaryDto> userSummaries = iuserService.getUsers(pageable);
+        PaginatedResponseDto<UserSummaryDto> response = PaginatedResponseDto.of(userSummaries, STATUS_200, MESSAGE_200_fetchSuccess);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
 
     }
 
