@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .addFilterAfter(csrfCookieFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token").permitAll()
+                        .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token", "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
                         .requestMatchers(HttpMethod.POST, "/api/logout", "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())

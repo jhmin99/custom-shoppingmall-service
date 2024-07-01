@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeParseException;
 
-import static jihong99.shoppingmall.constants.UserConstants.*;
-import static jihong99.shoppingmall.constants.UserConstants.MESSAGE_400_WrongBirthDate;
+import static jihong99.shoppingmall.constants.Constants.*;
+import static jihong99.shoppingmall.constants.Constants.MESSAGE_400_WrongBirthDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,12 +27,12 @@ import static jihong99.shoppingmall.constants.UserConstants.MESSAGE_400_WrongBir
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 public class SuperAdminController {
 
-    private final IUserService userService;
+    private final IUserService iuserService;
 
     @PostMapping("/create-admin")
     public ResponseEntity<ResponseDto> createAdmin(@RequestBody @Validated(SignUpValidation.class) SignUpDto adminRequest) {
         try {
-            userService.signUpAdminAccount(adminRequest);
+            iuserService.signUpAdminAccount(adminRequest);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(new ResponseDto(STATUS_201, MESSAGE_201_createUser));

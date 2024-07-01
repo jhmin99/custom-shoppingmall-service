@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.constants.UserConstants;
+import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
 import jihong99.shoppingmall.entity.Users;
@@ -74,7 +74,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_verifiedId));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_verifiedId));
     }
 
     /**
@@ -96,7 +96,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto2)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_duplicatedId));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_duplicatedId));
     }
 
     /**
@@ -172,7 +172,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_201_createUser));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_201_createUser));
     }
 
     /**
@@ -194,7 +194,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto2)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_duplicatedId));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_duplicatedId));
     }
 
     /**
@@ -211,7 +211,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_MissMatchPw));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_MissMatchPw));
     }
 
     /**
@@ -229,7 +229,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_WrongBirthDate));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_WrongBirthDate));
     }
 
     /**
@@ -322,7 +322,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_LoginSuccess))
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_LoginSuccess))
                 .andExpect(jsonPath("$.userId").isNotEmpty())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty());
@@ -348,7 +348,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_LoginFailed));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_LoginFailed));
     }
 
     /**
@@ -365,7 +365,7 @@ class UserControllerTest {
         // Perform logout and check the response
         mockMvc.perform(post("/api/logout"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_LogoutSuccess));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_LogoutSuccess));
     }
 
     /**
@@ -380,7 +380,7 @@ class UserControllerTest {
         // Perform logout and check the response
         mockMvc.perform(post("/api/logout"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_400_LogoutFailed));
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_LogoutFailed));
     }
 
     /**
@@ -406,8 +406,8 @@ class UserControllerTest {
                         .param("userId", String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusCode").value(UserConstants.STATUS_200))
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_200_fetchSuccess))
+                .andExpect(jsonPath("$.statusCode").value(Constants.STATUS_200))
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_fetchSuccess))
                 .andExpect(jsonPath("$.identification").value("testuser"))
                 .andExpect(jsonPath("$.name").value("Test User"));
     }
@@ -426,8 +426,8 @@ class UserControllerTest {
                         .param("userId", String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusCode").value(UserConstants.STATUS_404))
-                .andExpect(jsonPath("$.statusMessage").value(UserConstants.MESSAGE_404_NoUserFound));
+                .andExpect(jsonPath("$.statusCode").value(Constants.STATUS_404))
+                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_UserNotFound));
     }
 
     /**

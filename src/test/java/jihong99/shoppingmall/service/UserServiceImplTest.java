@@ -5,7 +5,7 @@ import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -303,7 +303,7 @@ class UserServiceImplTest {
         Long invalidUserId = -1L;
 
         // when & then
-        assertThrows(UserNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             userService.getUserDetails(invalidUserId);
         });
     }

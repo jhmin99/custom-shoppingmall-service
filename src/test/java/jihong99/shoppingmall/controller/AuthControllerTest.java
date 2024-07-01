@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IAuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +101,7 @@ class AuthControllerTest {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("refreshToken", "validRefreshToken");
 
-        when(authService.refreshAccessToken(anyString())).thenThrow(UserNotFoundException.class);
+        when(authService.refreshAccessToken(anyString())).thenThrow(NotFoundException.class);
 
         // when & then
         mockMvc.perform(post("/api/refresh-token")

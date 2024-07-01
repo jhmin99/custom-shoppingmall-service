@@ -2,7 +2,7 @@ package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.UserNotFoundException;
+import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,7 +121,7 @@ class AuthServiceImplTest {
         when(userRepository.findByIdentification(identification)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(UserNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             authService.refreshAccessToken(refreshToken);
         });
 
