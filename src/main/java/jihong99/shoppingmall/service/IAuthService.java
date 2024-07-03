@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface IAuthService {
     Map<String, String> refreshAccessToken(String refreshToken);
-
+    boolean hasId(Long ID);
 }
