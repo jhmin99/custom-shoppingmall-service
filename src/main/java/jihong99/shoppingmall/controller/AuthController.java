@@ -1,6 +1,7 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jihong99.shoppingmall.exception.InvalidTokenException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IAuthService;
 import lombok.RequiredArgsConstructor;
@@ -27,22 +28,27 @@ public class AuthController {
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     /**
-     * Endpoint to refresh the access token using a provided refresh token.
+     * Refresh the access token.
      *
-     * @param request A map containing the refresh token.
-     * @return A ResponseEntity containing the new access token or an error status.
+     * <p>This endpoint allows a user to refresh their access token using a valid refresh token.
+     * The request body must contain the refresh token.</p>
+     *
+     * @param request A map containing the refresh token
+     * @return ResponseEntity<Map<String, String>> Response object containing the new access token
+     * @success Access token successfully refreshed
+     * Response Code: 200
+     * @exception InvalidTokenException Thrown if the refresh token is invalid
+     * Response Code: 400
+     * @exception NotFoundException Thrown if the user associated with the refresh token is not found
+     * Response Code: 404
+     * @exception Exception Internal server error occurred
+     * Response Code: 500
      */
     @PostMapping("/refresh-token")
     public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
-        try {
-            Map<String, String> response = iauthService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        Map<String, String> response = iauthService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -50,6 +56,8 @@ public class AuthController {
      *
      * @param request The HttpServletRequest object.
      * @return The CSRF token.
+     * @exception Exception Internal server error occurred
+     * Response Code: 500
      */
     @GetMapping("/csrf-token")
     public CsrfToken csrfToken(HttpServletRequest request) {
