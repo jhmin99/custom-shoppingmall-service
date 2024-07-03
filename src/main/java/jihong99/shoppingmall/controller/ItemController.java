@@ -24,17 +24,25 @@ import static jihong99.shoppingmall.constants.Constants.MESSAGE_404_CategoryNotF
 public class ItemController {
 
     private final IItemService iitemService;
-
+    /**
+     * Create a new item.
+     *
+     * <p>This endpoint allows an admin to create a new item. The request body must contain valid item details.</p>
+     *
+     * @param itemRequestDto DTO object containing necessary information for item creation
+     * @return ResponseEntity<Object> Response object containing the result of the item creation
+     * @success Item successfully created
+     * Response Code: 201
+     * @exception NotFoundException Thrown if the category for the item is not found
+     * Response Code: 404
+     * @exception Exception Internal server error occurred
+     * Response Code: 500
+     * @precondition The authenticated user must have the 'ADMIN' role
+     */
     @PostMapping("/admin/item")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createItem(@Valid @RequestBody ItemRequestDto itemRequestDto) {
-        try {
-            ItemResponseDto createdItem = iitemService.createItem(itemRequestDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
-        }catch (NotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(Constants.STATUS_404, MESSAGE_404_CategoryNotFound));
-        }
-
+        ItemResponseDto createdItem = iitemService.createItem(itemRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
     }
 }
