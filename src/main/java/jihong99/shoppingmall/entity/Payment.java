@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Payment extends BaseEntity {
