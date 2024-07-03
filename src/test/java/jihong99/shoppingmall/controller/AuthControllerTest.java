@@ -1,6 +1,8 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jihong99.shoppingmall.exception.GlobalExceptionHandler;
+import jihong99.shoppingmall.exception.InvalidTokenException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IAuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +20,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.HashMap;
 import java.util.Map;
 
+import static jihong99.shoppingmall.constants.Constants.*;
 import static jihong99.shoppingmall.utils.JsonUtils.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AuthControllerTest {
@@ -44,7 +48,9 @@ class AuthControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(GlobalExceptionHandler.class)
+                .build();
     }
 
     /**
@@ -52,7 +58,7 @@ class AuthControllerTest {
      * @throws Exception
      */
     @Test
-    void refreshAccessToken_Success() throws Exception {
+    void refreshAccessToken_Return_OK() throws Exception {
         // given
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("refreshToken", "validRefreshToken");
@@ -71,22 +77,23 @@ class AuthControllerTest {
     }
 
     /**
-     * Test for forbidden response when refresh token is invalid
+     * Test for bad request response when refresh token is invalid
      * @throws Exception
      */
     @Test
-    void refreshAccessToken_Forbidden() throws Exception {
+    void refreshAccessToken_Return_BadRequest() throws Exception {
         // given
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("refreshToken", "invalidRefreshToken");
 
-        when(authService.refreshAccessToken(anyString())).thenThrow(IllegalArgumentException.class);
+        when(authService.refreshAccessToken(anyString())).thenThrow(new InvalidTokenException(MESSAGE_400_InvalidRefreshToken));
 
         // when & then
         mockMvc.perform(post("/api/refresh-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestBody)))
-                .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_InvalidRefreshToken));
 
         verify(authService, times(1)).refreshAccessToken(anyString());
     }
@@ -96,7 +103,7 @@ class AuthControllerTest {
      * @throws Exception
      */
     @Test
-    void refreshAccessToken_UserNotFound() throws Exception {
+    void refreshAccessToken_Return_NotFoundException() throws Exception {
         // given
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("refreshToken", "validRefreshToken");
@@ -117,7 +124,7 @@ class AuthControllerTest {
      * @throws Exception
      */
     @Test
-    void csrfToken_Success() throws Exception {
+    void csrfToken_Return_OK() throws Exception {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         CsrfToken csrfToken = new DefaultCsrfToken("headerName", "_csrf", "tokenValue");
