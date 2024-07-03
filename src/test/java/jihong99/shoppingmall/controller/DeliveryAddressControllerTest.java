@@ -3,8 +3,9 @@ package jihong99.shoppingmall.controller;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.DeliveryAddressDto;
+import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.GlobalExceptionHandler;
+import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import org.junit.jupiter.api.AfterEach;
@@ -13,12 +14,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.context.WebApplicationContext;
 
 import static jihong99.shoppingmall.utils.JsonUtils.asJsonString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -29,6 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DeliveryAddressControllerTest {
 
     private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private IDeliveryAddressService deliveryAddressService;
@@ -39,9 +50,8 @@ class DeliveryAddressControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(new DeliveryAddressController(deliveryAddressService))
-                .setValidator(new LocalValidatorFactoryBean())
-                .setControllerAdvice(GlobalExceptionHandler.class)
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
                 .build();
     }
 
@@ -61,15 +71,24 @@ class DeliveryAddressControllerTest {
         Users user = Users.builder()
                 .identification("testuser")
                 .build();
-        userRepository.save(user);
+        Users savedUser = userRepository.save(user);
+        savedUser.updateRole(Roles.USER);
 
-        DeliveryAddressDto addressDto = new DeliveryAddressDto(user.getId(), null,"민지홍","01012341234"
+        UserDetailsDto userDetailsDto = new UserDetailsDto(savedUser);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(userDetailsDto, "password", userDetailsDto.getAuthorities()));
+        SecurityContextHolder.setContext(context);
+
+        DeliveryAddressDto addressDto = new DeliveryAddressDto(savedUser.getId(), null,"민지홍","01012341234"
         ,41412,"abc로 123", "101-1234");
 
+
         // when & then
-        mockMvc.perform(post("/api/users/delivery-address")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(addressDto)))
+        MockHttpServletRequestBuilder request = post("/api/users/delivery-address")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(addressDto));
+        mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_201_createDeliveryAddress));
     }
@@ -79,16 +98,19 @@ class DeliveryAddressControllerTest {
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    public void addDeliveryAddress_Return_NotFound_Handles_UserNotFoundException() throws Exception {
+    @WithMockUser(username = "testuser")
+    public void addDeliveryAddress_Return_NotFound_Handles_NotFoundException() throws Exception {
         // given
         DeliveryAddressDto addressDto = new DeliveryAddressDto(-1L, null,"민지홍","01012341234"
                 ,41412,"abc로 123", "101-1234");
         // when & then
-        mockMvc.perform(post("/api/users/delivery-address")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(addressDto)))
+        MockHttpServletRequestBuilder request = post("/api/users/delivery-address")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(addressDto));
+        mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_UserNotFound));
+                .andExpect(jsonPath("$.errorCode").value(HttpStatus.NOT_FOUND.name()));
     }
 
     /**
@@ -97,20 +119,23 @@ class DeliveryAddressControllerTest {
      */
     @Test
     @Transactional
+    @WithMockUser(username = "testuser")
     public void updateDeliveryAddress_Return_OK() throws Exception {
         // given
         Users user = Users.builder()
                 .identification("testuser")
                 .build();
-        userRepository.save(user);
-        DeliveryAddressDto addressDto = new DeliveryAddressDto(user.getId(), null,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
+        Users savedUser = userRepository.save(user);
+        DeliveryAddressDto addressDto = new DeliveryAddressDto(savedUser.getId(), null,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
         deliveryAddressService.addDeliveryAddress(addressDto);
         Long addressId = deliveryAddressService.getDeliveryAddresses(user).stream().findAny().get().getId();
 
         // when & then
-        mockMvc.perform(put("/api/users/delivery-address/{addressId}", addressId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(addressDto)))
+        MockHttpServletRequestBuilder request = put("/api/users/delivery-address/{addressId}", addressId.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(addressDto));
+        mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_UpdateDeliveryAddressSuccess));
     }
@@ -120,20 +145,23 @@ class DeliveryAddressControllerTest {
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    public void updateDeliveryAddress_Return_NotFound_Handles_DeliveryAddressNotFoundException() throws Exception {
+    @WithMockUser(username = "testuser")
+    public void updateDeliveryAddress_Return_NotFound_Handles_NotFoundException() throws Exception {
         // given
         Users user = Users.builder()
                 .identification("testuser")
                 .build();
-        userRepository.save(user);
-        DeliveryAddressDto addressDto = new DeliveryAddressDto(1L, -1L,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
-
+        Users savedUser = userRepository.save(user);
+        DeliveryAddressDto addressDto = new DeliveryAddressDto(savedUser.getId(), -1L,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
+        Long addressId = -1L;
         // when & then
-        mockMvc.perform(put("/api/users/delivery-address/{addressId}", -1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(addressDto)))
+        MockHttpServletRequestBuilder request = put("/api/users/delivery-address/{addressId}", addressId.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(addressDto));
+        mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_DeliveryAddressNotFound));
+                .andExpect(jsonPath("$.errorCode").value(HttpStatus.NOT_FOUND.name()));
     }
 
     /**
@@ -142,18 +170,23 @@ class DeliveryAddressControllerTest {
      */
     @Test
     @Transactional
+    @WithMockUser(username = "testuser")
     public void deleteDeliveryAddress_Return_OK() throws Exception {
         // given
         Users user = Users.builder()
                 .identification("testuser")
                 .build();
-        userRepository.save(user);
-        DeliveryAddressDto addressDto = new DeliveryAddressDto(user.getId(), null,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
+        Users savedUser = userRepository.save(user);
+        DeliveryAddressDto addressDto = new DeliveryAddressDto(savedUser.getId(), null,"Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
         deliveryAddressService.addDeliveryAddress(addressDto);
         Long addressId = deliveryAddressService.getDeliveryAddresses(user).stream().findAny().get().getId();
 
         // when & then
-        mockMvc.perform(delete("/api/users/delivery-address/{addressId}", addressId))
+        MockHttpServletRequestBuilder request = delete("/api/users/delivery-address/{addressId}", addressId.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(addressDto));
+        mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_DeleteDeliveryAddressSuccess));
     }
@@ -164,10 +197,15 @@ class DeliveryAddressControllerTest {
      */
     @Test
     @Transactional
-    public void deleteDeliveryAddress_Return_NotFound_Handles_DeliveryAddressNotFoundException() throws Exception {
+    @WithMockUser(username = "testuser")
+    public void deleteDeliveryAddress_Return_NotFound_Handles_NotFoundException() throws Exception {
+        Long addressId= -1L;
         // when & then
-        mockMvc.perform(delete("/api/users/delivery-address/{addressId}", -1L))
+        MockHttpServletRequestBuilder request = delete("/api/users/delivery-address/{addressId}", addressId.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON);
+        mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_DeliveryAddressNotFound));
+                .andExpect(jsonPath("$.errorCode").value(HttpStatus.NOT_FOUND.name()));
     }
 }

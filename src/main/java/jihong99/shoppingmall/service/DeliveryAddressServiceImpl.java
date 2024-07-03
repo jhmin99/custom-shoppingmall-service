@@ -39,15 +39,16 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
      *
      * @param requestDto The DTO object containing the delivery address details.
      * @throws NotFoundException If the user with the specified ID is not found.
+     * @return Id of saved delivery address
      */
     @Override
     @Transactional
-    public void addDeliveryAddress(DeliveryAddressDto requestDto) {
+    public Long addDeliveryAddress(DeliveryAddressDto requestDto) {
         Users findUser = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
         DeliveryAddressMapper deliveryAddressMapper = new DeliveryAddressMapper();
         DeliveryAddress deliveryAddress = deliveryAddressMapper.mapToDeliveryAddress(findUser, requestDto);
-        deliveryAddressRepository.save(deliveryAddress);
+        return deliveryAddressRepository.save(deliveryAddress).getId();
     }
 
     /**

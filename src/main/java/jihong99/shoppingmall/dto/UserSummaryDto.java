@@ -11,6 +11,9 @@ public class UserSummaryDto {
     private Long id;
     private String name;
     private LocalDate birthDate;
-    private String deliveryAddress;
+    private Long addressId;
+    private Integer zipCode;
+    private String address;
+    private String addressDetail;
     private LocalDate registrationDate;
 }

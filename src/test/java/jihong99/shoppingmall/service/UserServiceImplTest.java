@@ -277,10 +277,10 @@ class UserServiceImplTest {
                 "민지홍", "1999-12-30", "01012341234");
         userService.signUpAccount(signUpDto);
         Users findUser = userRepository.findByIdentification("abcd123").get();
-        DeliveryAddressDto deliveryAddress1 = new DeliveryAddressDto(findUser.getId(),1L,"지홍민1","01012341234"
+        DeliveryAddressDto deliveryAddress1 = new DeliveryAddressDto(findUser.getId(),null,"지홍민1","01012341234"
                 ,14235,"abc로 123길", "101-1234");
         deliveryAddressService.addDeliveryAddress(deliveryAddress1);
-        DeliveryAddressDto deliveryAddress2 = new DeliveryAddressDto(findUser.getId(),2L,"지홍민2","01012341234"
+        DeliveryAddressDto deliveryAddress2 = new DeliveryAddressDto(findUser.getId(),null,"지홍민2","01012341234"
                 ,14235,"abc로 123길", "101-1234");
         deliveryAddressService.addDeliveryAddress(deliveryAddress2);
 

@@ -1,12 +1,17 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.constants.Constants;
+import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.dto.LoginRequestDto;
 import jihong99.shoppingmall.dto.SignUpDto;
+import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
+import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
+import jihong99.shoppingmall.exception.NotFoundException;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
+import jihong99.shoppingmall.service.IDeliveryAddressService;
 import jihong99.shoppingmall.service.IUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,46 +23,60 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
+import static jihong99.shoppingmall.constants.Constants.*;
 import static jihong99.shoppingmall.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class UserControllerTest {
     private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private IUserService userService;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    @Autowired
+    private IDeliveryAddressService deliveryAddressService;
+    @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
-                .setValidator(new LocalValidatorFactoryBean())
-                .setControllerAdvice(GlobalExceptionHandler.class)
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
                 .build();
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        deliveryAddressRepository.deleteAll();
     }
 
     /**
@@ -74,7 +93,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_verifiedId));
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_verifiedId));
     }
 
     /**
@@ -96,7 +115,8 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto2)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_duplicatedId));
+                .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_duplicatedId));
     }
 
     /**
@@ -172,7 +192,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_201_createUser));
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_201_createUser));
     }
 
     /**
@@ -194,7 +214,8 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto2)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_duplicatedId));
+                .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_duplicatedId));
     }
 
     /**
@@ -211,7 +232,8 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_MissMatchPw));
+                .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_MissMatchPw));
     }
 
     /**
@@ -229,7 +251,8 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_WrongBirthDate));
+                .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
+                .andExpect(jsonPath("$.errorMessage").value("Invalid date format: " + birthDate));
     }
 
     /**
@@ -322,7 +345,7 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_LoginSuccess))
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_LoginSuccess))
                 .andExpect(jsonPath("$.userId").isNotEmpty())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty());
@@ -348,7 +371,8 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_LoginFailed));
+                .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadCredentialsException));
     }
 
     /**
@@ -358,29 +382,25 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "testuser")
     public void logout_Return_OK() throws Exception {
-        // Set up the security context with a mock user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
-
         // Perform logout and check the response
-        mockMvc.perform(post("/api/logout"))
+        MockHttpServletRequestBuilder request = post("/api/logout")
+                .with(csrf());
+        mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_LogoutSuccess));
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_LogoutSuccess));
     }
 
     /**
-     * Tests handling of a bad request when no user is logged in during logout.
+     * Tests handling when no user is logged in during logout.
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    public void logout_Return_BadRequest_WhenNotLoggedIn() throws Exception {
+    public void logout_Return_Forbidden_WhenNotLoggedIn() throws Exception {
         // Clear the security context to simulate no user logged in
         SecurityContextHolder.clearContext();
-
         // Perform logout and check the response
         mockMvc.perform(post("/api/logout"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_400_LogoutFailed));
+                .andExpect(status().isForbidden());
     }
 
     /**
@@ -389,6 +409,7 @@ class UserControllerTest {
      */
     @Test
     @Transactional
+    @WithMockUser(username = "testuser")
     void getUserDetails_Return_OK() throws Exception {
         // given
         Users testUser = Users.builder()
@@ -406,8 +427,8 @@ class UserControllerTest {
                         .param("userId", String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusCode").value(Constants.STATUS_200))
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_fetchSuccess))
+                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
                 .andExpect(jsonPath("$.identification").value("testuser"))
                 .andExpect(jsonPath("$.name").value("Test User"));
     }
@@ -417,17 +438,18 @@ class UserControllerTest {
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    void getUserDetails_Return_NotFound_Handles_UserNotFoundException() throws Exception {
+    @WithMockUser(username = "testuser")
+    void getUserDetails_Return_NotFound_Handles_NotFoundException() throws Exception {
         // given
-        Long userId = 1L; // This user does not exist
+        Long userId = 3L; // This user does not exist
 
         // when & then
         mockMvc.perform(get("/api/users")
                         .param("userId", String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.statusCode").value(Constants.STATUS_404))
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_404_UserNotFound));
+                .andExpect(jsonPath("$.errorCode").value(NOT_FOUND.name()))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
     }
 
     /**
@@ -436,6 +458,7 @@ class UserControllerTest {
      */
     @Test
     @Transactional
+    @WithMockUser(username = "testuser")
     void getUserDetails_Return_InternalServerError() throws Exception {
         // given
         Users testUser = Users.builder()
@@ -457,4 +480,149 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    @Transactional
+    public void getUserDetails_Return_Forbidden_WhenLoggedInAsDifferentUser() throws Exception {
+        // given
+        Users testUser = Users.builder()
+                .identification("testuser")
+                .name("Test User")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .phoneNumber("01012345678")
+                .build();
+        userRepository.save(testUser);
+
+        Users otherUser = Users.builder()
+                .identification("otheruser")
+                .name("Other User")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .phoneNumber("01012345678")
+                .build();
+        Users savedUser = userRepository.save(otherUser);
+        savedUser.updateRole(Roles.USER);
+
+        UserDetailsDto userDetailsDto = new UserDetailsDto(savedUser);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(userDetailsDto, "password", userDetailsDto.getAuthorities()));
+        SecurityContextHolder.setContext(context);
+
+        // when & then
+        mockMvc.perform(get("/api/users")
+                        .param("userId", testUser.getId().toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Tests the successful retrieval of user summaries by an admin.
+     * @throws Exception if an error occurs during the test.
+     */
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void getUsers_Return_OK_ForAdmin_Without_DeliveryAddress() throws Exception {
+        // given
+        Users adminUser = Users.builder()
+                .identification("admin")
+                .name("Admin User")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .phoneNumber("01012345678")
+                .build();
+        Users savedAdmin = userRepository.save(adminUser);
+        savedAdmin.updateRole(Roles.ADMIN);
+
+        Users normalUser = Users.builder()
+                .identification("user1")
+                .name("User One")
+                .birthDate(LocalDate.of(1991, 1, 1))
+                .phoneNumber("01087654321")
+                .build();
+        Users savedUser = userRepository.save(normalUser);
+        savedUser.updateRole(Roles.USER);
+        // when & then
+        mockMvc.perform(get("/api/admin/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
+                .andExpect(jsonPath("$.content[0].id").value(savedUser.getId()))
+                .andExpect(jsonPath("$.content[0].name").value(savedUser.getName()))
+                .andExpect(jsonPath("$.content[0].birthDate").value(savedUser.getBirthDate().toString()))
+                .andExpect(jsonPath("$.content[0].address").doesNotExist())
+                .andExpect(jsonPath("$.content[0].registrationDate").value(savedUser.getRegistrationDate().toString()));
+
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void getUsers_Return_OK_ForAdmin_With_DeliveryAddress() throws Exception {
+        // given
+        Users adminUser = Users.builder()
+                .identification("admin")
+                .name("Admin User")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .phoneNumber("01012345678")
+                .build();
+        Users savedAdmin = userRepository.save(adminUser);
+        savedAdmin.updateRole(Roles.ADMIN);
+
+        Users normalUser = Users.builder()
+                .identification("user1")
+                .name("User One")
+                .birthDate(LocalDate.of(1991, 1, 1))
+                .phoneNumber("01087654321")
+                .build();
+        Users savedUser = userRepository.save(normalUser);
+        savedUser.updateRole(Roles.USER);
+
+        Long addressId = deliveryAddressService.addDeliveryAddress(new DeliveryAddressDto(savedUser.getId(), null, "abc","01012341234",
+                12345,"abc로 123", "101- 1234"));
+        // when & then
+        mockMvc.perform(get("/api/admin/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
+                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
+                .andExpect(jsonPath("$.content[0].id").value(savedUser.getId()))
+                .andExpect(jsonPath("$.content[0].name").value(savedUser.getName()))
+                .andExpect(jsonPath("$.content[0].birthDate").value(savedUser.getBirthDate().toString()))
+                .andExpect(jsonPath("$.content[0].addressId").value(addressId))
+                .andExpect(jsonPath("$.content[0].zipCode").value(12345))
+                .andExpect(jsonPath("$.content[0].address").value("abc로 123"))
+                .andExpect(jsonPath("$.content[0].addressDetail").value("101- 1234"))
+                .andExpect(jsonPath("$.content[0].registrationDate").value(savedUser.getRegistrationDate().toString()));
+
+    }
+    /**
+     * Tests forbidden access when a non-admin user tries to retrieve user summaries.
+     * @throws Exception if an error occurs during the test.
+     */
+    @Test
+    @Transactional
+    @WithMockUser(username = "user", roles = {"USER"})
+    public void getUsers_Return_Forbidden_ForNonAdmin() throws Exception {
+        // given
+        Users normalUser = Users.builder()
+                .identification("user")
+                .name("Normal User")
+                .birthDate(LocalDate.of(1991, 1, 1))
+                .phoneNumber("01087654321")
+                .build();
+        userRepository.save(normalUser);
+
+        // when & then
+        mockMvc.perform(get("/api/admin/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 }
+
