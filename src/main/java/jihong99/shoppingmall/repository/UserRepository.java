@@ -13,7 +13,10 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByIdentification(String identification);
-    @Query("SELECT new jihong99.shoppingmall.dto.UserSummaryDto(u.id, u.name, u.birthDate, COALESCE(da.address, 'No Address'), u.registrationDate) " +
+    @Query("SELECT new jihong99.shoppingmall.dto.UserSummaryDto(" +
+            "u.id, u.name, u.birthDate, da.id, da.zipCode, da.address, da.addressDetail, u.registrationDate) " +
             "FROM Users u LEFT JOIN DeliveryAddress da ON da.users.id = u.id WHERE u.role = 'USER'")
     Page<UserSummaryDto> findAllUserSummaries(Pageable pageable);
 }
+
+
