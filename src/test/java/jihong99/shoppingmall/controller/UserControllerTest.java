@@ -579,7 +579,7 @@ class UserControllerTest {
         Users savedUser = userRepository.save(normalUser);
         savedUser.updateRole(Roles.USER);
 
-        deliveryAddressService.addDeliveryAddress(new DeliveryAddressDto(savedUser.getId(), 1L, "abc","01012341234",
+        Long addressId = deliveryAddressService.addDeliveryAddress(new DeliveryAddressDto(savedUser.getId(), null, "abc","01012341234",
                 12345,"abc로 123", "101- 1234"));
         // when & then
         mockMvc.perform(get("/api/admin/users")
@@ -593,7 +593,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.content[0].id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.content[0].name").value(savedUser.getName()))
                 .andExpect(jsonPath("$.content[0].birthDate").value(savedUser.getBirthDate().toString()))
-                .andExpect(jsonPath("$.content[0].addressId").value(1L))
+                .andExpect(jsonPath("$.content[0].addressId").value(addressId))
                 .andExpect(jsonPath("$.content[0].zipCode").value(12345))
                 .andExpect(jsonPath("$.content[0].address").value("abc로 123"))
                 .andExpect(jsonPath("$.content[0].addressDetail").value("101- 1234"))
