@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.DeliveryAddressNotFoundException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.mapper.DeliveryAddressMapper;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
@@ -13,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+
+import static jihong99.shoppingmall.constants.Constants.*;
 
 
 @Service
@@ -43,7 +44,7 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
     @Transactional
     public void addDeliveryAddress(DeliveryAddressDto requestDto) {
         Users findUser = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + requestDto.getUserId()));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
         DeliveryAddressMapper deliveryAddressMapper = new DeliveryAddressMapper();
         DeliveryAddress deliveryAddress = deliveryAddressMapper.mapToDeliveryAddress(findUser, requestDto);
         deliveryAddressRepository.save(deliveryAddress);
@@ -54,34 +55,36 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
      *
      * @param addressId The ID of the delivery address to be updated.
      * @param requestDto The DTO object containing the updated delivery address details.
-     * @throws DeliveryAddressNotFoundException If the delivery address with the specified ID is not found.
+     * @throws NotFoundException If the delivery address with the specified ID is not found.
      */
     @Override
     @Transactional
     public void updateDeliveryAddress(Long addressId, DeliveryAddressDto requestDto) {
         DeliveryAddress deliveryAddress = deliveryAddressRepository.findById(addressId)
-                .orElseThrow(() -> new DeliveryAddressNotFoundException("Delivery address not found with id: " + addressId));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_DeliveryAddressNotFound));
+        applyAddressUpdates(requestDto, deliveryAddress);
+        deliveryAddressRepository.save(deliveryAddress);
+    }
 
+    private static void applyAddressUpdates(DeliveryAddressDto requestDto, DeliveryAddress deliveryAddress) {
         deliveryAddress.updateAddress(requestDto.getAddress());
         deliveryAddress.updateAddressDetail(requestDto.getAddressDetail());
         deliveryAddress.updateZipCode(requestDto.getZipCode());
         deliveryAddress.updateName(requestDto.getName());
         deliveryAddress.updatePhoneNumber(requestDto.getPhoneNumber());
-
-        deliveryAddressRepository.save(deliveryAddress);
     }
 
     /**
      * Deletes the delivery address with the specified ID.
      *
      * @param addressId The ID of the delivery address to be deleted.
-     * @throws DeliveryAddressNotFoundException If the delivery address with the specified ID is not found.
+     * @throws NotFoundException If the delivery address with the specified ID is not found.
      */
     @Override
     @Transactional
     public void deleteDeliveryAddress(Long addressId) {
         DeliveryAddress deliveryAddress = deliveryAddressRepository.findById(addressId)
-                .orElseThrow(() -> new DeliveryAddressNotFoundException("Delivery address not found with id: " + addressId));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_DeliveryAddressNotFound));
         deliveryAddressRepository.delete(deliveryAddress);
     }
 }

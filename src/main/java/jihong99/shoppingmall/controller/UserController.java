@@ -8,6 +8,7 @@ import jihong99.shoppingmall.exception.DuplicateIdentificationException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IUserService;
+import jihong99.shoppingmall.utils.annotation.HasId;
 import jihong99.shoppingmall.validation.groups.IdentificationValidation;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ import static jihong99.shoppingmall.constants.Constants.*;
 @RequiredArgsConstructor
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
-
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final IUserService iuserService;
 
@@ -59,16 +59,11 @@ public class UserController {
      */
     @PostMapping("/users/check-id")
     public ResponseEntity<ResponseDto> verifyIdentification(@RequestBody @Validated(IdentificationValidation.class) SignUpDto signUpDto) {
-        try {
-            iuserService.checkDuplicateIdentification(signUpDto.getIdentification());
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new ResponseDto(STATUS_200, MESSAGE_200_verifiedId));
-        } catch (DuplicateIdentificationException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(STATUS_400, MESSAGE_400_duplicatedId));
-        }
+        iuserService.checkDuplicateIdentification(signUpDto.getIdentification());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_verifiedId));
+
     }
 
     /**
@@ -93,24 +88,11 @@ public class UserController {
      */
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto> signUp(@RequestBody @Validated(SignUpValidation.class) SignUpDto signUpDto) {
-        try {
-            iuserService.signUpAccount(signUpDto);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(new ResponseDto(STATUS_201, MESSAGE_201_createUser));
-        } catch (DuplicateIdentificationException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(STATUS_400, MESSAGE_400_duplicatedId));
-        } catch (PasswordMismatchException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(STATUS_400, MESSAGE_400_MissMatchPw));
-        } catch (DateTimeParseException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(STATUS_400, MESSAGE_400_WrongBirthDate));
-        }
+        iuserService.signUpAccount(signUpDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDto(STATUS_201, MESSAGE_201_createUser));
+
     }
 
     /**
@@ -133,19 +115,12 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request, HttpServletResponse response){
-        try{
-            Users user = iuserService.loginByIdentificationAndPassword(loginRequestDto);
-            String accessToken = iuserService.generateAccessToken(user);
-            String refreshToken = iuserService.generateRefreshToken(user);
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(LoginResponseDto.success(accessToken, refreshToken, user.getId()));
-        }catch (BadCredentialsException e){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(LoginResponseDto.error(STATUS_400, MESSAGE_400_LoginFailed));
-        }
+        Users user = iuserService.loginByIdentificationAndPassword(loginRequestDto);
+        String accessToken = iuserService.generateAccessToken(user);
+        String refreshToken = iuserService.generateRefreshToken(user);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(LoginResponseDto.success(accessToken, refreshToken, user.getId()));
     }
     /**
      * Logout processing
@@ -157,17 +132,16 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<ResponseDto> logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            LOGGER.info("User logged out: {}", authentication.getName());
-            SecurityContextHolder.clearContext();
-            return ResponseEntity.ok(new ResponseDto(STATUS_200, MESSAGE_200_LogoutSuccess));
-        } else {
-            LOGGER.info("Logout attempt with no user logged in.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(STATUS_400, MESSAGE_400_LogoutFailed));
-        }
+        LOGGER.info("User logged out: {}", authentication.getName());
+        SecurityContextHolder.clearContext();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_LogoutSuccess));
     }
     /**
      * Retrieves user details based on the provided user ID.
+     *
+     * <p>Checks if the authenticated user has the required ID before retrieving the user details.</p>
      *
      * @param userId The ID of the user whose details are being requested
      * @return ResponseEntity<MyPageResponseDto> containing the user's details
@@ -177,29 +151,32 @@ public class UserController {
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
+     * @precondition The authenticated user must have the specified userId
      */
+    @HasId
     @GetMapping("/users")
-    @PreAuthorize("hasRole('USER') and #userId == principal.user.id")
     public ResponseEntity<MyPageResponseDto> getUserDetails(@RequestParam Long userId) {
-        try{
-            MyPageResponseDto userDetails = iuserService.getUserDetails(userId);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(userDetails);
-        }catch (NotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(MyPageResponseDto.error(STATUS_404, MESSAGE_404_UserNotFound));
-        }
+        MyPageResponseDto userDetails = iuserService.getUserDetails(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userDetails);
 
     }
 
     /**
      * Retrieves a summary list of users.
      *
+     * <p>This endpoint is accessible only by users with the 'ADMIN' role.
+     * It retrieves a paginated summary list of all users.</p>
+     *
      * @param page the page number to retrieve (for pagination)
      * @param size the number of users to retrieve per page (maximum 10)
-     * @return a paginated response containing the user summaries
+     * @return ResponseEntity<PaginatedResponseDto<UserSummaryDto>> a paginated response containing the user summaries
+     * @success Valid response containing the paginated user summaries
+     * Response Code: 200
+     * @exception Exception Internal server error occurred
+     * Response Code: 500
+     * @precondition The authenticated user must have the 'ADMIN' role
      */
     @GetMapping("/admin/users")
     @PreAuthorize("hasRole('ADMIN')")
