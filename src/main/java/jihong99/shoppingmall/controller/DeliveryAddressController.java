@@ -3,7 +3,6 @@ package jihong99.shoppingmall.controller;
 import jakarta.validation.Valid;
 import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.dto.ResponseDto;
-import jihong99.shoppingmall.exception.DeliveryAddressNotFoundException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import lombok.RequiredArgsConstructor;
@@ -38,16 +37,11 @@ public class DeliveryAddressController {
      */
     @PostMapping("/delivery-address")
     public ResponseEntity<ResponseDto> addDeliveryAddress(@Valid @RequestBody DeliveryAddressDto requestDto) {
-        try{
-            ideliveryAddressService.addDeliveryAddress(requestDto);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(new ResponseDto(STATUS_201, MESSAGE_201_createDeliveryAddress));
-        }catch(NotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(STATUS_404, MESSAGE_404_UserNotFound));
-        }
+        ideliveryAddressService.addDeliveryAddress(requestDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDto(STATUS_201, MESSAGE_201_createDeliveryAddress));
+
     }
 
     /**
@@ -60,23 +54,18 @@ public class DeliveryAddressController {
      * @return ResponseEntity<ResponseDto> Response object containing the result of the update operation
      * @success Valid response indicating that the delivery address was successfully updated
      * Response Code: 200
-     * @exception DeliveryAddressNotFoundException Thrown if the delivery address with the given ID is not found
+     * @exception NotFoundException Thrown if the delivery address with the given ID is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
      */
     @PutMapping("/delivery-address/{addressId}")
     public ResponseEntity<ResponseDto> updateDeliveryAddress(@PathVariable Long addressId, @Valid @RequestBody DeliveryAddressDto requestDto) {
-        try {
-            ideliveryAddressService.updateDeliveryAddress(addressId, requestDto);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new ResponseDto(STATUS_200, MESSAGE_200_UpdateDeliveryAddressSuccess));
-        } catch (DeliveryAddressNotFoundException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(STATUS_404, MESSAGE_404_DeliveryAddressNotFound));
-        }
+        ideliveryAddressService.updateDeliveryAddress(addressId, requestDto);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_UpdateDeliveryAddressSuccess));
+
     }
 
     /**
@@ -88,23 +77,18 @@ public class DeliveryAddressController {
      * @return ResponseEntity<ResponseDto> Response object containing the result of the delete operation
      * @success Valid response indicating that the delivery address was successfully deleted
      * Response Code: 200
-     * @exception DeliveryAddressNotFoundException Thrown if the delivery address with the given ID is not found
+     * @exception NotFoundException Thrown if the delivery address with the given ID is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
      */
     @DeleteMapping("/delivery-address/{addressId}")
     public ResponseEntity<ResponseDto> deleteDeliveryAddress(@PathVariable Long addressId) {
-        try {
-            ideliveryAddressService.deleteDeliveryAddress(addressId);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new ResponseDto(STATUS_200, MESSAGE_200_DeleteDeliveryAddressSuccess));
-        } catch (DeliveryAddressNotFoundException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(STATUS_404, MESSAGE_404_DeliveryAddressNotFound));
-        }
+        ideliveryAddressService.deleteDeliveryAddress(addressId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_DeleteDeliveryAddressSuccess));
+
     }
 
 }
