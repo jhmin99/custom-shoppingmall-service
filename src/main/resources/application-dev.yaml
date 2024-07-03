@@ -14,7 +14,6 @@ spring:
     show-sql: true
 
 
-
 cors:
   allowed:
     origins: http://localhost:3000
