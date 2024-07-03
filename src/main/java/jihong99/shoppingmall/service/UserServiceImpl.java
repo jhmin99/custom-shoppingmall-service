@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.Set;
 
+import static jihong99.shoppingmall.constants.Constants.*;
 import static jihong99.shoppingmall.entity.enums.Tiers.*;
 
 @Service
@@ -55,10 +56,10 @@ public class UserServiceImpl implements IUserService {
     public void signUpAccount(SignUpDto signUpDto) {
         Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
         if (findUser.isPresent()) {
-            throw new DuplicateIdentificationException("The ID already exists.");
+            throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
-            throw new PasswordMismatchException("Passwords do not match.");
+            throw new PasswordMismatchException(MESSAGE_400_MissMatchPw);
         }
         UserMapper userMapper = new UserMapper();
         Users user = userMapper.mapToUser(signUpDto);
@@ -137,7 +138,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public MyPageResponseDto getUserDetails(Long userId) {
         Users findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
         Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
         return MyPageResponseDto.success(findUser,deliveryAddresses);
     }
@@ -154,10 +155,10 @@ public class UserServiceImpl implements IUserService {
     public void signUpAdminAccount(SignUpDto signUpDto) {
         Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
         if (findUser.isPresent()) {
-            throw new DuplicateIdentificationException("The ID already exists.");
+            throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
-            throw new PasswordMismatchException("Passwords do not match.");
+            throw new PasswordMismatchException(MESSAGE_400_MissMatchPw);
         }
         UserMapper userMapper = new UserMapper();
         Users user = userMapper.mapToUser(signUpDto);
@@ -213,7 +214,12 @@ public class UserServiceImpl implements IUserService {
     private boolean isIdentificationExist(String identification) {
         return userRepository.findByIdentification(identification).isPresent();
     }
-
+    /**
+     * Retrieves a paginated list of user summaries.
+     *
+     * @param pageable the pagination information
+     * @return a page of user summaries
+     */
     @Override
     public Page<UserSummaryDto> getUsers(Pageable pageable) {
         return userRepository.findAllUserSummaries(pageable);
