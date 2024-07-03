@@ -186,8 +186,8 @@ public class UserServiceImpl implements IUserService {
      * @param user the user for whom to create the cart and wishlist
      */
     private void createCartAndWishList(Users user) {
-        Cart cart = new Cart(0L);
-        WishList wishList = new WishList();
+        Cart cart = Cart.createCart(0L);
+        WishList wishList = WishList.createWishList();
         cartRepository.save(cart);
         wishListRepository.save(wishList);
         user.updateCart(cart);

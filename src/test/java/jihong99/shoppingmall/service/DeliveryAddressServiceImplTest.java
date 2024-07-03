@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.DeliveryAddressNotFoundException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
@@ -186,7 +185,7 @@ class DeliveryAddressServiceImplTest {
         DeliveryAddressDto dto = new DeliveryAddressDto(user.getId(), -1L, "Updated Name", "01087654321", 54321, "Updated Address", "Updated Detail");
 
         // when & then
-        assertThrows(DeliveryAddressNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             deliveryAddressService.updateDeliveryAddress(-1L, dto);
         });
     }
@@ -218,7 +217,7 @@ class DeliveryAddressServiceImplTest {
         deliveryAddressService.deleteDeliveryAddress(address.getId());
 
         // then
-        assertThrows(DeliveryAddressNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             deliveryAddressService.deleteDeliveryAddress(address.getId());
         });
         assertThat(deliveryAddressRepository.findById(address.getId()).isEmpty()).isTrue();
@@ -232,7 +231,7 @@ class DeliveryAddressServiceImplTest {
     @Transactional
     void deleteDeliveryAddress_DeliveryAddressNotFoundException() {
         // when & then
-        assertThrows(DeliveryAddressNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             deliveryAddressService.deleteDeliveryAddress(-1L);
         });
     }

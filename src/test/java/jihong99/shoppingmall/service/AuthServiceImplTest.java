@@ -2,6 +2,7 @@ package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.entity.Users;
+import jihong99.shoppingmall.exception.InvalidTokenException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,16 +67,16 @@ class AuthServiceImplTest {
     }
 
     /**
-     * Tests handling of an IllegalArgumentException when the refresh token is invalid.
+     * Tests handling of an InvalidTokenException when the refresh token is invalid.
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    void refreshAccessToken_IllegalArgumentException_No_RefreshToken() {
+    void refreshAccessToken_InvalidTokenException_No_RefreshToken() {
         // given
         String invalidRefreshToken = null;
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTokenException.class, () -> {
             authService.refreshAccessToken(invalidRefreshToken);
         });
 
@@ -86,18 +87,18 @@ class AuthServiceImplTest {
     }
 
     /**
-     * Tests handling of an IllegalArgumentException when the refresh token is invalid.
+     * Tests handling of an InvalidTokenException when the refresh token is invalid.
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    void refreshAccessToken_IllegalArgumentException_Invalid_RefreshToken() {
+    void refreshAccessToken_InvalidTokenException_Invalid_RefreshToken() {
         // given
         String invalidRefreshToken = "invalidRefreshToken";
 
         when(jwtTokenProvider.validateToken(invalidRefreshToken)).thenReturn(false);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTokenException.class, () -> {
             authService.refreshAccessToken(invalidRefreshToken);
         });
 

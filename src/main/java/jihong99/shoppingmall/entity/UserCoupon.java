@@ -6,7 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserCoupon extends BaseEntity {
 

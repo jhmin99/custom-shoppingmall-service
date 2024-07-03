@@ -9,7 +9,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WishList extends BaseEntity {
 
     /**
@@ -18,4 +18,13 @@ public class WishList extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wishListId;
 
+    @Builder
+    public WishList(Long wishListId) {
+        this.wishListId = wishListId;
+    }
+
+    public static WishList createWishList() {
+        return WishList.builder()
+                .build();
+    }
 }

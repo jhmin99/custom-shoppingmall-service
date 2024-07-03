@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Coupon extends BaseEntity {
 

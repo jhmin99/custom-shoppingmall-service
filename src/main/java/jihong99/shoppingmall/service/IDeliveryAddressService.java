@@ -9,7 +9,7 @@ import java.util.Set;
 public interface IDeliveryAddressService {
     Set<DeliveryAddress> getDeliveryAddresses(Users findUser);
 
-    void addDeliveryAddress(DeliveryAddressDto requestDto);
+    Long addDeliveryAddress(DeliveryAddressDto requestDto);
 
     void updateDeliveryAddress(Long addressId, DeliveryAddressDto requestDto);
 
