@@ -1,21 +1,11 @@
 spring:
   profiles:
     active: "dev"
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
-  h2:
-    console:
-      enabled: true
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
 security:
   jwt:
     secret-key: hongshopping
     access-token-expiration-time: 1800000    # 30 minutes in milliseconds
     refresh-token-expiration-time: 86400000  # 1 day in milliseconds
+superAdmin:
+  id: "superadmin"
+  pw: "superadmin_password"
