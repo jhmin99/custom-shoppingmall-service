@@ -59,7 +59,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
-            throw new PasswordMismatchException(MESSAGE_400_MissMatchPw);
+            throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
         UserMapper userMapper = new UserMapper();
         Users user = userMapper.mapToUser(signUpDto);
@@ -158,7 +158,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
-            throw new PasswordMismatchException(MESSAGE_400_MissMatchPw);
+            throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
         UserMapper userMapper = new UserMapper();
         Users user = userMapper.mapToUser(signUpDto);
