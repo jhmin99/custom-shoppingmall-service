@@ -17,7 +17,4 @@ public class LoginResponseDto {
         return  new LoginResponseDto(Constants.STATUS_200, Constants.MESSAGE_200_LoginSuccess, accessToken,refreshToken,userId);
     }
 
-    public static LoginResponseDto error(String statusCode, String statusMessage){
-        return new LoginResponseDto(statusCode, statusMessage, null, null, null);
-    }
 }

@@ -161,7 +161,7 @@ class UserControllerTest {
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    public void verifyIdentification_Return_InternalServerError() throws Exception {
+    public void verifyIdentification_InternalServerError_Handles_Exception() throws Exception {
         // given
         mockMvc = MockMvcBuilders.standaloneSetup(new UserController(null))
                 .setValidator(new LocalValidatorFactoryBean())
@@ -233,7 +233,7 @@ class UserControllerTest {
                         .content(asJsonString(signUpDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value(BAD_REQUEST.name()))
-                .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_MissMatchPw));
+                .andExpect(jsonPath("$.errorMessage").value(MESSAGE_400_MisMatchPw));
     }
 
     /**

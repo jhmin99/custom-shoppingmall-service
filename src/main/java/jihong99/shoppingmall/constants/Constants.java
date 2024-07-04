@@ -18,7 +18,7 @@ public class Constants {
     public static final String MESSAGE_200_UpdateDeliveryAddressSuccess = "Delivery address updated successfully.";
     public static final String MESSAGE_200_DeleteDeliveryAddressSuccess = "Delivery address deleted successfully.";
     public static final String MESSAGE_400_duplicatedId = "The ID already exists.";
-    public static final String MESSAGE_400_MissMatchPw = "Passwords do not match.";
+    public static final String MESSAGE_400_MisMatchPw = "Passwords do not match.";
     public static final String MESSAGE_400_InvalidRefreshToken = "Refresh Token is invalid or not found";
     public static final String MESSAGE_404_UserNotFound = "User not found.";
     public static final String MESSAGE_404_CategoryNotFound = "Category not found.";

@@ -39,14 +39,4 @@ public class MyPageResponseDto {
         return new MyPageResponseDto(STATUS_200, MESSAGE_200_fetchSuccess, findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDto);
     }
 
-    /**
-     * Creates an error MyPageResponseDto.
-     *
-     * @param statusCode The status code of the error.
-     * @param statusMessage The status message of the error.
-     * @return MyPageResponseDto A response object containing error details.
-     */
-    public static MyPageResponseDto error(String statusCode, String statusMessage) {
-        return new MyPageResponseDto(statusCode, statusMessage, null, null, null, null, null);
-    }
 }

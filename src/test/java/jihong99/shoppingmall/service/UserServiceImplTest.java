@@ -16,6 +16,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +41,7 @@ class UserServiceImplTest {
     @Autowired
     private DeliveryAddressRepository deliveryAddressRepository;
     @Autowired
-    private UserServiceImpl userService;
+    private IUserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -341,6 +344,84 @@ class UserServiceImplTest {
         // then
         assertThat(refreshToken).isNotNull();
         assertThat(jwtTokenProvider.validateToken(refreshToken)).isTrue();
+    }
+
+    @Test
+    @Transactional
+    public void signUpAdminAccount_Success(){
+        // given
+        SignUpDto signUpDto = new SignUpDto("admin123","admin123!@#","admin123!@#",
+                "민지홍","1999-12-30","01012341234");
+        // when
+        userService.signUpAdminAccount(signUpDto);
+        Users findAdmin = userRepository.findByIdentification("admin123").get();
+        // then
+        assertThat(findAdmin.getId()).isNotNull();
+        assertThat(findAdmin.getIdentification()).isEqualTo("admin123");
+        assertThat(passwordEncoder.matches("admin123!@#", findAdmin.getPassword())).isTrue();
+        assertThat(findAdmin.getName()).isEqualTo("민지홍");
+        assertThat(findAdmin.getBirthDate()).isEqualTo(LocalDate.parse("1999-12-30"));
+        assertThat(findAdmin.getPhoneNumber()).isEqualTo("01012341234");
+
+        assertThat(findAdmin.getRole()).isEqualTo(ADMIN);
+
+        assertThat(findAdmin.getRegistrationDate()).isEqualTo(LocalDate.now());
+        assertThat(findAdmin.getCreationTime()).isNotNull();
+        assertThat(findAdmin.getLastModifiedTime()).isNotNull();
+    }
+    @Test
+    @Transactional
+    public void signUpAdminAccount_DuplicateIdentificationException(){
+        // given
+        Users admin = Users.builder()
+                .identification("admin123")
+                .build();
+        userRepository.save(admin);
+        // when & then
+        SignUpDto signUpDto = new SignUpDto("admin123","admin123!@#","admin123!@#",
+                "민지홍","1999-12-30","01012341234");
+        assertThrows(DuplicateIdentificationException.class,()->{
+            userService.signUpAdminAccount(signUpDto);
+        });
+    }
+    @Test
+    public void signUpAdminAccount_PasswordMismatchException(){
+        // given
+        SignUpDto signUpDto = new SignUpDto("admin123","admin123!@#","wrong123!@#",
+                "민지홍","1999-12-30","01012341234");
+        // when & then
+        assertThrows(PasswordMismatchException.class,()->{
+            userService.signUpAdminAccount(signUpDto);
+        });
+
+    }
+    @Test
+    @Transactional
+    public void getUsers_Success() {
+        // given
+        SignUpDto signUpDto1 = new SignUpDto("user1", "password1!@#", "password1!@#",
+                "사용자1", "1990-01-01", "01012345678");
+        userService.signUpAccount(signUpDto1);
+
+        SignUpDto signUpDto2 = new SignUpDto("user2", "password2!@#", "password2!@#",
+                "사용자2", "1991-02-02", "01023456789");
+        userService.signUpAccount(signUpDto2);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<UserSummaryDto> userSummaries = userService.getUsers(pageable);
+
+        // then
+        assertThat(userSummaries).isNotNull();
+        assertThat(userSummaries.getTotalElements()).isEqualTo(2);
+        assertThat(userSummaries.getContent()).hasSize(2);
+
+        UserSummaryDto user1 = userSummaries.getContent().get(0);
+        assertThat(user1.getName()).isEqualTo("사용자1");
+
+        UserSummaryDto user2 = userSummaries.getContent().get(1);
+        assertThat(user2.getName()).isEqualTo("사용자2");
     }
 
 }
