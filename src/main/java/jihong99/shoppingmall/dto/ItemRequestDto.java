@@ -1,9 +1,6 @@
 package jihong99.shoppingmall.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -26,6 +23,7 @@ public class ItemRequestDto {
 
     @NotNull(message = "Keyword is a required field.")
     @Size(min = 3, max = 50, message = "Keyword must be between 3 and 50 characters.")
+    @Pattern(regexp = "^#(\\w+)(#\\w+)*$", message = "Keyword must start with # and be followed by words separated by #.")
     private String keyword;
 
     @NotEmpty(message = "Category IDs cannot be empty.")
