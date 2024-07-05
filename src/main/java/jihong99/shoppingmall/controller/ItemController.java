@@ -12,11 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import static jihong99.shoppingmall.constants.Constants.MESSAGE_404_CategoryNotFound;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,6 +33,8 @@ public class ItemController {
      * @return ResponseEntity<Object> Response object containing the result of the item creation
      * @success Item successfully created
      * Response Code: 201
+     * @exception MethodArgumentNotValidException Validation failed
+     * Response Code: 400
      * @exception NotFoundException Thrown if the category for the item is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
