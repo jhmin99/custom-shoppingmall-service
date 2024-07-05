@@ -30,4 +30,8 @@ public class Item extends BaseEntity {
     @CreatedDate
     private LocalDate registrationDate;
 
+    public void updateName(String name){ this.name = name;}
+    public void updatePrice(Integer price){this.price = price;}
+    public void updateInventory(Integer inventory){this.inventory = inventory;}
+    public void updateKeyword(String keyword){this.keyword = keyword;}
 }
