@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.ItemRequestDto;
 import jihong99.shoppingmall.dto.ItemResponseDto;
 import jihong99.shoppingmall.entity.Category;
+import jihong99.shoppingmall.entity.Item;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.CategoryItemRepository;
 import jihong99.shoppingmall.repository.CategoryRepository;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 
+import static jihong99.shoppingmall.constants.Constants.MESSAGE_404_ItemNotFound;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -77,4 +79,67 @@ class ItemServiceImplTest {
             itemService.createItem(itemRequestDto);
         });
     }
+
+
+    @Test
+    @Transactional
+    void updateItem_Success() {
+        // given
+        Category category1 = new Category(null,"Category 1");
+        Category category2 = new Category(null,"Category 2");
+        categoryRepository.save(category1);
+        categoryRepository.save(category2);
+        ItemRequestDto itemRequestDto = new ItemRequestDto("new Item", 1500, 20, "#new", Arrays.asList(category1.getId(), category2.getId()));
+        Long itemId = itemService.createItem(itemRequestDto).getId();
+
+        ItemRequestDto itemRequestDto2 = new ItemRequestDto("Updated Item", 1500, 20, "#updated", Arrays.asList(category1.getId(), category2.getId()));
+
+        // when
+        itemService.updateItem(itemId, itemRequestDto2);
+        Item updatedItem = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException(MESSAGE_404_ItemNotFound));
+
+        // then
+        assertThat(updatedItem.getName()).isEqualTo("Updated Item");
+        assertThat(updatedItem.getPrice()).isEqualTo(1500);
+        assertThat(updatedItem.getInventory()).isEqualTo(20);
+        assertThat(updatedItem.getKeyword()).isEqualTo("#updated");
+    }
+
+    @Test
+    void updateItem_NotFoundException(){
+        // given
+        ItemRequestDto itemRequestDto = new ItemRequestDto("Updated Item", 1500, 20, "#updated", Arrays.asList(1L, 2L));
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> {
+            itemService.updateItem(999L, itemRequestDto);
+        });
+    }
+    @Test
+    void deleteItem_Success(){
+        // given
+        Category category1 = new Category(null,"Category 1");
+        Category category2 = new Category(null,"Category 2");
+        categoryRepository.save(category1);
+        categoryRepository.save(category2);
+        ItemRequestDto itemRequestDto = new ItemRequestDto("new Item", 1500, 20, "#new", Arrays.asList(category1.getId(), category2.getId()));
+        Long itemId = itemService.createItem(itemRequestDto).getId();
+        // when
+        itemService.deleteItem(itemId);
+        // then
+        assertThrows(NotFoundException.class, () -> {
+            itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException(MESSAGE_404_ItemNotFound));
+        });
+    }
+    @Test
+    void deleteItem_NotFoundException(){
+        // when & then
+        assertThrows(NotFoundException.class, () -> {
+            itemService.deleteItem(-1L);
+        });
+    }
+
+
+
+
 }
