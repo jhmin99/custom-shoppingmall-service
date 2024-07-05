@@ -48,6 +48,52 @@ public class ItemServiceImpl implements IItemService{
         return ItemResponseDto.of(savedItem.getId(), savedItem.getName(), savedItem.getPrice(), savedItem.getInventory(),
                 savedItem.getKeyword(), savedItem.getRegistrationDate(), categoryNames);
     }
+    /**
+     * Updates an existing item with the specified details.
+     *
+     * <p>This method finds the item by its ID, updates its fields with the values from the provided {@link ItemRequestDto},
+     * and saves the updated item back to the database. If the item ID does not exist, a {@link NotFoundException} is thrown.</p>
+     *
+     * @param itemId the ID of the item to be updated
+     * @param itemRequestDto the item request data transfer object containing the updated item details
+     * @throws NotFoundException if the item with the specified ID does not exist
+     */
+    @Override
+    @Transactional
+    public void updateItem(Long itemId, ItemRequestDto itemRequestDto) {
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new NotFoundException(MESSAGE_404_ItemNotFound));
+        applyItemUpdates(itemRequestDto, item);
+        itemRepository.save(item);
+    }
+
+    private void applyItemUpdates(ItemRequestDto itemRequestDto, Item item) {
+        item.updateName(itemRequestDto.getName());
+        item.updatePrice(itemRequestDto.getPrice());
+        item.updateInventory(itemRequestDto.getInventory());
+        item.updateKeyword(itemRequestDto.getKeyword());
+    }
+    /**
+     * Deletes an existing item by its ID.
+     *
+     * <p>This method finds the item by its ID and deletes it from the database.
+     * If the item ID does not exist, a {@link NotFoundException} is thrown.</p>
+     *
+     * @param itemId the ID of the item to be deleted
+     * @throws NotFoundException if the item with the specified ID does not exist
+     */
+    @Override
+    @Transactional
+    public void deleteItem(Long itemId) {
+        List<CategoryItem> categoryItems = categoryItemRepository.findByItemId(itemId);
+        if (!categoryItems.isEmpty()) {
+            categoryItemRepository.deleteAll(categoryItems);
+        }
+
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                new NotFoundException(MESSAGE_404_ItemNotFound));
+        itemRepository.delete(item);
+    }
 
     private Item createItemEntity(ItemRequestDto itemRequestDto) {
         ItemMapper itemMapper = new ItemMapper();
