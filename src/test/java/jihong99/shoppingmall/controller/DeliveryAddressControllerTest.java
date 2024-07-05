@@ -66,7 +66,7 @@ class DeliveryAddressControllerTest {
      */
     @Test
     @Transactional
-    public void addDeliveryAddress_Return_OK() throws Exception {
+    public void addDeliveryAddress_Return_Created() throws Exception {
         // given
         Users user = Users.builder()
                 .identification("testuser")
