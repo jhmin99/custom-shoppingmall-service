@@ -67,7 +67,7 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
         deliveryAddressRepository.save(deliveryAddress);
     }
 
-    private static void applyAddressUpdates(DeliveryAddressDto requestDto, DeliveryAddress deliveryAddress) {
+    private void applyAddressUpdates(DeliveryAddressDto requestDto, DeliveryAddress deliveryAddress) {
         deliveryAddress.updateAddress(requestDto.getAddress());
         deliveryAddress.updateAddressDetail(requestDto.getAddressDetail());
         deliveryAddress.updateZipCode(requestDto.getZipCode());
