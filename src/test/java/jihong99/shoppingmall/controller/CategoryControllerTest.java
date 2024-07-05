@@ -59,7 +59,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void createCategory_Return_OK() throws Exception {
+    void createCategory_Return_Created() throws Exception {
         // given
         CategoryRequestDto categoryRequestDto = new CategoryRequestDto("Sample Category");
 

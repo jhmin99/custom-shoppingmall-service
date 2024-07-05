@@ -183,7 +183,7 @@ class UserControllerTest {
      */
     @Test
     @Transactional
-    public void signUp_Return_OK() throws Exception {
+    public void signUp_Return_Created() throws Exception {
         // given
         SignUpDto signUpDto = new SignUpDto("abcd123", "abcd123!@#",
                 "abcd123!@#", "민지홍", "1999-12-30", "01012341234");
