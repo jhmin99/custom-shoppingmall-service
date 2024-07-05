@@ -50,7 +50,7 @@ class SuperAdminControllerTest {
     @Test
     @Transactional
     @WithMockUser(username = "superadmin", roles = "SUPER_ADMIN")
-    void createAdmin_Return_OK() throws Exception {
+    void createAdmin_Return_Created() throws Exception {
         // given
         SignUpDto signUpDto = new SignUpDto("admin123", "admin123!@#",
                 "admin123!@#", "민지홍", "1999-12-30", "01012341234");
