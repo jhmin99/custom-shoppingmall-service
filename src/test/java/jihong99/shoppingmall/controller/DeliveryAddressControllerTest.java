@@ -6,6 +6,7 @@ import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.dto.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.enums.Roles;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import org.junit.jupiter.api.AfterEach;
@@ -45,8 +46,10 @@ class DeliveryAddressControllerTest {
     private IDeliveryAddressService deliveryAddressService;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
+    @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -57,6 +60,7 @@ class DeliveryAddressControllerTest {
 
     @AfterEach
     void tearDown() {
+        deliveryAddressRepository.deleteAll();
         userRepository.deleteAll();
     }
 

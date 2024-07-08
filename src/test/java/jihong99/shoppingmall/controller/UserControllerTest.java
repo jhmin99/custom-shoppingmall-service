@@ -75,8 +75,8 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() {
-        userRepository.deleteAll();
         deliveryAddressRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     /**
