@@ -2,6 +2,7 @@ package jihong99.shoppingmall.controller;
 
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.SignUpDto;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.IUserService;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +37,8 @@ class SuperAdminControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -45,6 +48,7 @@ class SuperAdminControllerTest {
     }
     @AfterEach
     void tearDown() {
+        deliveryAddressRepository.deleteAll();
         userRepository.deleteAll();
     }
     @Test

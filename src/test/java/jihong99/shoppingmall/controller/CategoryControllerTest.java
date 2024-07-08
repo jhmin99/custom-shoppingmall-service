@@ -3,6 +3,7 @@ package jihong99.shoppingmall.controller;
 import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.CategoryRequestDto;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
+import jihong99.shoppingmall.repository.CategoryItemRepository;
 import jihong99.shoppingmall.repository.CategoryRepository;
 import jihong99.shoppingmall.service.ICategoryService;
 import org.junit.jupiter.api.AfterEach;
@@ -44,6 +45,8 @@ class CategoryControllerTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private CategoryItemRepository categoryItemRepository;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -54,6 +57,7 @@ class CategoryControllerTest {
 
     @AfterEach
     void tearDown() {
+        categoryItemRepository.deleteAll();
         categoryRepository.deleteAll();
     }
 
