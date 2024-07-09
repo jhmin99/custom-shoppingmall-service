@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.DuplicateIdentificationException;
+import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IUserService;
@@ -52,7 +52,7 @@ public class UserController {
      * Response Code: 200
      * @exception MethodArgumentNotValidException Validation failed (Validating only the identification field of SignUpDto, groups: {IdentificationValidation.class})
      * Response Code: 400
-     * @exception DuplicateIdentificationException Duplicate ID exists
+     * @exception DuplicateNameException Duplicate ID exists
      * Response Code: 400
      * @exception Exception Internal server error occurred
      * Response Code: 500
@@ -77,7 +77,7 @@ public class UserController {
      * Response Code: 201
      * @exception MethodArgumentNotValidException Validation failed (groups: {SignUpValidation.class})
      * Response Code: 400
-     * @exception DuplicateIdentificationException Duplicate ID exists
+     * @exception DuplicateNameException Duplicate ID exists
      * Response Code: 400
      * @exception PasswordMismatchException Password mismatch
      * Response Code: 400
@@ -120,7 +120,7 @@ public class UserController {
         String refreshToken = iuserService.generateRefreshToken(user);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(LoginResponseDto.success(accessToken, refreshToken, user.getId()));
+                .body(LoginResponseDto.of(accessToken, refreshToken, user.getId()));
     }
     /**
      * Logout processing
@@ -185,7 +185,7 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserSummaryDto> userSummaries = iuserService.getUsers(pageable);
-        PaginatedResponseDto<UserSummaryDto> response = PaginatedResponseDto.of(userSummaries, STATUS_200, MESSAGE_200_fetchSuccess);
+        PaginatedResponseDto<UserSummaryDto> response = PaginatedResponseDto.of(userSummaries);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
