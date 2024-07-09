@@ -9,6 +9,7 @@ import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
 import jihong99.shoppingmall.exception.NotFoundException;
+import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import jihong99.shoppingmall.service.IUserService;
