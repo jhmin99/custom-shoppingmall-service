@@ -38,9 +38,6 @@ class SuperAdminControllerTest {
 
     @Autowired
     private UserRepository userRepository;
-  
-    @Autowired
-    private DeliveryAddressRepository deliveryAddressRepository;
 
     @BeforeEach
     void setUp() {
@@ -51,7 +48,6 @@ class SuperAdminControllerTest {
     }
     @AfterEach
     void tearDown() {
-        deliveryAddressRepository.deleteAll();
         userRepository.deleteAll();
     }
     @Test
