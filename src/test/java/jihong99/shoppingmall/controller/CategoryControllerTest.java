@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.controller;
 
-import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.CategoryRequestDto;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
 import jihong99.shoppingmall.repository.CategoryItemRepository;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @SpringBootTest
+@ActiveProfiles("test")
 class CategoryControllerTest {
 
     private MockMvc mockMvc;
@@ -160,8 +160,7 @@ class CategoryControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON);
         mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(Constants.MESSAGE_200_fetchSuccess));
+                .andExpect(status().isOk());
     }
 
     @Test

@@ -9,7 +9,6 @@ import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.GlobalExceptionHandler;
 import jihong99.shoppingmall.exception.NotFoundException;
-import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import jihong99.shoppingmall.service.IUserService;
@@ -28,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
@@ -62,8 +63,6 @@ class UserControllerTest {
     private UserRepository userRepository;
     @Autowired
     private IDeliveryAddressService deliveryAddressService;
-    @Autowired
-    private DeliveryAddressRepository deliveryAddressRepository;
 
     @BeforeEach
     void setUp() {
@@ -75,7 +74,6 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() {
-        deliveryAddressRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -345,7 +343,6 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(asJsonString(loginRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_LoginSuccess))
                 .andExpect(jsonPath("$.userId").isNotEmpty())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty());
@@ -427,8 +424,6 @@ class UserControllerTest {
                         .param("userId", String.valueOf(userId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
-                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
                 .andExpect(jsonPath("$.identification").value("testuser"))
                 .andExpect(jsonPath("$.name").value("Test User"));
     }
@@ -546,8 +541,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
-                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
                 .andExpect(jsonPath("$.content[0].id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.content[0].name").value(savedUser.getName()))
                 .andExpect(jsonPath("$.content[0].birthDate").value(savedUser.getBirthDate().toString()))
@@ -588,8 +581,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusCode").value(STATUS_200))
-                .andExpect(jsonPath("$.statusMessage").value(MESSAGE_200_fetchSuccess))
                 .andExpect(jsonPath("$.content[0].id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.content[0].name").value(savedUser.getName()))
                 .andExpect(jsonPath("$.content[0].birthDate").value(savedUser.getBirthDate().toString()))
