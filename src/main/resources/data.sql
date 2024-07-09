@@ -1,5 +1,6 @@
 -- Insert data into USERS table
 INSERT INTO USERS(identification, password, role)
+
 VALUES('admin123', '$2a$12$c7I6U0HS/0Q97.tUjhAQkeXcd9RGRSmHkyLldnXlBDavkyGModZeO', 'ADMIN');
 
 INSERT INTO USERS(identification, password, name, birth_date, phone_number, role) VALUES

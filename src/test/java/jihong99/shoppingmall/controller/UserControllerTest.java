@@ -63,6 +63,8 @@ class UserControllerTest {
     private UserRepository userRepository;
     @Autowired
     private IDeliveryAddressService deliveryAddressService;
+    @Autowired
+    private DeliveryAddressRepository deliveryAddressRepository;
 
     @BeforeEach
     void setUp() {
@@ -74,6 +76,7 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() {
+        deliveryAddressRepository.deleteAll();
         userRepository.deleteAll();
     }
 
