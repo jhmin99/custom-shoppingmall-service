@@ -1,8 +1,5 @@
 package jihong99.shoppingmall.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
@@ -14,16 +11,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Coupon extends BaseEntity {
 
-    // 쿠폰 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long couponId;
+    @Column(name = "coupon_id")
+    private Long id;
 
-    // 쿠폰 이름
     private String name;
 
-    // 쿠폰 내용
     private String content;
 
-    // 만료 날짜
     private LocalDate expirationDate;
 }
