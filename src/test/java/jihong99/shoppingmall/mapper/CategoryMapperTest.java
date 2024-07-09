@@ -3,9 +3,10 @@ package jihong99.shoppingmall.mapper;
 import jihong99.shoppingmall.dto.CategoryRequestDto;
 import jihong99.shoppingmall.entity.Category;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
-
+@ActiveProfiles("test")
 class CategoryMapperTest {
 
     @Test

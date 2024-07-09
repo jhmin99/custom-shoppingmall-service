@@ -4,11 +4,12 @@ import jihong99.shoppingmall.entity.Category;
 import jihong99.shoppingmall.entity.CategoryItem;
 import jihong99.shoppingmall.entity.Item;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.*;
-
+@ActiveProfiles("test")
 class CategoryItemMapperTest {
 
     @Test

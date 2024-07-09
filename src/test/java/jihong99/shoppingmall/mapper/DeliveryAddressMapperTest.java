@@ -4,10 +4,11 @@ import jihong99.shoppingmall.dto.DeliveryAddressDto;
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+@ActiveProfiles("test")
 class DeliveryAddressMapperTest {
 
     /**
