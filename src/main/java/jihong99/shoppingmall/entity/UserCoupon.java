@@ -5,26 +5,41 @@ import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
 @Entity
-@Getter @Builder
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserCoupon extends BaseEntity {
 
-    // 회원 쿠폰 번호
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userCouponId;
+    @Column(name = "user_coupon_id")
+    private Long id;
 
-    // 회원 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users users;
 
-    // 쿠폰 번호 (fk)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    // 유효 여부
     private Boolean isValid;
 
+    public void updateToInvalid(){
+        this.isValid = false;
+    }
+
+    @Builder
+    public UserCoupon(Users user, Coupon coupon, Boolean isValid){
+        this.users = user;
+        this.coupon = coupon;
+        this.isValid = true;
+    }
+
+    public static UserCoupon createUserCoupon(Users user, Coupon coupon){
+        return UserCoupon.builder()
+                .user(user)
+                .coupon(coupon)
+                .isValid(true)
+                .build();
+    }
 }

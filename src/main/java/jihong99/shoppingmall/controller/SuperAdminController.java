@@ -2,7 +2,7 @@ package jihong99.shoppingmall.controller;
 
 import jihong99.shoppingmall.dto.ResponseDto;
 import jihong99.shoppingmall.dto.SignUpDto;
-import jihong99.shoppingmall.exception.DuplicateIdentificationException;
+import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
@@ -39,7 +39,7 @@ public class SuperAdminController {
      * Response Code: 201
      * @exception MethodArgumentNotValidException Validation failed (groups: {SignUpValidation.class})
      * Response Code: 400
-     * @exception DuplicateIdentificationException Thrown if the identification already exists
+     * @exception DuplicateNameException Thrown if the identification already exists
      * Response Code: 400
      * @exception PasswordMismatchException Thrown if the passwords do not match
      * Response Code: 400

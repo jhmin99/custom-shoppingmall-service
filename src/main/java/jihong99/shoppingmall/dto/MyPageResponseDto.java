@@ -16,27 +16,18 @@ import static jihong99.shoppingmall.constants.Constants.*;
 @Getter
 @AllArgsConstructor
 public class MyPageResponseDto {
-    private String statusCode;
-    private String statusMessage;
     private String identification;
     private String name;
     private LocalDate birthDate;
     private String phoneNumber;
     private Set<DeliveryAddressDto> deliveryAddresses;
 
-    /**
-     * Creates a successful MyPageResponseDto.
-     *
-     * @param findUser The user whose details are to be included in the response.
-     * @param deliveryAddresses The set of delivery addresses associated with the user.
-     * @return MyPageResponseDto A response object containing user details and delivery addresses.
-     */
-    public static MyPageResponseDto success(Users findUser, Set<DeliveryAddress> deliveryAddresses) {
+    public static MyPageResponseDto of(Users findUser, Set<DeliveryAddress> deliveryAddresses) {
         DeliveryAddressMapper deliveryAddressMapper = new DeliveryAddressMapper();
         Set<DeliveryAddressDto> deliveryAddressDto = deliveryAddresses.stream()
                 .map(address -> deliveryAddressMapper.mapToDeliveryAddressDto(findUser, address))
                 .collect(Collectors.toSet());
-        return new MyPageResponseDto(STATUS_200, MESSAGE_200_fetchSuccess, findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDto);
+        return new MyPageResponseDto(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDto);
     }
 
 }

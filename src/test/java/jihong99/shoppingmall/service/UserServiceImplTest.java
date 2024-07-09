@@ -3,10 +3,11 @@ import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.dto.*;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.exception.DuplicateIdentificationException;
+import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
+import jihong99.shoppingmall.repository.UserCouponRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserServiceImplTest {
 
     @Autowired
@@ -48,6 +51,8 @@ class UserServiceImplTest {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private IDeliveryAddressService deliveryAddressService;
+    @Autowired
+    private UserCouponRepository userCouponRepository;
 
     @BeforeEach
     public void setUp(){
@@ -56,8 +61,9 @@ class UserServiceImplTest {
 
     @AfterEach
     public void tearDown(){
-        userRepository.deleteAll();
         deliveryAddressRepository.deleteAll();
+        userCouponRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     /**
@@ -109,7 +115,7 @@ class UserServiceImplTest {
         // when & then
         SignUpDto signUpDto = new SignUpDto("abc123","abcd123!@#","abcd123!@#",
                 "민지홍","1999-12-30","01012341234");
-        assertThrows(DuplicateIdentificationException.class,()->{
+        assertThrows(DuplicateNameException.class,()->{
                     userService.signUpAccount(signUpDto);
                 });
     }
@@ -192,10 +198,10 @@ class UserServiceImplTest {
         SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#","abcd123!@#",
                 "민지홍","1999-12-30","01012341234");
         // when & then
-        DuplicateIdentificationException duplicateIdentificationException = assertThrows(DuplicateIdentificationException.class, () -> {
+        DuplicateNameException duplicateNameException = assertThrows(DuplicateNameException.class, () -> {
             userService.checkDuplicateIdentification(signUpDto.getIdentification());
         });
-        assertThat(duplicateIdentificationException.getMessage()).isEqualTo("The ID already exists.");
+        assertThat(duplicateNameException.getMessage()).isEqualTo("The ID already exists.");
     }
 
     /**
@@ -380,7 +386,7 @@ class UserServiceImplTest {
         // when & then
         SignUpDto signUpDto = new SignUpDto("admin123","admin123!@#","admin123!@#",
                 "민지홍","1999-12-30","01012341234");
-        assertThrows(DuplicateIdentificationException.class,()->{
+        assertThrows(DuplicateNameException.class,()->{
             userService.signUpAdminAccount(signUpDto);
         });
     }

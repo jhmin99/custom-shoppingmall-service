@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -19,7 +20,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static jihong99.shoppingmall.constants.Constants.*;
 import static jihong99.shoppingmall.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @SpringBootTest
+@ActiveProfiles("test")
 class SuperAdminControllerTest {
     private MockMvc mockMvc;
     @Autowired
@@ -37,8 +38,10 @@ class SuperAdminControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+  
     @Autowired
     private DeliveryAddressRepository deliveryAddressRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);

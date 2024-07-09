@@ -3,18 +3,13 @@ package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.dto.*;
-import jihong99.shoppingmall.entity.Cart;
-import jihong99.shoppingmall.entity.DeliveryAddress;
-import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.entity.WishList;
+import jihong99.shoppingmall.entity.*;
 import jihong99.shoppingmall.entity.enums.Roles;
-import jihong99.shoppingmall.exception.DuplicateIdentificationException;
+import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.mapper.UserMapper;
-import jihong99.shoppingmall.repository.CartRepository;
-import jihong99.shoppingmall.repository.UserRepository;
-import jihong99.shoppingmall.repository.WishListRepository;
+import jihong99.shoppingmall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,20 +38,23 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final IDeliveryAddressService deliveryAddressService;
+    private final CouponRepository couponRepository;
+    private final UserCouponRepository userCouponRepository;
 
     /**
      * Registers a new user account.
      *
      * @param signUpDto the data transfer object containing user sign up details
-     * @throws DuplicateIdentificationException if the identification is already in use
+     * @throws DuplicateNameException if the identification is already in use
      * @throws PasswordMismatchException if the password and confirmation password do not match
+     * @throws RuntimeException if welcome coupon doesn't exist
      */
     @Override
     @Transactional
     public void signUpAccount(SignUpDto signUpDto) {
         Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
         if (findUser.isPresent()) {
-            throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
+            throw new DuplicateNameException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
@@ -66,19 +64,27 @@ public class UserServiceImpl implements IUserService {
         encodePassword(user, signUpDto.getPassword());
         createCartAndWishList(user);
         createAdditionalUserInfo(user);
-        userRepository.save(user);
+        Users savedUser = userRepository.save(user);
+        assignWelcomeCoupon(savedUser);
+    }
+
+    private void assignWelcomeCoupon(Users user) {
+        Coupon welcomeCoupon = couponRepository.findByName("Welcome Coupon")
+                .orElseThrow(() -> new RuntimeException(MESSAGE_500_CouponNotFound));
+        UserCoupon userCoupon = UserCoupon.createUserCoupon(user, welcomeCoupon);
+        userCouponRepository.save(userCoupon);
     }
 
     /**
      * Checks if the provided identification is already in use.
      *
      * @param identification the identification to check
-     * @throws DuplicateIdentificationException if the identification is already in use
+     * @throws DuplicateNameException if the identification is already in use
      */
     @Override
     public void checkDuplicateIdentification(String identification) {
         if (isIdentificationExist(identification)) {
-            throw new DuplicateIdentificationException("The ID already exists.");
+            throw new DuplicateNameException("The ID already exists.");
         }
     }
 
@@ -140,14 +146,14 @@ public class UserServiceImpl implements IUserService {
         Users findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
         Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
-        return MyPageResponseDto.success(findUser,deliveryAddresses);
+        return MyPageResponseDto.of(findUser,deliveryAddresses);
     }
 
     /**
      * Registers a new admin account.
      *
      * @param signUpDto the data transfer object containing admin sign up details
-     * @throws DuplicateIdentificationException if the identification is already in use
+     * @throws DuplicateNameException if the identification is already in use
      * @throws PasswordMismatchException if the password and confirmation password do not match
      */
     @Override
@@ -155,7 +161,7 @@ public class UserServiceImpl implements IUserService {
     public void signUpAdminAccount(SignUpDto signUpDto) {
         Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
         if (findUser.isPresent()) {
-            throw new DuplicateIdentificationException(MESSAGE_400_duplicatedId);
+            throw new DuplicateNameException(MESSAGE_400_duplicatedId);
         }
         if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);

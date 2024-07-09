@@ -3,13 +3,14 @@ package jihong99.shoppingmall.mapper;
 import jihong99.shoppingmall.dto.ItemRequestDto;
 import jihong99.shoppingmall.entity.Item;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-
+@ActiveProfiles("test")
 class ItemMapperTest {
 
     @Test

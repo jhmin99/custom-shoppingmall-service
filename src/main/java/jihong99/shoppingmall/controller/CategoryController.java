@@ -16,8 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import static jihong99.shoppingmall.constants.Constants.MESSAGE_200_fetchSuccess;
-import static jihong99.shoppingmall.constants.Constants.STATUS_200;
 
 @RestController
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +68,7 @@ public class CategoryController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CategoryResponseDto> categories = icategoryService.getCategories(pageable);
-        PaginatedResponseDto<CategoryResponseDto> response = PaginatedResponseDto.of(categories, STATUS_200, MESSAGE_200_fetchSuccess);
+        PaginatedResponseDto<CategoryResponseDto> response = PaginatedResponseDto.of(categories);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
