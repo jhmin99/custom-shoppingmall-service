@@ -1,6 +1,6 @@
 -- Insert data into USERS table
 INSERT INTO USERS(identification, password, role)
-VALUES('admin12345', '$2a$12$c7I6U0HS/0Q97.tUjhAQkeXcd9RGRSmHkyLldnXlBDavkyGModZeO', 'ADMIN');
+VALUES('admin123', '$2a$12$c7I6U0HS/0Q97.tUjhAQkeXcd9RGRSmHkyLldnXlBDavkyGModZeO', 'ADMIN');
 
 INSERT INTO USERS(identification, password, name, birth_date, phone_number, role) VALUES
 ('abc12345', '$2a$12$c7I6U0HS/0Q97.tUjhAQkeXcd9RGRSmHkyLldnXlBDavkyGModZeO', 'user1','1999-12-30','01012341234','USER'),
