@@ -123,8 +123,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request The web request.
      * @return The ResponseEntity containing the error message.
      */
-    @ExceptionHandler(DuplicateIdentificationException.class)
-    public ResponseEntity<ErrorResponseDto> handleDuplicateIdentificationException(DuplicateIdentificationException exception, WebRequest request) {
+    @ExceptionHandler(DuplicateNameException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicateIdentificationException(DuplicateNameException exception, WebRequest request) {
         ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
@@ -154,6 +154,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
+    /**
+     * Handles invalid expiration date Exception.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(InvalidExpirationDateException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidExpirationDateException(InvalidExpirationDateException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
 
     /**
      * Builds an ErrorResponseDto with the given details.
