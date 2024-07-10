@@ -2,10 +2,12 @@ package jihong99.shoppingmall.service;
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.dto.*;
+import jihong99.shoppingmall.entity.Coupon;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
+import jihong99.shoppingmall.repository.CouponRepository;
 import jihong99.shoppingmall.repository.DeliveryAddressRepository;
 import jihong99.shoppingmall.repository.UserCouponRepository;
 import jihong99.shoppingmall.repository.UserRepository;
@@ -53,6 +55,8 @@ class UserServiceImplTest {
     private IDeliveryAddressService deliveryAddressService;
     @Autowired
     private UserCouponRepository userCouponRepository;
+    @Autowired
+    private CouponRepository couponRepository;
 
     @BeforeEach
     public void setUp(){
@@ -78,6 +82,8 @@ class UserServiceImplTest {
         // when
         userService.signUpAccount(signUpDto);
         Users findUser = userRepository.findByIdentification("abcd123").get();
+        Long CouponId = couponRepository.findByName("Welcome Coupon").get().getId();
+
         // then
         assertThat(findUser.getId()).isNotNull();
         assertThat(findUser.getIdentification()).isEqualTo("abcd123");
@@ -98,6 +104,7 @@ class UserServiceImplTest {
         assertThat(findUser.getRegistrationDate()).isEqualTo(LocalDate.now());
         assertThat(findUser.getCreationTime()).isNotNull();
         assertThat(findUser.getLastModifiedTime()).isNotNull();
+        assertThat(userCouponRepository.findByUsersIdAndCouponId(findUser.getId(), CouponId)).isNotNull();
 
     }
 
@@ -164,6 +171,33 @@ class UserServiceImplTest {
         assertThrows(PasswordMismatchException.class, ()->{
             userService.signUpAccount(signUpDto);
         });
+    }
+
+    /**
+     * Test method while signing up a new user account with no welcome coupon.
+     */
+    @Test
+    @Transactional
+    public void signUpAccount_RunTimeException(){
+        // given
+        SignUpDto signUpDto = new SignUpDto("abcd123","abcd123!@#","abcd123!@#",
+                "민지홍","1999-12-30","01012341234");
+        // when
+        couponRepository.deleteAll();
+        // then
+        assertThrows(RuntimeException.class, () -> {
+            userService.signUpAccount(signUpDto);
+        });
+        createWelcomeCoupon();
+    }
+
+    private void createWelcomeCoupon() {
+        Coupon welcomeCoupon = Coupon.builder()
+                .name("Welcome Coupon")
+                .content("Welcome! Enjoy your first purchase with this coupon.")
+                .expirationDate(LocalDate.now().plusYears(999))
+                .build();
+        couponRepository.save(welcomeCoupon);
     }
 
     /**
