@@ -135,7 +135,7 @@ class ItemControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    void createItem_Return_Forbidden_NotAuthorized() throws Exception {
+    void createItem_Return_Forbidden_Handles_AccessDeniedException() throws Exception {
         // given
         CategoryRequestDto categoryRequestDto = new CategoryRequestDto("sample1");
         Long categoryId = categoryService.createCategory(categoryRequestDto).getId();
