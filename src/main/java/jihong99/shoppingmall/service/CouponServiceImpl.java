@@ -99,7 +99,6 @@ public class CouponServiceImpl implements ICouponService{
      * @return the created coupon response
      * @throws DuplicateNameException if a coupon with the same name already exists
      * @throws InvalidExpirationDateException if the expiration date is in the past
-     * @throws Exception if an internal server error occurs
      */
     @Override
     public CouponResponseDto createCoupon(CouponRequestDto couponRequestDto) {
@@ -154,12 +153,15 @@ public class CouponServiceImpl implements ICouponService{
      *
      * @param couponId the ID of the coupon to distribute
      * @param tier the tier of users to receive the coupon
-     * @throws NotFoundException if the coupon is not found
+     * @throws NotFoundException if the user or coupon is not found
      */
     @Override
     @Transactional
     public void distributeCouponToUsersByTier(Long couponId, Tiers tier) {
         List<Users> findUsers = userRepository.findByTier(tier);
+        if(findUsers.isEmpty()){
+            throw new NotFoundException(MESSAGE_404_UserNotFound);
+        }
         Coupon findCoupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new NotFoundException(MESSAGE_404_CouponNotFound)
         );
@@ -170,12 +172,15 @@ public class CouponServiceImpl implements ICouponService{
      * Distributes a coupon to all users.
      *
      * @param couponId the ID of the coupon to distribute
-     * @throws NotFoundException if the coupon is not found
+     * @throws NotFoundException if the user or coupon is not found
      */
     @Override
     @Transactional
     public void distributeCouponToAllUsers(Long couponId) {
         List<Users> findUsers = userRepository.findAll();
+        if(findUsers.isEmpty()){
+            throw new NotFoundException(MESSAGE_404_UserNotFound);
+        }
         Coupon findCoupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new NotFoundException(MESSAGE_404_CouponNotFound)
         );

@@ -396,7 +396,7 @@ class UserControllerTest {
      * @throws Exception if an error occurs during the test.
      */
     @Test
-    public void logout_Return_Forbidden_WhenNotLoggedIn() throws Exception {
+    public void logout_Return_Forbidden_Handles_AccessDeniedException() throws Exception {
         // Clear the security context to simulate no user logged in
         SecurityContextHolder.clearContext();
         // Perform logout and check the response
@@ -482,7 +482,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    public void getUserDetails_Return_Forbidden_WhenLoggedInAsDifferentUser() throws Exception {
+    public void getUserDetails_Return_Forbidden_Handles_AccessDeniedException() throws Exception {
         // given
         Users testUser = Users.builder()
                 .identification("testuser")
@@ -602,7 +602,7 @@ class UserControllerTest {
     @Test
     @Transactional
     @WithMockUser(username = "user", roles = {"USER"})
-    public void getUsers_Return_Forbidden_ForNonAdmin() throws Exception {
+    public void getUsers_Return_Forbidden_Handles_AccessDeniedException() throws Exception {
         // given
         Users normalUser = Users.builder()
                 .identification("user")

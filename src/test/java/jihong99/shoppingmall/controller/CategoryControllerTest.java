@@ -115,7 +115,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    void createCategory_Return_Forbidden_NotAuthorized() throws Exception {
+    void createCategory_Return_Forbidden_Handles_AccessDeniedException() throws Exception {
         // given
         CategoryRequestDto categoryRequestDto = new CategoryRequestDto("Sample Category");
 
