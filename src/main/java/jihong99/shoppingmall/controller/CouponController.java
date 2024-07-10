@@ -74,8 +74,8 @@ public class CouponController {
      * Response Code: 500
      * @precondition The authenticated user must have the specified userId
      */
-    @GetMapping("/users/coupons")
     @HasId
+    @GetMapping("/users/coupons")
     public ResponseEntity<PaginatedResponseDto<CouponResponseDto>> getUserCoupons(
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
@@ -146,7 +146,7 @@ public class CouponController {
      * @return a response indicating the result of the distribution
      * @success Coupon successfully distributed to the specified tier of users
      * Response Code: 200
-     * @exception NotFoundException Thrown if the coupon is not found
+     * @exception NotFoundException Thrown if the user or coupon is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
@@ -168,7 +168,7 @@ public class CouponController {
      * @return a response indicating the result of the distribution
      * @success Coupon successfully distributed to all users
      * Response Code: 200
-     * @exception NotFoundException Thrown if the coupon is not found
+     * @exception NotFoundException Thrown if the user or coupon is not found
      * Response Code: 404
      * @exception Exception Internal server error occurred
      * Response Code: 500
