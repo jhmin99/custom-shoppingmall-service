@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  cloud:
+    gcp:
+      credentials:
+        json: ${GCP_SERVICE_ACCOUNT_KEY}
+      storage:
+        bucket: ${GCP_STORAGE_BUCKET}
+security:
+  jwt:
+    secret-key: ${JWT_SECRET}
+    access-token-expiration-time: 1800000    # 30 minutes in milliseconds
+    refresh-token-expiration-time: 86400000  # 1 day in milliseconds
+superAdmin:
+  id: ${SUPER_ADMIN_ID}
+  pw: ${SUPER_ADMIN_PASSWORD}
+cors:
+  allowed:
+    origins: ${CORS_ALLOWED_ORIGINS}
