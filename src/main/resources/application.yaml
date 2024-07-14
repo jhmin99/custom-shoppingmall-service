@@ -1,11 +1,3 @@
 spring:
   profiles:
     active: "dev"
-security:
-  jwt:
-    secret-key: hongshopping
-    access-token-expiration-time: 1800000    # 30 minutes in milliseconds
-    refresh-token-expiration-time: 86400000  # 1 day in milliseconds
-superAdmin:
-  id: "superadmin"
-  pw: "superadmin_password"
