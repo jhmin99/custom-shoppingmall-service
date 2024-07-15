@@ -131,3 +131,4 @@ jobs:
 
       - name: Cleanup service account key file
         run: rm -f /home/runner/.ssh/id_rsa
+
