@@ -39,7 +39,7 @@ jobs:
       - name: Extract SSH key and save to file
         run: |
           mkdir -p /home/runner/.ssh
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | tr -d '\r' > /home/runner/.ssh/id_rsa
+          echo "${{ secrets.GCP_SSH_KEY }}" | tr -d '\r' > /home/runner/.ssh/id_rsa
           chmod 600 /home/runner/.ssh/id_rsa
 
       - name: SSH to Google Cloud VM and pull Docker image
@@ -49,12 +49,6 @@ jobs:
           username: ${{ secrets.GCP_VM_USER }}
           key_path: /home/runner/.ssh/id_rsa
           script: |
-            echo "Installing gcloud CLI"
-            sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-
-            echo "Authenticating gcloud"
-            gcloud auth activate-service-account --key-file=/home/runner/.ssh/id_rsa
-
             echo "Running Docker commands"
             docker pull jihongmin/custom-shoppingmall-service-backend:latest
             export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
@@ -66,7 +60,6 @@ jobs:
             export SUPER_ADMIN_PASSWORD=${{ secrets.SUPER_ADMIN_PASSWORD }}
             export CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
             export GCP_STORAGE_BUCKET=${{ secrets.GCP_STORAGE_BUCKET }}
-            export GCP_SERVICE_ACCOUNT_KEY=${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
             docker-compose down
             docker-compose up -d
 
