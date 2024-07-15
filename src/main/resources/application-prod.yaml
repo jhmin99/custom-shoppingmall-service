@@ -11,10 +11,12 @@ spring:
     show-sql: true
   cloud:
     gcp:
-      credentials:
-        privateKey: ${GCP_SSH_KEY}
       storage:
+        credentials:
+          location: ${GOOGLE_APPLICATION_CREDENTIALS}
+        project-id: ${GCP_PROJECT_ID}
         bucket: ${GCP_STORAGE_BUCKET}
+
 security:
   jwt:
     secret-key: ${JWT_SECRET}
