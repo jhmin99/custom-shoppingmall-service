@@ -25,6 +25,11 @@ jobs:
       - name: Run tests
         run: ./gradlew test
 
+      - name: Copy build output
+        run: |
+          mkdir -p build/libs
+          cp build/libs/*.jar build/libs/
+
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport
 
