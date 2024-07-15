@@ -92,10 +92,10 @@ jobs:
             fi
 
             echo "Setting up environment variables"
-            echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" > .env
-            echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-            echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" > .env
+            echo "MYSQL_DATABASE=${{ secrets.DB_NAME }}" >> .env
+            echo "MYSQL_USER=${{ secrets.DB_USER }}" >> .env
+            echo "MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
             echo "SUPER_ADMIN_ID=${{ secrets.SUPER_ADMIN_ID }}" >> .env
             echo "SUPER_ADMIN_PASSWORD=${{ secrets.SUPER_ADMIN_PASSWORD }}" >> .env
