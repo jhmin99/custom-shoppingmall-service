@@ -54,6 +54,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y google-cloud-sdk
 
             echo "Authenticating gcloud"
+            echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp_service_account_key.json
             gcloud auth activate-service-account --key-file=gcp_service_account_key.json
 
             echo "Running Docker commands"
