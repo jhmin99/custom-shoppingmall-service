@@ -120,12 +120,14 @@ jobs:
             echo "Running Docker commands"
             sudo docker pull jihongmin/custom-shoppingmall-service-backend:latest
 
-      - name: Run Docker Compose Down
-        run: |
-          sudo docker-compose down || true
-          sudo docker network rm custom-shoppingmall-service_default || true
-      - name: Run Docker Compose Up
-        run: |
-          sudo docker-compose up -d
+            echo "Shutting down existing Docker containers"
+            if sudo docker-compose down; then
+              echo "Successfully shut down containers. Starting new containers."
+              sudo docker-compose up -d
+            else
+              echo "Failed to shut down containers. Aborting."
+              exit 1
+            fi
+
       - name: Cleanup service account key file
         run: rm -f /home/runner/.ssh/id_rsa
