@@ -12,7 +12,7 @@ spring:
   cloud:
     gcp:
       credentials:
-        privateKey: ${GCP_SERVICE_ACCOUNT_KEY}
+        privateKey: ${GCP_SSH_KEY}
       storage:
         bucket: ${GCP_STORAGE_BUCKET}
 security:
