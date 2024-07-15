@@ -42,6 +42,12 @@ jobs:
           echo "${{ secrets.GCP_SSH_KEY }}" | tr -d '\r' > /home/runner/.ssh/id_rsa
           chmod 600 /home/runner/.ssh/id_rsa
 
+      - name: Set up Google Cloud credentials
+        run: |
+          echo "${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}" > $HOME/gcloud.json
+          chmod 600 $HOME/gcloud.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
+
       - name: SSH to Google Cloud VM and pull Docker image
         uses: appleboy/ssh-action@master
         with:
@@ -68,6 +74,10 @@ jobs:
             
             sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             
+            echo "Cloning repository"
+            git clone https://github.com/jhmin99/custom-shoppingmall-service.git
+            cd custom-shoppingmall-service
+            
             echo "Running Docker commands"
             sudo docker pull jihongmin/custom-shoppingmall-service-backend:latest
             export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
@@ -78,7 +88,10 @@ jobs:
             export SUPER_ADMIN_ID=${{ secrets.SUPER_ADMIN_ID }}
             export SUPER_ADMIN_PASSWORD=${{ secrets.SUPER_ADMIN_PASSWORD }}
             export CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
+            export GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
             export GCP_STORAGE_BUCKET=${{ secrets.GCP_STORAGE_BUCKET }}
+            export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
+            
             sudo docker-compose down
             sudo docker-compose up -d
 
