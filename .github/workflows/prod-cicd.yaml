@@ -74,9 +74,15 @@ jobs:
             
             sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             
-            echo "Cloning repository"
-            git clone https://github.com/jhmin99/custom-shoppingmall-service.git
-            cd custom-shoppingmall-service
+            if [ -d "custom-shoppingmall-service" ]; then
+              echo "Repository already exists. Pulling latest changes."
+              cd custom-shoppingmall-service
+              git pull
+            else
+              echo "Cloning repository"
+              git clone https://github.com/jhmin99/custom-shoppingmall-service.git
+              cd custom-shoppingmall-service
+            fi
             
             echo "Running Docker commands"
             sudo docker pull jihongmin/custom-shoppingmall-service-backend:latest
