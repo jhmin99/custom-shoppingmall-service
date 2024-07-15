@@ -29,12 +29,12 @@ jobs:
         run: ./gradlew jacocoTestReport
 
       - name: Build Docker image
-        run: docker build -t custom-shoppingmall-service:latest .
+        run: docker build -t jihongmin/custom-shoppingmall-service-backend:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-          docker push custom-shoppingmall-service:latest
+          docker push jihongmin/custom-shoppingmall-service-backend:latest
 
       - name: SSH to Google Cloud VM and pull Docker image
         uses: appleboy/ssh-action@master
@@ -50,7 +50,7 @@ jobs:
             echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | gcloud auth activate-service-account --key-file=-
 
             echo "Running Docker commands"
-            docker pull custom-shoppingmall-service:latest
+            docker pull jihongmin/custom-shoppingmall-service-backend:latest
             export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
             export DB_NAME=${{ secrets.DB_NAME }}
             export DB_USER=${{ secrets.DB_USER }}
