@@ -36,11 +36,10 @@ jobs:
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push jihongmin/custom-shoppingmall-service-backend:latest
 
-      - name: Extract SSH key from JSON and save to file
+      - name: Extract SSH key and save to file
         run: |
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp_service_account_key.json
           mkdir -p /home/runner/.ssh
-          jq -r '.private_key' gcp_service_account_key.json > /home/runner/.ssh/id_rsa
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | tr -d '\r' > /home/runner/.ssh/id_rsa
           chmod 600 /home/runner/.ssh/id_rsa
 
       - name: SSH to Google Cloud VM and pull Docker image
@@ -54,8 +53,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y google-cloud-sdk
 
             echo "Authenticating gcloud"
-            echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp_service_account_key.json
-            gcloud auth activate-service-account --key-file=gcp_service_account_key.json
+            gcloud auth activate-service-account --key-file=/home/runner/.ssh/id_rsa
 
             echo "Running Docker commands"
             docker pull jihongmin/custom-shoppingmall-service-backend:latest
@@ -73,4 +71,4 @@ jobs:
             docker-compose up -d
 
       - name: Cleanup service account key file
-        run: rm -f gcp_service_account_key.json /home/runner/.ssh/id_rsa
+        run: rm -f /home/runner/.ssh/id_rsa
