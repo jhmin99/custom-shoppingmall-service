@@ -39,6 +39,7 @@ jobs:
       - name: Extract SSH key from JSON and save to file
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > gcp_service_account_key.json
+          mkdir -p /home/runner/.ssh
           jq -r '.private_key' gcp_service_account_key.json > /home/runner/.ssh/id_rsa
           chmod 600 /home/runner/.ssh/id_rsa
 
