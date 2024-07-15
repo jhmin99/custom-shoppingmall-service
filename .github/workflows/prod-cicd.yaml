@@ -120,8 +120,12 @@ jobs:
             echo "Running Docker commands"
             sudo docker pull jihongmin/custom-shoppingmall-service-backend:latest
 
-            sudo docker-compose down
-            sudo docker-compose up -d
-
+      - name: Run Docker Compose Down
+        run: |
+          sudo docker-compose down || true
+          sudo docker network rm custom-shoppingmall-service_default || true
+      - name: Run Docker Compose Up
+        run: |
+          sudo docker-compose up -d
       - name: Cleanup service account key file
         run: rm -f /home/runner/.ssh/id_rsa
