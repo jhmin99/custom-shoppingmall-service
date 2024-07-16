@@ -129,6 +129,6 @@ jobs:
               exit 1
             fi
 
-      - name: Cleanup service account key file
+      - name: Cleanup ssh key file
         run: rm -f /home/runner/.ssh/id_rsa
 
