@@ -8,6 +8,7 @@ import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +23,7 @@ import static jihong99.shoppingmall.constants.Constants.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/super-admin")
+@RequestMapping(path = "api/super-admin", produces = MediaType.APPLICATION_JSON_VALUE)
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 public class SuperAdminController {
 

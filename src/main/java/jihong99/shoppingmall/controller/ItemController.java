@@ -1,7 +1,6 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.ItemRequestDto;
 import jihong99.shoppingmall.dto.ItemResponseDto;
 import jihong99.shoppingmall.dto.ResponseDto;
@@ -9,18 +8,19 @@ import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import static jihong99.shoppingmall.constants.Constants.*;
 
 
-@Controller
+
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RestController
+@RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ItemController {
 
     private final IItemService iitemService;
