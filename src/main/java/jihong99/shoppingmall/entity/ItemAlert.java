@@ -6,9 +6,10 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * Represents the relationship between a category and an item in the shopping mall.
+ * Represents an alert for a specific item.
  *
- * <p>The CategoryItem entity associates an item with a specific category.</p>
+ * <p>The ItemAlert entity stores information about alerts set by users for specific items.
+ * It includes the user who set the alert and the item for which the alert is set.</p>
  */
 @Entity
 @Getter
@@ -16,28 +17,28 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class CategoryItem extends BaseEntity {
+public class ItemAlert extends BaseEntity {
 
     /**
-     * Unique identifier for the category-item relationship.
+     * Unique identifier for the item alert.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_item_id")
+    @Column(name = "item_alert_id")
     private Long id;
 
     /**
-     * The item associated with this category-item relationship.
+     * User who set the alert.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users users;
+
+    /**
+     * Item for which the alert is set.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
-
-    /**
-     * The category associated with this category-item relationship.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
 
 }

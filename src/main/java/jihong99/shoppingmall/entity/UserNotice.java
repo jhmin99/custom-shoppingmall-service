@@ -1,0 +1,38 @@
+package jihong99.shoppingmall.entity;
+
+import jakarta.persistence.*;
+import jihong99.shoppingmall.entity.base.BaseEntity;
+import lombok.*;
+
+/**
+ * Represents the relationship between a user and a notice in the shopping mall system.
+ *
+ * <p>The UserNotice entity stores information about the association between a user and a notice.</p>
+ */
+@Entity
+@Getter @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class UserNotice extends BaseEntity {
+
+    /**
+     * Unique identifier for the user-notice relationship.
+     */
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_notice_id")
+    private Long id;
+
+    /**
+     * The user associated with the notice.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users users;
+
+    /**
+     * The notice associated with the user.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notice_id")
+    private Notice notice;
+}

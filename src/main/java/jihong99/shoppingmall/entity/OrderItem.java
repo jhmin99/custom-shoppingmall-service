@@ -4,30 +4,47 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
+/**
+ * Represents an item in an order in the shopping mall system.
+ *
+ * <p>The OrderItem entity stores information about a specific item within an order,
+ * including the quantity and total price of the item.</p>
+ */
 @Entity
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class OrderItem extends BaseEntity {
 
-
-    // 주문 상품 번호
+    /**
+     * Unique identifier for the order item.
+     */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderItemId;
+    @Column(name = "order_item_id")
+    private Long id;
 
-    // 주문 번호 (fk)
+    /**
+     * The order associated with this order item.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Orders orders;
 
-    // 상품 번호 (fk)
+    /**
+     * The item associated with this order item.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    // 수량
+    /**
+     * The quantity of the item ordered.
+     */
     private Integer quantity;
 
-    // 가격
-    private Long price;
+    /**
+     * The total price for this order item.
+     */
+    @Column(name = "total_price")
+    private Long totalPrice;
 }

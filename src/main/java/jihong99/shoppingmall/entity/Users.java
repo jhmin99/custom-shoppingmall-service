@@ -4,13 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import jihong99.shoppingmall.entity.enums.Roles;
-import jihong99.shoppingmall.entity.enums.Tiers;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a user in the shopping mall system.
+ *
+ * <p>The Users entity stores information about a user, including their cart, wish list, identification, password, name, birth date, phone number, role, registration date, and refresh token.</p>
+ */
 @Table(
         name = "Users",
         uniqueConstraints = {
@@ -24,13 +28,14 @@ import java.time.LocalDate;
         }
 )
 @Entity
-@Getter
+@Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Users extends BaseEntity {
 
     /**
-     * Primary key for the user entity
+     * Primary key for the user entity.
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -71,109 +76,142 @@ public class Users extends BaseEntity {
     /**
      * The user's date of birth.
      */
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     /**
      * The user's phone number.
      */
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     /**
-     * The user's points.
-     * Default value: 0
-     */
-    private Integer point;
-
-    /**
-     * The user's tier.
-     * Default value: IRON
-     */
-    @Enumerated(EnumType.STRING)
-    private Tiers tier;
-
-    /**
-     * The remaining amount until the next tier.
-     * Default value: 50000
-     */
-    private Integer amountToNextTier;
-
-    /**
-     * Role: "user"
+     * The user's role.
      */
     @Enumerated(EnumType.STRING)
     private Roles role;
 
     /**
-     * The registration date of the user.
+     * The user's registration date.
      */
     @CreatedDate
+    @Column(name = "registration_date")
     private LocalDate registrationDate;
 
     /**
-     * The refresh token for the user.
-     *
-     * <p>This field stores the refresh token issued to the user. The refresh token is used to obtain
-     * a new access token without requiring the user to re-authenticate. It is stored as a plain string.</p>
+     * The user's refresh token.
      */
+    @Column(name = "refresh_token")
     private String refreshToken;
 
     /**
-     * Constructs a new user with the provided information.
+     * Creates a new user with the given details.
      *
-     * @param identification the user's identification
-     * @param password the user's password
-     * @param name the user's name
-     * @param birthDate the user's birth date
-     * @param phoneNumber the user's phone number
+     * @param identification The user's identification
+     * @param password The user's password
+     * @param name The user's name
+     * @param birthDate The user's date of birth
+     * @param phoneNumber The user's phone number
+     * @return A new user instance
      */
-    @Builder
-    public Users(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
-        this.identification = identification;
-        this.password = password;
-        this.name = name;
-        this.birthDate = birthDate;
-        this.phoneNumber = phoneNumber;
+    public static Users createUsers(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
+        return Users.builder()
+                .identification(identification)
+                .password(password)
+                .name(name)
+                .birthDate(birthDate)
+                .phoneNumber(phoneNumber)
+                .role(Roles.USER)
+                .build();
     }
 
+    /**
+     * Creates a new admin user with the given details.
+     *
+     * @param identification The admin's identification
+     * @param password The admin's password
+     * @param name The admin's name
+     * @param birthDate The admin's date of birth
+     * @param phoneNumber The admin's phone number
+     * @return A new admin user instance
+     */
+    public static Users createAdmin(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
+        return Users.builder()
+                .identification(identification)
+                .password(password)
+                .name(name)
+                .birthDate(birthDate)
+                .phoneNumber(phoneNumber)
+                .role(Roles.ADMIN)
+                .build();
+    }
+
+    /**
+     * Creates a new super admin user with the given details.
+     *
+     * @param identification The super admin's identification
+     * @param password The super admin's password
+     * @return A new super admin user instance
+     */
+    public static Users createSuperAdmin(String identification, String password){
+        return Users.builder()
+                .identification(identification)
+                .password(password)
+                .role(Roles.SUPER_ADMIN)
+                .build();
+    }
+
+    /**
+     * Updates the user's cart.
+     *
+     * @param cart The new cart to be associated with the user
+     */
     public void updateCart(Cart cart){
         this.cart = cart;
     }
 
+    /**
+     * Updates the user's wish list.
+     *
+     * @param wishList The new wish list to be associated with the user
+     */
     public void updateWishList(WishList wishList){
         this.wishList = wishList;
     }
 
+    /**
+     * Updates the user's phone number.
+     *
+     * @param phoneNumber The new phone number
+     */
     public void updatePhoneNumber(String phoneNumber){
         this.phoneNumber = phoneNumber;
     }
 
-    public void updatePoint(Integer point){
-        this.point = point;
+    /**
+     * Updates the user's role.
+     *
+     * @param role The new role
+     */
+    public void updateRole(Roles role){
+        this.role = role;
     }
 
-    public void updateTier(Tiers tier){
-        this.tier = tier;
+    /**
+     * Updates the user's password.
+     *
+     * @param password The new password
+     */
+    public void updatePassword(String password){
+        this.password = password;
     }
 
-    public void updateRole(Roles role){ this.role = role;}
-
-    public void updatePassword(String password){this.password = password;}
-
-    public void updateAmountToNextTier(Integer amountToNextTier){
-        this.amountToNextTier = amountToNextTier;
-    }
-
+    /**
+     * Updates the user's refresh token.
+     *
+     * @param refreshToken The new refresh token
+     */
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
-    }
-
-    @Override
-    public String toString() {
-        return "Users{" +
-                "identification='" + identification + '\'' +
-                ", name='" + name + '\'' +
-                ", birthDate=" + birthDate +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
     }
 }

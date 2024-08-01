@@ -1,5 +1,5 @@
 package jihong99.shoppingmall.entity.enums;
 
-public enum PaymentMethod {
-    CARD, KAKAOPAY
+public enum InquiryType {
+    ITEM, CUSTOMER
 }

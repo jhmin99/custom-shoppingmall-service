@@ -4,41 +4,65 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
+/**
+ * Represents a shopping cart.
+ *
+ * <p>The Cart entity stores information about a user's shopping cart,
+ * including the estimated total price of items in the cart and any applied coupon.</p>
+ */
 @Entity
-@Getter
+@Getter @Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends BaseEntity {
 
     /**
-     * Represents a shopping cart.
-     *
-     * <p>The Cart entity stores information about a user's shopping cart,
-     * including the estimated total price of items in the cart.</p>
+     * Unique identifier for the cart.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartId;
+    @Column(name = "cart_id")
+    private Long id;
 
     /**
      * Estimated total price of items in the cart.
-     * Default value: 0
+     * Default value: 0.
      */
-    private Long estimatedTotalPrice;
+    @Column(name = "estimated_total_price")
+    private Long estimatedTotalPrice = 0L;
 
     /**
-     * Constructs a new cart with the provided estimated total price.
-     *
-     * @param estimatedTotalPrice The estimated total price of items in the cart
+     * Coupon applied to the cart, if any.
      */
+    @ManyToOne
+    @JoinColumn(name = "coupon_id")
+    private Coupon appliedCoupon;
 
-    @Builder
-    public Cart(Long estimatedTotalPrice){
-        this.estimatedTotalPrice = estimatedTotalPrice;
-    }
-    public static Cart createCart(Long estimatedTotalPrice) {
+    /**
+     * Static factory method to create a new cart instance.
+     *
+     * @return a new Cart instance
+     */
+    public static Cart createCart() {
         return Cart.builder()
-                .estimatedTotalPrice(estimatedTotalPrice)
                 .build();
     }
 
+    /**
+     * Updates the applied coupon for the cart.
+     *
+     * @param coupon the coupon to be applied
+     */
+    public void updateAppliedCoupon(Coupon coupon) {
+        this.appliedCoupon = coupon;
+    }
+
+    /**
+     * Sets the estimated total price for the cart.
+     *
+     * @param estimatedTotalPrice the new estimated total price
+     */
+    public void setEstimatedTotalPrice(Long estimatedTotalPrice) {
+        this.estimatedTotalPrice = estimatedTotalPrice;
+    }
 }

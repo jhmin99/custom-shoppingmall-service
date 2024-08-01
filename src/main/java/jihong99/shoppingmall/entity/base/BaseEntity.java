@@ -15,16 +15,12 @@ import java.sql.Timestamp;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    /**
-     * creation time
-     */
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "creation_time", updatable = false)
     private Timestamp creationTime;
 
-    /**
-     * last modified time
-     */
+
     @UpdateTimestamp
+    @Column(name = "last_modified_time")
     private Timestamp lastModifiedTime;
 }

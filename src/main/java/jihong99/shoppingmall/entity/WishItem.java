@@ -4,22 +4,36 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 
+/**
+ * Represents an item in a user's wish list.
+ *
+ * <p>The WishItem entity stores information about an item that a user has added to their wish list.</p>
+ */
 @Entity
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class WishItem extends BaseEntity {
 
-    // 찜한 상품 번호
+    /**
+     * Primary key for the wish item entity.
+     */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishItemId;
+    @Column(name = "wish_item_id")
+    private Long id;
 
-    // 상품 번호 (fk)
+    /**
+     * The item associated with this wish item.
+     * It is a foreign key referencing the item entity.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", unique = true)
     private Item item;
 
-    // 찜 번호 (fk)
+    /**
+     * The wish list that this wish item belongs to.
+     * It is a foreign key referencing the wish list entity.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;

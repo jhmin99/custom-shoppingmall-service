@@ -3,54 +3,76 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
-
+/**
+ * Represents an image associated with an item or a review.
+ */
 @Entity
-@Getter @Builder
+@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Image extends BaseEntity {
 
-    // 이미지 번호
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long imageId;
+    /**
+     * Unique identifier for the image.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
+    private Long id;
 
-    // 상품 번호 (fk)
+    /**
+     * Item associated with the image.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    // 리뷰 번호 (fk)
+    /**
+     * Review associated with the image.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
 
-    // 이벤트 번호 (fk)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
-    private Event event;
-
-    // 상품문의 번호 (fk)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_inquiry_id")
-    private ItemInquiry itemInquiry;
-
-    // 이미지 이름
+    /**
+     * Name of the image file.
+     */
     private String name;
 
-    // 이미지 경로
+    /**
+     * URL where the image is stored.
+     */
     private String url;
 
-    // 이미지 설명
-    private String description;
+    /**
+     * MIME type of the image file.
+     */
+    private String type;
 
-    // 등록 날짜
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDate registrationDate;
+    /**
+     * Size of the image file in bytes.
+     */
+    private Long size;
 
+    /**
+     * Sets the review associated with the image.
+     *
+     * @param review the review to associate with the image
+     */
+    public void setReview(Review review) {
+        this.review = review;
+    }
+
+    /**
+     * Sets the item associated with the image.
+     *
+     * @param item the item to associate with the image
+     */
+    public void setItem(Item item) {
+        this.item = item;
+    }
 }
