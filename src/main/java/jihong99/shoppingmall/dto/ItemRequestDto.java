@@ -3,7 +3,6 @@ package jihong99.shoppingmall.dto;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
 import java.util.List;
 
 @Getter
@@ -17,9 +16,9 @@ public class ItemRequestDto {
     @Min(value = 0, message = "Price must be greater than or equal to 0.")
     private Integer price;
 
-    @NotNull(message = "Inventory is a required field.")
-    @Min(value = 0, message = "Inventory must be greater than or equal to 0.")
-    private Integer inventory;
+    @NotNull(message = "Stock is a required field.")
+    @Min(value = 0, message = "Stock must be greater than or equal to 0.")
+    private Integer stock;
 
     @NotNull(message = "Keyword is a required field.")
     @Size(min = 3, max = 50, message = "Keyword must be between 3 and 50 characters.")
@@ -28,4 +27,5 @@ public class ItemRequestDto {
 
     @NotEmpty(message = "Category IDs cannot be empty.")
     private List<Long> categoryIds;
+
 }
