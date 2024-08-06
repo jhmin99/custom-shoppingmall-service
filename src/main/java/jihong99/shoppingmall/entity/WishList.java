@@ -3,6 +3,7 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * Represents a user's wish list.
@@ -10,8 +11,10 @@ import lombok.*;
  * <p>The WishList entity stores information about a user's wish list.</p>
  */
 @Entity
-@Getter
+@Getter @Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class WishList extends BaseEntity {
 
     /**
@@ -21,15 +24,6 @@ public class WishList extends BaseEntity {
     @Column(name = "wish_list_id")
     private Long id;
 
-    /**
-     * Constructs a new WishList with the provided id.
-     *
-     * @param id The id of the wish list
-     */
-    @Builder
-    public WishList(Long id) {
-        this.id = id;
-    }
 
     /**
      * Static factory method to create a new wish list.

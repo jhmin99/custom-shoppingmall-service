@@ -70,13 +70,13 @@ public class Item extends BaseEntity {
      * Count of ratings the item has received.
      */
     @Column(name = "rating_count")
-    private Integer ratingCount;
+    private Integer ratingCount = 0;
 
     /**
      * Images associated with the item.
      */
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images;
+    private List<Image> images = new ArrayList<>();
 
     /**
      * Updates the name of the item.
@@ -131,9 +131,6 @@ public class Item extends BaseEntity {
      * @param image the image to add
      */
     public void addImage(Image image) {
-        if (images == null) {
-            images = new ArrayList<>();
-        }
         image.setItem(this);
         images.add(image);
     }
@@ -144,10 +141,8 @@ public class Item extends BaseEntity {
      * @param image the image to remove
      */
     public void removeImage(Image image) {
-        if (images != null) {
-            images.remove(image);
-            image.setItem(null);
-        }
+        images.remove(image);
+        image.setItem(null);
     }
 
     /**

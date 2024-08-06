@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import jihong99.shoppingmall.entity.enums.DiscountType;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Coupon extends BaseEntity {
 
     /**

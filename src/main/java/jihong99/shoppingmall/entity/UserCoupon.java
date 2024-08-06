@@ -3,6 +3,7 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * Represents the relationship between a user and a coupon in the shopping mall system.
@@ -13,7 +14,8 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class UserCoupon extends BaseEntity {
 
     /**
@@ -57,21 +59,6 @@ public class UserCoupon extends BaseEntity {
     }
 
     /**
-     * Constructs a new UserCoupon with the provided user, coupon, and validity status.
-     *
-     * @param user The user associated with the coupon
-     * @param coupon The coupon associated with the user
-     * @param isValid Indicates if the coupon is valid
-     */
-    @Builder
-    public UserCoupon(Users user, Coupon coupon, Boolean isValid){
-        this.users = user;
-        this.coupon = coupon;
-        this.isValid = isValid;
-        this.isUsed = false;
-    }
-
-    /**
      * Creates a new UserCoupon with the provided user and coupon.
      *
      * @param user The user associated with the coupon
@@ -80,7 +67,7 @@ public class UserCoupon extends BaseEntity {
      */
     public static UserCoupon createUserCoupon(Users user, Coupon coupon){
         return UserCoupon.builder()
-                .user(user)
+                .users(user)
                 .coupon(coupon)
                 .isValid(true)
                 .build();

@@ -3,6 +3,10 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDate;
 
 /**
  * Represents a notice in the shopping mall system.
@@ -15,6 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Notice extends BaseEntity {
 
     /**
@@ -34,6 +39,10 @@ public class Notice extends BaseEntity {
      * Content of the notice.
      */
     private String content;
+
+    @CreatedDate
+    @Column(name = "registration_date")
+    private LocalDate registrationDate;
 
     /**
      * Creates a new notice with the provided title and content.

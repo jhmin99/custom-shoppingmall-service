@@ -3,6 +3,7 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * Represents an item in an order in the shopping mall system.
@@ -14,6 +15,7 @@ import lombok.*;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class OrderItem extends BaseEntity {
 
     /**

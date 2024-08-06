@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import jihong99.shoppingmall.entity.enums.InquiryType;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDate;
 
 /**
  * Represents an inquiry made by a user regarding an item or general customer service.
@@ -46,6 +49,9 @@ public class Inquiry extends BaseEntity {
     @JoinColumn(name = "parent_inquiry_id")
     private Inquiry parent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "top_parent_inquiry_id")
+    private Inquiry topParent;
     /**
      * Type of the inquiry.
      */
@@ -74,6 +80,18 @@ public class Inquiry extends BaseEntity {
      */
     @Column(name = "is_question")
     private boolean isQuestion;
+
+
+    @CreatedDate
+    @Column(name = "registration_date")
+    private LocalDate registrationDate;
+
+    /**
+     * Add a method to set the top parent
+     */
+    public void setTopParent(Inquiry topParent) {
+        this.topParent = topParent;
+    }
 
     /**
      * Updates the title of the inquiry.
@@ -161,4 +179,6 @@ public class Inquiry extends BaseEntity {
                 .isResolved(true)
                 .build();
     }
+
+
 }

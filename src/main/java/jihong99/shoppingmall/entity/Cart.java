@@ -3,6 +3,7 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * Represents a shopping cart.
@@ -14,6 +15,7 @@ import lombok.*;
 @Getter @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Cart extends BaseEntity {
 
     /**

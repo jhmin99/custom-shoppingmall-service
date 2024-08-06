@@ -3,8 +3,10 @@ package jihong99.shoppingmall.entity;
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +45,6 @@ public class Review extends BaseEntity {
     private Item item;
 
     /**
-     * The parent review if this review is a reply.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_review_id")
-    private Review parent;
-
-    /**
      * The rating given to the item.
      */
     private Integer rating;
@@ -68,19 +63,18 @@ public class Review extends BaseEntity {
      * Indicates if the review contains photos.
      */
     @Column(name = "has_photo")
-    private Boolean hasPhoto;
-
-    /**
-     * Indicates if the review is a reply to another review.
-     */
-    @Column(name = "is_reply")
-    private Boolean isReply;
+    private Boolean hasPhoto = false;
 
     /**
      * List of images associated with the review.
      */
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images;
+    private List<Image> images = new ArrayList<>();
+
+
+    @CreatedDate
+    @Column(name = "registration_date")
+    private LocalDate registrationDate;
 
     /**
      * Updates the rating of the review.
@@ -124,9 +118,6 @@ public class Review extends BaseEntity {
      * @param image The image to add
      */
     public void addImage(Image image) {
-        if (images == null) {
-            images = new ArrayList<>();
-        }
         image.setReview(this);
         images.add(image);
         if(this.getHasPhoto() == false){
@@ -140,10 +131,8 @@ public class Review extends BaseEntity {
      * @param image The image to remove
      */
     public void removeImage(Image image) {
-        if (images != null) {
-            images.remove(image);
-            image.setReview(null);
-        }
+        images.remove(image);
+        image.setReview(null);
         if(images.isEmpty()){
             this.updateHasPhoto(false);
         }
@@ -167,7 +156,6 @@ public class Review extends BaseEntity {
                 .title(title)
                 .content(content)
                 .rating(rating)
-                .isReply(false)
                 .build();
 
         if (images != null) {
@@ -181,20 +169,4 @@ public class Review extends BaseEntity {
         return review;
     }
 
-    /**
-     * Creates a reply to an existing review.
-     *
-     * @param parent The parent review
-     * @param title The title of the reply
-     * @param content The content of the reply
-     * @return A new Review instance representing the reply
-     */
-    public static Review createReply(Review parent, String title, String content) {
-        return Review.builder()
-                .parent(parent)
-                .title(title)
-                .content(content)
-                .isReply(true)
-                .build();
-    }
 }

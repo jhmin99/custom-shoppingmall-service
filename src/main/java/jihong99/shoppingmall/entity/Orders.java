@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import jihong99.shoppingmall.entity.enums.OrderStatus;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Orders extends BaseEntity {
 
     /**
