@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto;
+package jihong99.shoppingmall.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ResponseDto {
 
-    // 상태 코드
     private String statusCode;
 
-    // 상태 메세지
     private String statusMessage;
 }

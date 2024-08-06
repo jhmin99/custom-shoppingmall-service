@@ -1,6 +1,5 @@
-package jihong99.shoppingmall.dto;
+package jihong99.shoppingmall.dto.response;
 
-import jihong99.shoppingmall.constants.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

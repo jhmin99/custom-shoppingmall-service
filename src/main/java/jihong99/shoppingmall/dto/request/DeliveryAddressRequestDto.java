@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto;
+package jihong99.shoppingmall.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,15 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class DeliveryAddressDto {
-
-    /**
-     * User ID associated with the delivery address.
-     *
-     * <p>This field is mandatory.</p>
-     */
-    @NotNull(message = "User ID is a required field.")
-    private Long userId;
+public class DeliveryAddressRequestDto {
 
     /**
      * Delivery address ID.
@@ -28,10 +20,10 @@ public class DeliveryAddressDto {
     /**
      * Name of the recipient.
      *
-     * <p>This field is mandatory and must be between 2 and 100 characters.</p>
+     * <p>This field is mandatory and must be between 5 and 100 characters.</p>
      */
     @NotNull(message = "Name is a required field.")
-    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters.")
+    @Size(min = 5, max = 20, message = "Name must be between 5 and 20 characters.")
     private String name;
 
     /**

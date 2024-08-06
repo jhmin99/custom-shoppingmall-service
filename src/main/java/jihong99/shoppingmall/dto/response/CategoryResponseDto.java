@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto;
+package jihong99.shoppingmall.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
