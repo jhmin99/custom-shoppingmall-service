@@ -7,7 +7,6 @@ import jihong99.shoppingmall.service.IAuthService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -25,7 +24,7 @@ import java.util.Map;
 public class AuthController {
 
     private final IAuthService iauthService;
-    private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     /**
      * Refresh the access token.
