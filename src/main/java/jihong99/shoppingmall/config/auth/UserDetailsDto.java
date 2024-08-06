@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto;
+package jihong99.shoppingmall.config.auth;
 
 import jihong99.shoppingmall.entity.Users;
 import lombok.AllArgsConstructor;
