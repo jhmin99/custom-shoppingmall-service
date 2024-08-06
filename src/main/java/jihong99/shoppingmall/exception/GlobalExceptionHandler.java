@@ -1,10 +1,12 @@
 package jihong99.shoppingmall.exception;
 
-import jihong99.shoppingmall.dto.ErrorResponseDto;
+import jihong99.shoppingmall.dto.response.ErrorResponseDto;
+import org.hibernate.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception, WebRequest webRequest) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(webRequest, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(webRequest, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -52,15 +55,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        Map<String, String> validationErrors = new HashMap<>();
+        List<Map<String, String>> validationErrors = new ArrayList<>();
         List<ObjectError> validationErrorList = exception.getBindingResult().getAllErrors();
 
         validationErrorList.forEach((error) -> {
+            Map<String, String> errorDetails = new HashMap<>();
             String fieldName = ((FieldError) error).getField();
             String validationMsg = error.getDefaultMessage();
-            validationErrors.put(fieldName, validationMsg);
+            errorDetails.put("fieldName", fieldName);
+            errorDetails.put("validationMsg", validationMsg);
+            validationErrors.add(errorDetails);
         });
-        return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), validationErrors);
+
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -72,7 +80,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(AccessDeniedException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.FORBIDDEN, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.FORBIDDEN, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.FORBIDDEN);
     }
 
@@ -85,7 +93,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.NOT_FOUND, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.NOT_FOUND, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
     }
 
@@ -99,7 +107,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<ErrorResponseDto> handleDateTimeParseException(DateTimeParseException exception, WebRequest request) {
         String errorMessage = "Invalid date format: " + exception.getParsedString();
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, errorMessage);
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, errorMessage, null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
@@ -112,7 +120,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ErrorResponseDto> handlePasswordMismatchException(PasswordMismatchException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
@@ -125,7 +133,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(DuplicateNameException.class)
     public ResponseEntity<ErrorResponseDto> handleDuplicateIdentificationException(DuplicateNameException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
@@ -138,7 +146,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDto> handleBadCredentialsException(BadCredentialsException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
@@ -151,22 +159,58 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidTokenException(InvalidTokenException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
+
     /**
-     * Handles invalid expiration date Exception.
+     * Handles invalid expiration date exceptions.
      *
      * @param exception The exception to be handled.
      * @param request The web request.
      * @return The ResponseEntity containing the error message.
      */
-    @ExceptionHandler(InvalidExpirationDateException.class)
-    public ResponseEntity<ErrorResponseDto> handleInvalidExpirationDateException(InvalidExpirationDateException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage());
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidOperationException(InvalidOperationException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
-
+    /**
+     * Handles type mismatch exceptions.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(TypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDto> handleTypeMismatchException(TypeMismatchException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+    /**
+     * Handles message not readable exceptions.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+    /**
+     * Handles exceptions where an entity cannot be deleted due to existing related entities.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(HasRelationException.class)
+    public ResponseEntity<ErrorResponseDto> handleHasRelationException(HasRelationException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.CONFLICT, exception.getMessage(), null);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.CONFLICT);
+    }
 
     /**
      * Builds an ErrorResponseDto with the given details.
@@ -174,14 +218,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request The web request.
      * @param status The HTTP status code.
      * @param message The error message.
+     * @param validationErrors The validation errors.
      * @return The built ErrorResponseDto.
      */
-    private ErrorResponseDto buildErrorResponseDto(WebRequest request, HttpStatus status, String message) {
+    private ErrorResponseDto buildErrorResponseDto(WebRequest request, HttpStatus status, String message, List<Map<String, String>> validationErrors) {
         return new ErrorResponseDto(
                 request.getDescription(false),
                 status,
                 message,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                validationErrors
         );
     }
+
+
+
 }
