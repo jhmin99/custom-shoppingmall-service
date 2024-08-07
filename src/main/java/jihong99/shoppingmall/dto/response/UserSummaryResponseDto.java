@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -14,15 +13,12 @@ public class UserSummaryResponseDto {
     private String identification;
     private String name;
     private LocalDate birthDate;
-    private List<Address> addresses;
     private String phoneNumber;
     private Timestamp creationTime;
     private Timestamp lastModifiedTime;
 
-    private class Address {
-        private Long addressId;
-        private Integer zipCode;
-        private String address;
-        private String addressDetail;
+
+    public static UserSummaryResponseDto of(Long id, String identification, String name, LocalDate birthDate, String phoneNumber, Timestamp creationTime, Timestamp lastModifiedTime){
+        return new UserSummaryResponseDto(id, identification, name, birthDate, phoneNumber, creationTime, lastModifiedTime);
     }
 }
