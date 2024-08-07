@@ -17,7 +17,7 @@ public class PatchAdminRequestDto {
             message = "Password must contain alphabets, numbers, and special characters, with a length of 8-15 characters. (Allowed special characters: !@#$%^&*)")
     private String password;
 
-    @Pattern(regexp = "\\d{11}", message = "Phone Number must consist of 11 digits.", groups = {SignUpValidation.class})
+    @Pattern(regexp = "\\d{11}", message = "Phone Number must consist of 11 digits.")
     private String phoneNumber;
 
     @Pattern(regexp = "USER|ADMIN|SUPER_ADMIN", message = "Role must be one of the following: USER, ADMIN, SUPER_ADMIN")
