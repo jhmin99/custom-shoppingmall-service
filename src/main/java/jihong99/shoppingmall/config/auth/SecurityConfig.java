@@ -55,16 +55,15 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfig.corsConfigurationSource()))
                 .csrf(csrfConfigurer -> csrfConfigurer.csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token") // public API urls
+                        .ignoringRequestMatchers("/api/signup", "/api/check-id", "/api/login", "/h2-console/**", "/api/refresh-token") // public API urls
                         .csrfTokenRepository(csrfTokenRepository))
                 .addFilterAfter(csrfCookieFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/signup", "/api/users/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token", "/api/categories").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
-                        .requestMatchers(HttpMethod.POST, "/api/logout", "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers("/api/signup", "/api/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token", "/api/categories", "/api/items/**",
+                                "/api/inquiries/**" ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/logout").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
+                        .requestMatchers("/api/users/**").hasAnyRole(USER.name())
                         .requestMatchers("/api/admin/**").hasRole(ADMIN.name())
                         .requestMatchers("/api/super-admin/**").hasRole(SUPER_ADMIN.name()))
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())); // access h2 console
