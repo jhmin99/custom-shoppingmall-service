@@ -1,14 +1,20 @@
 package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
+import jihong99.shoppingmall.config.auth.UserDetailsDto;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
-import jihong99.shoppingmall.dto.*;
+import jihong99.shoppingmall.dto.request.LoginRequestDto;
+import jihong99.shoppingmall.dto.request.PatchAdminRequestDto;
+import jihong99.shoppingmall.dto.request.PatchUserRequestDto;
+import jihong99.shoppingmall.dto.request.SignUpRequestDto;
+import jihong99.shoppingmall.dto.response.AdminSummaryResponseDto;
+import jihong99.shoppingmall.dto.response.UserDetailsResponseDto;
+import jihong99.shoppingmall.dto.response.UserSummaryResponseDto;
 import jihong99.shoppingmall.entity.*;
 import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.exception.NotFoundException;
-import jihong99.shoppingmall.mapper.UserMapper;
 import jihong99.shoppingmall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,11 +27,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
 import static jihong99.shoppingmall.constants.Constants.*;
-import static jihong99.shoppingmall.entity.enums.Tiers.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,41 +44,37 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final IDeliveryAddressService deliveryAddressService;
-    private final CouponRepository couponRepository;
-    private final UserCouponRepository userCouponRepository;
 
     /**
      * Registers a new user account.
      *
-     * @param signUpDto the data transfer object containing user sign up details
+     * @param signUpRequestDto the data transfer object containing user sign up details
      * @throws DuplicateNameException if the identification is already in use
      * @throws PasswordMismatchException if the password and confirmation password do not match
-     * @throws RuntimeException if welcome coupon doesn't exist
      */
     @Override
     @Transactional
-    public void signUpAccount(SignUpDto signUpDto) {
-        Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
+    public void signUpAccount(SignUpRequestDto signUpRequestDto) {
+        Optional<Users> findUser = userRepository.findByIdentification(signUpRequestDto.getIdentification());
         if (findUser.isPresent()) {
             throw new DuplicateNameException(MESSAGE_400_duplicatedId);
         }
-        if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
-        UserMapper userMapper = new UserMapper();
-        Users user = userMapper.mapToUser(signUpDto);
-        encodePassword(user, signUpDto.getPassword());
+        Users user = getUsers(signUpRequestDto);
+        encodePassword(user, signUpRequestDto.getPassword());
         createCartAndWishList(user);
-        createAdditionalUserInfo(user);
-        Users savedUser = userRepository.save(user);
-        assignWelcomeCoupon(savedUser);
+        userRepository.save(user);
     }
 
-    private void assignWelcomeCoupon(Users user) {
-        Coupon welcomeCoupon = couponRepository.findByName("Welcome Coupon")
-                .orElseThrow(() -> new RuntimeException(MESSAGE_500_CouponNotFound));
-        UserCoupon userCoupon = UserCoupon.createUserCoupon(user, welcomeCoupon);
-        userCouponRepository.save(userCoupon);
+    private static Users getUsers(SignUpRequestDto signUpRequestDto) {
+        return Users.createUsers(signUpRequestDto.getIdentification(),
+                signUpRequestDto.getPassword(),
+                signUpRequestDto.getName(),
+                LocalDate.parse(signUpRequestDto.getBirthDate()),
+                signUpRequestDto.getPhoneNumber()
+                );
     }
 
     /**
@@ -134,57 +136,39 @@ public class UserServiceImpl implements IUserService {
         return jwtTokenProvider.generateRefreshToken(user);
     }
 
-    /**
-     * Retrieves the user details along with their delivery addresses.
-     *
-     * @param userId the ID of the user whose details are to be retrieved
-     * @return the user details and delivery addresses
-     * @throws NotFoundException if the user with the specified ID is not found
-     */
-    @Override
-    public MyPageResponseDto getUserDetails(Long userId) {
-        Users findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
-        Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
-        return MyPageResponseDto.of(findUser,deliveryAddresses);
-    }
+
 
     /**
      * Registers a new admin account.
      *
-     * @param signUpDto the data transfer object containing admin sign up details
+     * @param signUpRequestDto the data transfer object containing admin sign up details
      * @throws DuplicateNameException if the identification is already in use
      * @throws PasswordMismatchException if the password and confirmation password do not match
      */
     @Override
     @Transactional
-    public void signUpAdminAccount(SignUpDto signUpDto) {
-        Optional<Users> findUser = userRepository.findByIdentification(signUpDto.getIdentification());
+    public void signUpAdminAccount(SignUpRequestDto signUpRequestDto) {
+        Optional<Users> findUser = userRepository.findByIdentification(signUpRequestDto.getIdentification());
         if (findUser.isPresent()) {
             throw new DuplicateNameException(MESSAGE_400_duplicatedId);
         }
-        if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+        if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
-        UserMapper userMapper = new UserMapper();
-        Users user = userMapper.mapToUser(signUpDto);
-        encodePassword(user, signUpDto.getPassword());
-        user.updateRole(Roles.ADMIN);
+        Users user = getAdmin(signUpRequestDto);
+        encodePassword(user, signUpRequestDto.getPassword());
         userRepository.save(user);
     }
 
-
-    /**
-     * Creates additional user information such as points, tier, and role.
-     *
-     * @param user the user for whom to create additional information
-     */
-    private void createAdditionalUserInfo(Users user) {
-        user.updatePoint(0);
-        user.updateTier(IRON);
-        user.updateAmountToNextTier(50000);
-        user.updateRole(Roles.USER);
+    private static Users getAdmin(SignUpRequestDto signUpRequestDto) {
+        return Users.createAdmin(
+                signUpRequestDto.getIdentification(),
+                signUpRequestDto.getPassword(),
+                signUpRequestDto.getName(),
+                LocalDate.parse(signUpRequestDto.getBirthDate()),
+                signUpRequestDto.getPhoneNumber());
     }
+
 
     /**
      * Creates a shopping cart and wishlist for the user.
@@ -192,7 +176,7 @@ public class UserServiceImpl implements IUserService {
      * @param user the user for whom to create the cart and wishlist
      */
     private void createCartAndWishList(Users user) {
-        Cart cart = Cart.createCart(0L);
+        Cart cart = Cart.createCart();
         WishList wishList = WishList.createWishList();
         cartRepository.save(cart);
         wishListRepository.save(wishList);
@@ -227,7 +211,103 @@ public class UserServiceImpl implements IUserService {
      * @return a page of user summaries
      */
     @Override
-    public Page<UserSummaryDto> getUsers(Pageable pageable) {
-        return userRepository.findAllUserSummaries(pageable);
+    public Page<UserSummaryResponseDto> getUsers(Pageable pageable) {
+        Page<Users> users = userRepository.findAllByRole(Roles.USER, pageable);
+        return getUserSummaryResponseDtos(users);
+
+    }
+
+    private static Page<UserSummaryResponseDto> getUserSummaryResponseDtos(Page<Users> users) {
+        return users.map(user -> UserSummaryResponseDto.of(
+                user.getId(),
+                user.getIdentification(),
+                user.getName(),
+                user.getBirthDate(),
+                user.getPhoneNumber(),
+                user.getCreationTime(),
+                user.getLastModifiedTime()
+        ));
+    }
+
+    @Override
+    public Page<AdminSummaryResponseDto> getAdmins(Pageable pageable) {
+        Page<Users> users = userRepository.findAllByRole(Roles.ADMIN, pageable);
+        return getAdminSummaryResponseDtos(users);
+
+    }
+    private static Page<AdminSummaryResponseDto> getAdminSummaryResponseDtos(Page<Users> users) {
+        return users.map(user -> AdminSummaryResponseDto.of(
+                user.getId(),
+                user.getIdentification(),
+                user.getName(),
+                user.getBirthDate(),
+                user.getPhoneNumber(),
+                user.getCreationTime(),
+                user.getLastModifiedTime()
+        ));
+    }
+    @Override
+    @Transactional
+    public void patchAdminAccount(Long userId, PatchAdminRequestDto patchAdminRequestDto) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        if (patchAdminRequestDto.getName() != null && !patchAdminRequestDto.getName().isEmpty()) {
+            user.updateName(patchAdminRequestDto.getName());
+        }
+
+        if (patchAdminRequestDto.getPassword() != null && !patchAdminRequestDto.getPassword().isEmpty()) {
+            user.updatePassword(patchAdminRequestDto.getPassword());
+        }
+
+        if (patchAdminRequestDto.getPhoneNumber() != null && !patchAdminRequestDto.getPhoneNumber().isEmpty()) {
+            user.updatePhoneNumber(patchAdminRequestDto.getPhoneNumber());
+        }
+
+        if (patchAdminRequestDto.getRole() != null && !patchAdminRequestDto.getRole().isEmpty()) {
+            user.updateRole(Roles.valueOf(patchAdminRequestDto.getRole()));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteAdminAccount(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public void patchUserAccount(Long userId, PatchUserRequestDto patchUserRequestDto) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        if (patchUserRequestDto.getName() != null && !patchUserRequestDto.getName().isEmpty()) {
+            user.updateName(patchUserRequestDto.getName());
+        }
+
+        if (patchUserRequestDto.getBirthDate() != null && !patchUserRequestDto.getBirthDate().isEmpty()) {
+            user.updatePassword(patchUserRequestDto.getBirthDate());
+        }
+
+        if (patchUserRequestDto.getPhoneNumber() != null && !patchUserRequestDto.getPhoneNumber().isEmpty()) {
+            user.updatePhoneNumber(patchUserRequestDto.getPhoneNumber());
+        }
+
+    }
+
+
+    /**
+     * Retrieves the user details along with their delivery addresses.
+     *
+     * @param userId the ID of the user whose details are to be retrieved
+     * @return the user details and delivery addresses
+     * @throws NotFoundException if the user with the specified ID is not found
+     */
+    @Override
+    public UserDetailsResponseDto getUserDetails(Long userId) {
+        Users findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
+        return UserDetailsResponseDto.of(findUser,deliveryAddresses);
     }
 }
