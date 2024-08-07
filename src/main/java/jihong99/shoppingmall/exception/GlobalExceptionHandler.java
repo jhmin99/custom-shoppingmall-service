@@ -188,18 +188,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
     /**
-     * Handles message not readable exceptions.
-     *
-     * @param exception The exception to be handled.
-     * @param request The web request.
-     * @return The ResponseEntity containing the error message.
-     */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
-        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
-        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
-    }
-    /**
      * Handles exceptions where an entity cannot be deleted due to existing related entities.
      *
      * @param exception The exception to be handled.
