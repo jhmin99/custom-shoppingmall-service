@@ -5,6 +5,7 @@ import jihong99.shoppingmall.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ public class UserDetailsResponseDto {
     private LocalDate birthDate;
     private String phoneNumber;
     private Set<Address> deliveryAddresses;
+    private Timestamp creationTime;
+    private Timestamp lastModifiedTime;
 
     @Getter
     @AllArgsConstructor
@@ -31,7 +34,7 @@ public class UserDetailsResponseDto {
 
     public static UserDetailsResponseDto of(Users findUser, Set<DeliveryAddress> deliveryAddresses) {
         Set<Address> deliveryAddressDtos = getAddresses(deliveryAddresses);
-        return new UserDetailsResponseDto(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDtos);
+        return new UserDetailsResponseDto(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDtos, findUser.getCreationTime(), findUser.getLastModifiedTime());
     }
 
     private static Set<Address> getAddresses(Set<DeliveryAddress> deliveryAddresses) {
