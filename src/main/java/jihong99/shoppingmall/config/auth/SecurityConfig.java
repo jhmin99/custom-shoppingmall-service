@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/signup", "/api/check-id", "/api/login", "/h2-console/**", "/api/refresh-token","/api/csrf-token", "/api/categories", "/api/items/**",
                                 "/api/inquiries/**" ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/logout").hasAnyRole(USER.name(), ADMIN.name(), SUPER_ADMIN.name())
-                        .requestMatchers("/api/users/**").hasAnyRole(USER.name())
+                        .requestMatchers("/api/users/**").hasRole(USER.name())
                         .requestMatchers("/api/admin/**").hasRole(ADMIN.name())
                         .requestMatchers("/api/super-admin/**").hasRole(SUPER_ADMIN.name()))
                 .headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())); // access h2 console
