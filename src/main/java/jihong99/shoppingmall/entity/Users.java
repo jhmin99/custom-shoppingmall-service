@@ -92,13 +92,6 @@ public class Users extends BaseEntity {
     private Roles role;
 
     /**
-     * The user's registration date.
-     */
-    @CreatedDate
-    @Column(name = "registration_date")
-    private LocalDate registrationDate;
-
-    /**
      * The user's refresh token.
      */
     @Column(name = "refresh_token")
@@ -179,6 +172,14 @@ public class Users extends BaseEntity {
         this.wishList = wishList;
     }
 
+    /**
+     *
+     * Updates the user's name.
+     * @param name - The new username
+     */
+    public void updateName (String name) {
+        this.name = name;
+    }
     /**
      * Updates the user's phone number.
      *
