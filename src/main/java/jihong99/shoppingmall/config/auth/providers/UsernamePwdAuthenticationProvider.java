@@ -1,6 +1,6 @@
 package jihong99.shoppingmall.config.auth.providers;
 
-import jihong99.shoppingmall.dto.UserDetailsDto;
+import jihong99.shoppingmall.config.auth.UserDetailsDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
