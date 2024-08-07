@@ -11,6 +11,7 @@ import jihong99.shoppingmall.exception.PasswordMismatchException;
 import jihong99.shoppingmall.service.IUserService;
 import jihong99.shoppingmall.validation.groups.SignUpValidation;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.TypeMismatchException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,8 +75,12 @@ public class SuperAdminController {
      * @param page The page number to retrieve (default is 0)
      * @param size The number of records per page (default is 10)
      * @return ResponseEntity<PaginatedResponseDto<AdminSummaryResponseDto>> Response object containing the paginated list of admin summaries
+     * @throws TypeMismatchException           Thrown if method argument (path variable or query parameter) cannot be converted to the expected type
+     *                                         Response Code: 400
      * @throws AccessDeniedException           Thrown if the user does not have SUPER_ADMIN role
      *                                         Response Code: 403
+     * @throws Exception                       Internal server error occurred
+     *                                         Response Code: 500
      * @success Paginated list of admin summaries successfully retrieved
      * Response Code: 200
      */
@@ -101,6 +106,8 @@ public class SuperAdminController {
      * @return ResponseEntity<ResponseDto> Response object containing the result of the admin update
      * @success Admin account successfully updated
      * Response Code: 200
+     * @throws TypeMismatchException           Thrown if method argument (path variable or query parameter) cannot be converted to the expected type
+     *                                         Response Code: 400
      * @throws MethodArgumentNotValidException Validation failed
      *                                         Response Code: 400
      * @throws AccessDeniedException           Thrown if the user does not have SUPER_ADMIN role
@@ -127,7 +134,7 @@ public class SuperAdminController {
      * @return ResponseEntity<ResponseDto> Response object containing the result of the admin deletion
      * @success Admin account successfully deleted
      * Response Code: 200
-     * @throws MethodArgumentNotValidException Validation failed
+     * @throws TypeMismatchException           Thrown if method argument (path variable or query parameter) cannot be converted to the expected type
      *                                         Response Code: 400
      * @throws AccessDeniedException           Thrown if the user does not have SUPER_ADMIN role
      *                                         Response Code: 403
