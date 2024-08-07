@@ -52,15 +52,15 @@ public class AuthServiceImpl implements IAuthService {
      * <p>This method retrieves the currently authenticated user's identification,
      * looks up the user in the database, and checks if the user's ID matches the specified ID.</p>
      *
-     * @param Id The user ID to check against the authenticated user's ID.
+     * @param userId The user ID to check against the authenticated user's ID.
      * @return true if the authenticated user's ID matches the specified ID, false otherwise.
      * @throws NotFoundException If no user is found with the authenticated user's identification.
      */
     @Override
-    public boolean hasId(Long Id) {
+    public boolean hasId(Long userId) {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        Users user = userRepository.findByIdentification(name)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
-        return user.getId().equals(Id);
+        return user.getIdentification().equals(name);
     }
 }
