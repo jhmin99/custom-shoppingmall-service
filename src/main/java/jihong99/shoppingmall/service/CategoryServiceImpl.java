@@ -1,14 +1,23 @@
 package jihong99.shoppingmall.service;
 
-import jihong99.shoppingmall.dto.CategoryRequestDto;
-import jihong99.shoppingmall.dto.CategoryResponseDto;
+import jakarta.transaction.Transactional;
+import jihong99.shoppingmall.dto.request.CategoryRequestDto;
+import jihong99.shoppingmall.dto.request.PutCategoryRequestDto;
+import jihong99.shoppingmall.dto.response.CategoryResponseDto;
 import jihong99.shoppingmall.entity.Category;
-import jihong99.shoppingmall.mapper.CategoryMapper;
+import jihong99.shoppingmall.exception.DuplicateNameException;
+import jihong99.shoppingmall.exception.HasRelationException;
+import jihong99.shoppingmall.exception.NotFoundException;
+import jihong99.shoppingmall.repository.CategoryItemRepository;
 import jihong99.shoppingmall.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+import static jihong99.shoppingmall.constants.Constants.*;
 
 /**
  * Service implementation for managing categories.
@@ -21,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class CategoryServiceImpl implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryItemRepository categoryItemRepository;
 
     /**
      * Creates a new category.
@@ -29,14 +39,22 @@ public class CategoryServiceImpl implements ICategoryService {
      * saves the entity to the repository, and returns a response DTO.</p>
      *
      * @param categoryRequestDto the DTO containing the category details
-     * @return the response DTO containing the saved category details
      */
     @Override
-    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
-        CategoryMapper categoryMapper = new CategoryMapper();
-        Category category = categoryMapper.mapToCategory(categoryRequestDto);
-        Category savedCategory = categoryRepository.save(category);
-        return CategoryResponseDto.of(savedCategory.getId(), savedCategory.getName());
+    @Transactional
+    public void createCategory(CategoryRequestDto categoryRequestDto) {
+        Optional<Category> findCategory = categoryRepository.findByName(categoryRequestDto.getName());
+        if (findCategory.isPresent()){
+            throw new DuplicateNameException(MESSAGE_400_duplicatedName);
+        }
+        Category category = getCategory(categoryRequestDto);
+        categoryRepository.save(category);
+    }
+
+    private static Category getCategory(CategoryRequestDto categoryRequestDto) {
+        return Category.builder()
+                .name(categoryRequestDto.getName())
+                .build();
     }
 
     /**
@@ -53,4 +71,41 @@ public class CategoryServiceImpl implements ICategoryService {
         return categoryRepository.findAll(pageable)
                 .map(category -> CategoryResponseDto.of(category.getId(), category.getName()));
     }
+
+    /**
+     * Updates a category.
+     *
+     * <p>This method updates the name of an existing category.</p>
+     *
+     * @param categoryId the ID of the category to update
+     * @param putCategoryRequestDto the DTO containing the updated category details
+     */
+    @Override
+    @Transactional
+    public void editCategory(Long categoryId, PutCategoryRequestDto putCategoryRequestDto) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new NotFoundException(MESSAGE_404_CategoryNotFound));
+        category.updateName(putCategoryRequestDto.getName());
+        categoryRepository.save(category);
+    }
+
+    /**
+     * Deletes a category.
+     *
+     * <p>This method deletes an existing category if it has no related items.</p>
+     *
+     * @param categoryId the ID of the category to delete
+     */
+    @Override
+    @Transactional
+    public void deleteCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new NotFoundException(MESSAGE_404_CategoryNotFound));
+        if(categoryItemRepository.findByCategoryId(categoryId).isEmpty()){
+            categoryRepository.delete(category);
+        } else {
+            throw new HasRelationException(MESSAGE_409_RelationConflict);
+        }
+    }
 }
+

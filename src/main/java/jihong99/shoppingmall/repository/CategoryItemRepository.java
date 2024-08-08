@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface CategoryItemRepository extends JpaRepository<CategoryItem, Long> {
     List<CategoryItem> findByItemId(Long itemId);
+
+    List<CategoryItem> findByCategoryId(Long categoryId);
 }
