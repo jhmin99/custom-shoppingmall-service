@@ -28,3 +28,6 @@ superAdmin:
 cors:
   allowed:
     origins: ${CORS_ALLOWED_ORIGINS}
+file:
+  storage:
+    type: "gcs"
