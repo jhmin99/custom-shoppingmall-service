@@ -68,13 +68,19 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
 
+    /**
+     * Helper method to map SignUpRequestDto to a Users entity.
+     *
+     * @param signUpRequestDto the data transfer object containing user sign up details
+     * @return a Users entity populated with data from the SignUpRequestDto
+     */
     private static Users getUsers(SignUpRequestDto signUpRequestDto) {
         return Users.createUsers(signUpRequestDto.getIdentification(),
                 signUpRequestDto.getPassword(),
                 signUpRequestDto.getName(),
                 LocalDate.parse(signUpRequestDto.getBirthDate()),
                 signUpRequestDto.getPhoneNumber()
-                );
+        );
     }
 
     /**
@@ -136,8 +142,6 @@ public class UserServiceImpl implements IUserService {
         return jwtTokenProvider.generateRefreshToken(user);
     }
 
-
-
     /**
      * Registers a new admin account.
      *
@@ -160,6 +164,12 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
 
+    /**
+     * Helper method to map SignUpRequestDto to an Admin Users entity.
+     *
+     * @param signUpRequestDto the data transfer object containing admin sign up details
+     * @return a Users entity populated with admin data from the SignUpRequestDto
+     */
     private static Users getAdmin(SignUpRequestDto signUpRequestDto) {
         return Users.createAdmin(
                 signUpRequestDto.getIdentification(),
@@ -204,6 +214,7 @@ public class UserServiceImpl implements IUserService {
     private boolean isIdentificationExist(String identification) {
         return userRepository.findByIdentification(identification).isPresent();
     }
+
     /**
      * Retrieves a paginated list of user summaries.
      *
@@ -217,6 +228,12 @@ public class UserServiceImpl implements IUserService {
 
     }
 
+    /**
+     * Helper method to map Users entities to UserSummaryResponseDto.
+     *
+     * @param users the page of Users entities
+     * @return a page of UserSummaryResponseDto
+     */
     private static Page<UserSummaryResponseDto> getUserSummaryResponseDtos(Page<Users> users) {
         return users.map(user -> UserSummaryResponseDto.of(
                 user.getId(),
@@ -229,12 +246,25 @@ public class UserServiceImpl implements IUserService {
         ));
     }
 
+    /**
+     * Retrieves a paginated list of admin summaries.
+     *
+     * @param pageable the pagination information
+     * @return a page of admin summaries
+     */
     @Override
     public Page<AdminSummaryResponseDto> getAdmins(Pageable pageable) {
         Page<Users> users = userRepository.findAllByRole(Roles.ADMIN, pageable);
         return getAdminSummaryResponseDtos(users);
 
     }
+
+    /**
+     * Helper method to map Users entities to AdminSummaryResponseDto.
+     *
+     * @param users the page of Users entities
+     * @return a page of AdminSummaryResponseDto
+     */
     private static Page<AdminSummaryResponseDto> getAdminSummaryResponseDtos(Page<Users> users) {
         return users.map(user -> AdminSummaryResponseDto.of(
                 user.getId(),
@@ -246,11 +276,18 @@ public class UserServiceImpl implements IUserService {
                 user.getLastModifiedTime()
         ));
     }
+
+    /**
+     * Updates the details of an admin account.
+     *
+     * @param userId the ID of the admin to update
+     * @param patchAdminRequestDto the data transfer object containing updated admin details
+     * @throws NotFoundException if the admin with the specified ID is not found
+     */
     @Override
     @Transactional
     public void patchAdminAccount(Long userId, PatchAdminRequestDto patchAdminRequestDto) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Users user = validateUsersExist(userId);
         if (patchAdminRequestDto.getName() != null && !patchAdminRequestDto.getName().isEmpty()) {
             user.updateName(patchAdminRequestDto.getName());
         }
@@ -268,19 +305,30 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
+    /**
+     * Deletes an admin account.
+     *
+     * @param userId the ID of the admin to delete
+     * @throws NotFoundException if the admin with the specified ID is not found
+     */
     @Override
     @Transactional
     public void deleteAdminAccount(Long userId) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Users user = validateUsersExist(userId);
         userRepository.delete(user);
     }
 
+    /**
+     * Updates the details of a user account.
+     *
+     * @param userId the ID of the user to update
+     * @param patchUserRequestDto the data transfer object containing updated user details
+     * @throws NotFoundException if the user with the specified ID is not found
+     */
     @Override
     @Transactional
     public void patchUserAccount(Long userId, PatchUserRequestDto patchUserRequestDto) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Users user = validateUsersExist(userId);
         if (patchUserRequestDto.getName() != null && !patchUserRequestDto.getName().isEmpty()) {
             user.updateName(patchUserRequestDto.getName());
         }
@@ -295,7 +343,6 @@ public class UserServiceImpl implements IUserService {
 
     }
 
-
     /**
      * Retrieves the user details along with their delivery addresses.
      *
@@ -305,9 +352,20 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public UserDetailsResponseDto getUserDetails(Long userId) {
-        Users findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Users findUser = validateUsersExist(userId);
         Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
-        return UserDetailsResponseDto.of(findUser,deliveryAddresses);
+        return UserDetailsResponseDto.of(findUser, deliveryAddresses);
+    }
+
+    /**
+     * Validates that a user exists by ID.
+     *
+     * @param userId the ID of the user to validate
+     * @return the Users entity if found
+     * @throws NotFoundException if the user with the specified ID is not found
+     */
+    private Users validateUsersExist(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
     }
 }
