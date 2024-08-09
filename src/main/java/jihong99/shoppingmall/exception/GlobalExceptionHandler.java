@@ -201,6 +201,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles an exception that occurs when an illegal argument is passed.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleIllegalArgumentException(IllegalArgumentException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.BAD_REQUEST, exception.getMessage(), null);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles exceptions that occur during image upload.
+     *
+     * @param exception The exception to be handled.
+     * @param request The web request.
+     * @return The ResponseEntity containing the error message.
+     */
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<ErrorResponseDto> handleImageUploadException(ImageUploadException exception, WebRequest request) {
+        ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), null);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
      * Builds an ErrorResponseDto with the given details.
      *
      * @param request The web request.
