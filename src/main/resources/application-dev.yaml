@@ -26,3 +26,8 @@ superAdmin:
 cors:
   allowed:
     origins: http://localhost:3000
+file:
+  storage:
+    type: "local"
+  local:
+    upload-dir: "/customshoppingmallservice/test-local/image"
