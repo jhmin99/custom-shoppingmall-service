@@ -145,6 +145,12 @@ public class Item extends BaseEntity {
         image.setItem(null);
     }
 
+    public void invalidateItem(){
+        this.isInvalid = true;
+    }
+    public void validateItem(){
+        this.isInvalid = false;
+    }
     /**
      * Creates a new item with the specified properties.
      *
