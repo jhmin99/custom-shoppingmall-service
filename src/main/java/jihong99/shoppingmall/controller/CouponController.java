@@ -38,8 +38,6 @@ public class CouponController {
      * Response Code: 201
      * @throws MethodArgumentNotValidException Validation failed
      * Response Code: 400
-     * @throws DuplicateNameException Duplicate code exists
-     * Response Code: 400
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
@@ -66,8 +64,6 @@ public class CouponController {
      * @throws MethodArgumentNotValidException Validation failed
      * Response Code: 400
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
-     * Response Code: 400
-     * @throws DuplicateNameException Duplicate code exists
      * Response Code: 400
      * @throws NotFoundException The coupon is not found
      * Response Code: 404
@@ -213,13 +209,13 @@ public class CouponController {
      */
     @GetMapping("/admin/coupons/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PaginatedResponseDto<UserCouponDetailsResponseDto>> getAllUserCoupons(
+    public ResponseEntity<PaginatedResponseDto<UserCouponsResponseDto>> getAllUserCoupons(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserCouponDetailsResponseDto> coupons = icouponService.getUserCoupons(userId, pageable);
-        PaginatedResponseDto<UserCouponDetailsResponseDto> response = PaginatedResponseDto.of(coupons);
+        Page<UserCouponsResponseDto> coupons = icouponService.getUserCoupons(userId, pageable);
+        PaginatedResponseDto<UserCouponsResponseDto> response = PaginatedResponseDto.of(coupons);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
