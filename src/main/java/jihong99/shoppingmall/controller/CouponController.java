@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jihong99.shoppingmall.dto.request.CouponRequestDto;
 import jihong99.shoppingmall.dto.request.PatchCouponRequestDto;
 import jihong99.shoppingmall.dto.response.*;
-import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.ICouponService;
 import lombok.RequiredArgsConstructor;
