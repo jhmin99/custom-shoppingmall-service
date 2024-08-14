@@ -1,8 +1,8 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.DeliveryAddressDto;
-import jihong99.shoppingmall.dto.ResponseDto;
+import jihong99.shoppingmall.dto.request.DeliveryAddressRequestDto;
+import jihong99.shoppingmall.dto.response.ResponseDto;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import static jihong99.shoppingmall.constants.Constants.*;
 
 @RestController
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeliveryAddressController {
@@ -36,7 +35,7 @@ public class DeliveryAddressController {
      * Response Code: 500
      */
     @PostMapping("/delivery-address")
-    public ResponseEntity<ResponseDto> addDeliveryAddress(@Valid @RequestBody DeliveryAddressDto requestDto) {
+    public ResponseEntity<ResponseDto> addDeliveryAddress(@Valid @RequestBody DeliveryAddressRequestDto requestDto) {
         ideliveryAddressService.addDeliveryAddress(requestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -60,7 +59,7 @@ public class DeliveryAddressController {
      * Response Code: 500
      */
     @PutMapping("/delivery-address/{addressId}")
-    public ResponseEntity<ResponseDto> updateDeliveryAddress(@PathVariable Long addressId, @Valid @RequestBody DeliveryAddressDto requestDto) {
+    public ResponseEntity<ResponseDto> updateDeliveryAddress(@PathVariable Long addressId, @Valid @RequestBody DeliveryAddressRequestDto requestDto) {
         ideliveryAddressService.updateDeliveryAddress(addressId, requestDto);
         return ResponseEntity
                 .status(HttpStatus.OK)

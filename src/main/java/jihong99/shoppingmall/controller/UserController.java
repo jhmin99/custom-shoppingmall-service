@@ -39,7 +39,6 @@ import static jihong99.shoppingmall.constants.Constants.*;
 
 
 @RestController
-@Validated
 @RequiredArgsConstructor
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
