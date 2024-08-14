@@ -300,8 +300,8 @@ public class UserServiceImpl implements IUserService {
             user.updatePhoneNumber(patchAdminRequestDto.getPhoneNumber());
         }
 
-        if (patchAdminRequestDto.getRole() != null && !patchAdminRequestDto.getRole().isEmpty()) {
-            user.updateRole(Roles.valueOf(patchAdminRequestDto.getRole()));
+        if (patchAdminRequestDto.getRole() != null) {
+            user.updateRole(patchAdminRequestDto.getRole());
         }
     }
 
