@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * Represents a coupon that can be applied to a purchase for a discount.
@@ -30,6 +32,7 @@ public class Coupon extends BaseEntity {
     /**
      * Code of the coupon.
      */
+    @Column(unique = true)
     private String code;
 
     /**
@@ -52,20 +55,50 @@ public class Coupon extends BaseEntity {
     private LocalDate expirationDate;
 
     /**
+     * Factory method to create a new Coupon instance.
+     *
+     * <p>This method generates a new coupon code based on the current date and a random UUID.
+     * It sets the discount type, discount value, and expiration date for the coupon.</p>
+     *
+     * @param discountType The type of discount the coupon provides.
+     * @param discountValue The value of the discount.
+     * @param expirationDate The expiration date of the coupon.
+     * @return A new instance of the Coupon entity.
+     */
+    public static Coupon createCoupon(DiscountType discountType, Long discountValue, LocalDate expirationDate) {
+        String code = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) + "-" + UUID.randomUUID().toString().substring(0, 8);
+        return Coupon.builder()
+                .code(code)
+                .discountType(discountType)
+                .discountValue(discountValue)
+                .expirationDate(expirationDate)
+                .build();
+    }
+
+    /**
      * Updates the discount type of the coupon.
      *
-     * @param discountType the new discount type
+     * @param discountType The new discount type to be applied to the coupon.
      */
-    public void updateDiscountType(DiscountType discountType){
+    public void updateDiscountType(DiscountType discountType) {
         this.discountType = discountType;
     }
 
     /**
      * Updates the discount value of the coupon.
      *
-     * @param discountValue the new discount value
+     * @param discountValue The new discount value to be applied to the coupon.
      */
-    public void updateDiscountValue(Long discountValue){
+    public void updateDiscountValue(Long discountValue) {
         this.discountValue = discountValue;
+    }
+
+    /**
+     * Updates the expiration date of the coupon.
+     *
+     * @param expirationDate The new expiration date to be applied to the coupon.
+     */
+    public void updateExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }
