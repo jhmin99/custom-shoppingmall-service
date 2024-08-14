@@ -1,204 +1,184 @@
 package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.CouponRequestDto;
-import jihong99.shoppingmall.dto.CouponResponseDto;
+import jihong99.shoppingmall.constants.Constants;
+import jihong99.shoppingmall.dto.request.CouponRequestDto;
+import jihong99.shoppingmall.dto.request.PatchCouponRequestDto;
+import jihong99.shoppingmall.dto.response.CouponResponseDto;
+import jihong99.shoppingmall.dto.response.UserCouponsResponseDto;
 import jihong99.shoppingmall.entity.Coupon;
 import jihong99.shoppingmall.entity.UserCoupon;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.entity.enums.Tiers;
-import jihong99.shoppingmall.exception.DuplicateNameException;
-import jihong99.shoppingmall.exception.InvalidExpirationDateException;
 import jihong99.shoppingmall.exception.NotFoundException;
-import jihong99.shoppingmall.mapper.CouponMapper;
 import jihong99.shoppingmall.repository.CouponRepository;
 import jihong99.shoppingmall.repository.UserCouponRepository;
 import jihong99.shoppingmall.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static jihong99.shoppingmall.constants.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class CouponServiceImpl implements ICouponService{
+public class CouponServiceImpl implements ICouponService {
 
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
     private final UserCouponRepository userCouponRepository;
 
     /**
-     * Retrieves a list of valid coupons for the specified user with pagination.
-     * It first fetches the user's coupons, validates them, and then returns only the valid coupons.
+     * Retrieves the coupons of a specific user.
      *
-     * @param id the user's id
-     * @param pageable pagination information
-     * @return a paginated list of valid coupons
-     * @throws NotFoundException if the user is not found
+     * @param userId The ID of the user.
+     * @param pageable Pagination information.
+     * @return A paginated list of the user's coupons.
+     */
+    @Override
+    public Page<UserCouponsResponseDto> getUserCoupons(Long userId, Pageable pageable) {
+        return userCouponRepository.findAll(pageable)
+                .map(userCoupon -> UserCouponsResponseDto.of(
+                        userCoupon.getCoupon().getId(),
+                        userCoupon.getCoupon().getCode(),
+                        userCoupon.getCoupon().getDiscountType(),
+                        userCoupon.getCoupon().getDiscountValue(),
+                        userCoupon.getCoupon().getExpirationDate(),
+                        userCoupon.getIsValid(),
+                        userCoupon.getIsUsed(),
+                        userCoupon.getCreationTime(),
+                        userCoupon.getLastModifiedTime()
+                ));
+    }
+
+    /**
+     * Creates a new coupon.
+     *
+     * @param couponRequestDto The DTO containing the coupon details.
      */
     @Override
     @Transactional
-    public Page<CouponResponseDto> getUserCoupons(Long id, Pageable pageable) {
-        Users user = userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_UserNotFound));
-
-        LocalDate today = LocalDate.now();
-        Page<UserCoupon> paginatedUserCoupons = userCouponRepository.findByUsersId(user.getId(), pageable);
-        validateCoupons(paginatedUserCoupons, today);
-        List<CouponResponseDto> validCoupons = getValidCoupons(paginatedUserCoupons);
-        return new PageImpl<>(validCoupons, pageable, paginatedUserCoupons.getTotalElements());
+    public void createCoupon(CouponRequestDto couponRequestDto) {
+        Coupon coupon = Coupon.createCoupon(
+                couponRequestDto.getDiscountType(),
+                couponRequestDto.getDiscountValue(),
+                couponRequestDto.getExpirationDate()
+        );
+        couponRepository.save(coupon);
     }
 
     /**
-     * Validates the user's coupons and marks expired ones as invalid.
+     * Retrieves all coupons with pagination.
      *
-     * @param paginatedUserCoupons the page of user coupons
-     * @param today the current date
-     */
-    private void validateCoupons(Page<UserCoupon> paginatedUserCoupons, LocalDate today) {
-        paginatedUserCoupons.forEach(userCoupon -> {
-            if (userCoupon.getCoupon().getExpirationDate().isBefore(today)) {
-                userCoupon.updateToInvalid();
-                userCouponRepository.save(userCoupon);
-            }
-        });
-    }
-
-    /**
-     * Filters and converts the valid user coupons to CouponResponseDto objects.
-     *
-     * @param paginatedUserCoupons the page of user coupons
-     * @return a list of valid CouponResponseDto objects
-     */
-    private List<CouponResponseDto> getValidCoupons(Page<UserCoupon> paginatedUserCoupons) {
-        return paginatedUserCoupons.stream()
-                .filter(UserCoupon::getIsValid)
-                .map(userCoupon -> {
-                    Coupon coupon = userCoupon.getCoupon();
-                    return CouponResponseDto.of(coupon.getId(), coupon.getName(), coupon.getContent(), coupon.getExpirationDate());
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Creates a new coupon based on the provided request data.
-     *
-     * <p>This method checks for duplicate coupon names and validates the expiration date.
-     * If the coupon name already exists, a DuplicateNameException is thrown.
-     * If the expiration date is in the past, an InvalidExpirationDateException is thrown.</p>
-     *
-     * @param couponRequestDto the coupon request data transfer object
-     * @return the created coupon response
-     * @throws DuplicateNameException if a coupon with the same name already exists
-     * @throws InvalidExpirationDateException if the expiration date is in the past
-     */
-    @Override
-    public CouponResponseDto createCoupon(CouponRequestDto couponRequestDto) {
-        Optional<Coupon> coupon =  couponRepository.findByName(couponRequestDto.getName());
-        if(coupon.isPresent()) {
-            throw new DuplicateNameException(MESSAGE_400_duplicatedCoupon);
-        }
-        LocalDate today = LocalDate.now();
-        if(couponRequestDto.getExpirationDate().isBefore(today)){
-            throw new InvalidExpirationDateException(MESSAGE_400_InvalidExpirationDate);
-        }
-        CouponMapper couponMapper = new CouponMapper();
-        Coupon mappedCoupon = couponMapper.mapToCoupon(couponRequestDto);
-        couponRepository.save(mappedCoupon);
-        return CouponResponseDto.of(mappedCoupon.getId(), mappedCoupon.getName(), mappedCoupon.getContent(), mappedCoupon.getExpirationDate());
-    }
-
-    /**
-     * Retrieves a list of all available coupons with pagination.
-     *
-     * @param pageable pagination information
-     * @return a paginated list of all coupons
+     * @param pageable Pagination information.
+     * @return A paginated list of all coupons.
      */
     @Override
     public Page<CouponResponseDto> getAllCoupons(Pageable pageable) {
-        Page<Coupon> coupons = couponRepository.findAll(pageable);
-        return coupons.map(coupon -> CouponResponseDto.of(coupon.getId(), coupon.getName(), coupon.getContent(), coupon.getExpirationDate()));
+        return couponRepository.findAll(pageable)
+                .map(coupon -> CouponResponseDto.of(
+                        coupon.getId(),
+                        coupon.getCode(),
+                        coupon.getDiscountType(),
+                        coupon.getDiscountValue(),
+                        coupon.getExpirationDate(),
+                        coupon.getCreationTime(),
+                        coupon.getLastModifiedTime()));
     }
 
     /**
      * Distributes a coupon to a specific user.
      *
-     * @param couponId the ID of the coupon to distribute
-     * @param userId the ID of the user to receive the coupon
-     * @throws NotFoundException if the user or coupon is not found
+     * @param couponId The ID of the coupon to be distributed.
+     * @param userId The ID of the user to whom the coupon will be distributed.
      */
     @Override
     @Transactional
     public void distributeCouponToUser(Long couponId, Long userId) {
-        Users findUser = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_UserNotFound)
-        );
-        Coupon findCoupon = couponRepository.findById(couponId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_CouponNotFound)
-        );
-        UserCoupon userCoupon = UserCoupon.createUserCoupon(findUser, findCoupon);
+        Coupon coupon = validateCouponsExist(couponId);
+        Users user = validateUsersExist(userId);
+        UserCoupon userCoupon = UserCoupon.createUserCoupon(user, coupon);
         userCouponRepository.save(userCoupon);
     }
 
     /**
-     * Distributes a coupon to all users with a specific tier.
+     * Validates if the user with the specified ID exists.
      *
-     * @param couponId the ID of the coupon to distribute
-     * @param tier the tier of users to receive the coupon
-     * @throws NotFoundException if the user or coupon is not found
+     * @param userId The ID of the user.
+     * @return The found user.
+     * @throws NotFoundException if the user does not exist.
      */
-    @Override
-    @Transactional
-    public void distributeCouponToUsersByTier(Long couponId, Tiers tier) {
-        List<Users> findUsers = userRepository.findByTier(tier);
-        if(findUsers.isEmpty()){
-            throw new NotFoundException(MESSAGE_404_UserNotFound);
-        }
-        Coupon findCoupon = couponRepository.findById(couponId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_CouponNotFound)
+    private Users validateUsersExist(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(Constants.MESSAGE_404_UserNotFound)
         );
-        assignCoupon(findUsers, findCoupon);
+    }
+
+    /**
+     * Validates if the coupon with the specified ID exists.
+     *
+     * @param couponId The ID of the coupon.
+     * @return The found coupon.
+     * @throws NotFoundException if the coupon does not exist.
+     */
+    private Coupon validateCouponsExist(Long couponId) {
+        return couponRepository.findById(couponId).orElseThrow(
+                () -> new NotFoundException(Constants.MESSAGE_404_CouponNotFound)
+        );
     }
 
     /**
      * Distributes a coupon to all users.
      *
-     * @param couponId the ID of the coupon to distribute
-     * @throws NotFoundException if the user or coupon is not found
+     * @param couponId The ID of the coupon to be distributed.
      */
     @Override
     @Transactional
     public void distributeCouponToAllUsers(Long couponId) {
-        List<Users> findUsers = userRepository.findAll();
-        if(findUsers.isEmpty()){
-            throw new NotFoundException(MESSAGE_404_UserNotFound);
-        }
-        Coupon findCoupon = couponRepository.findById(couponId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_CouponNotFound)
-        );
-        assignCoupon(findUsers, findCoupon);
+        Coupon coupon = validateCouponsExist(couponId);
+        List<Users> users = userRepository.findAll();
+        List<UserCoupon> userCoupons = users.stream()
+                .map(user -> UserCoupon.createUserCoupon(user, coupon))
+                .collect(Collectors.toList());
+        userCouponRepository.saveAll(userCoupons);
     }
 
     /**
-     * Assigns a coupon to a list of users.
+     * Deletes a coupon and all its associations with users.
      *
-     * @param findUsers the list of users to assign the coupon to
-     * @param findCoupon the coupon to assign
+     * @param couponId The ID of the coupon to be deleted.
      */
-    private void assignCoupon(List<Users> findUsers, Coupon findCoupon) {
-        findUsers.forEach(
-                user -> {
-                    UserCoupon coupon = UserCoupon.createUserCoupon(user, findCoupon);
-                    userCouponRepository.save(coupon);
-                }
-        );
+    @Override
+    @Transactional
+    public void deleteCoupon(Long couponId) {
+        Coupon coupon = validateCouponsExist(couponId);
+        userCouponRepository.deleteAllByCouponId(coupon.getId());
+        couponRepository.delete(coupon);
+    }
+
+    /**
+     * Updates a coupon's details.
+     *
+     * @param couponId The ID of the coupon to be updated.
+     * @param patchCouponRequestDto The DTO containing the updated coupon details.
+     */
+    @Override
+    @Transactional
+    public void patchCoupon(Long couponId, PatchCouponRequestDto patchCouponRequestDto) {
+        Coupon coupon = validateCouponsExist(couponId);
+
+        if (patchCouponRequestDto.getDiscountType() != null) {
+            coupon.updateDiscountType(patchCouponRequestDto.getDiscountType());
+        }
+
+        if (patchCouponRequestDto.getDiscountValue() != null) {
+            coupon.updateDiscountValue(patchCouponRequestDto.getDiscountValue());
+        }
+
+        if (patchCouponRequestDto.getExpirationDate() != null) {
+            coupon.updateExpirationDate(patchCouponRequestDto.getExpirationDate());
+        }
+        couponRepository.save(coupon);
     }
 }
