@@ -2,7 +2,7 @@ package jihong99.shoppingmall.dto.request;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import jihong99.shoppingmall.validation.groups.SignUpValidation;
+import jihong99.shoppingmall.entity.enums.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,6 +20,5 @@ public class PatchAdminRequestDto {
     @Pattern(regexp = "\\d{11}", message = "Phone Number must consist of 11 digits.")
     private String phoneNumber;
 
-    @Pattern(regexp = "USER|ADMIN|SUPER_ADMIN", message = "Role must be one of the following: USER, ADMIN, SUPER_ADMIN")
-    private String role;
+    private Roles role;
 }
