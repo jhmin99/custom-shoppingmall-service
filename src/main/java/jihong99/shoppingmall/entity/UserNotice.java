@@ -37,4 +37,12 @@ public class UserNotice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notice_id")
     private Notice notice;
+
+    public static UserNotice createUserNotice(Users user, Notice notice){
+        return UserNotice.builder()
+                .users(user)
+                .notice(notice)
+                .build();
+    }
+
 }
