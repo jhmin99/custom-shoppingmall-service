@@ -75,6 +75,35 @@ public class NoticeController {
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(STATUS_200, MESSAGE_200_DistributeNoticeSuccess));
     }
+    /**
+     * Assigns a notice to a specific user.
+     *
+     * <p>This endpoint allows an admin to assign a specific notice to a specific user.
+     * The notice ID and user ID must be specified in the path.</p>
+     *
+     * @param noticeId the ID of the notice to be assigned
+     * @return ResponseEntity<ResponseDto> Response object containing the result of the notice assignment
+     * @success Notice successfully assigned to user
+     * Response Code: 200
+     * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
+     * Response Code: 400
+     * @throws NotFoundException Notice not found
+     * Response Code: 404
+     * @throws Exception Internal server error occurred
+     * Response Code: 500
+     */
+    @PostMapping("/admin/notices/{noticeId}/assign/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDto> assignNoticeToAll(
+            @PathVariable Long noticeId
+    ) {
+        inoticeService.postNoticeToAllUsers(noticeId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_DistributeNoticeSuccess));
+    }
+
+
 
     /**
      * Updates an existing notice.
