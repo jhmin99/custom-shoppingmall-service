@@ -9,6 +9,7 @@ import jihong99.shoppingmall.dto.response.UserCouponsResponseDto;
 import jihong99.shoppingmall.entity.Coupon;
 import jihong99.shoppingmall.entity.UserCoupon;
 import jihong99.shoppingmall.entity.Users;
+import jihong99.shoppingmall.entity.enums.Roles;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.CouponRepository;
 import jihong99.shoppingmall.repository.UserCouponRepository;
@@ -137,7 +138,7 @@ public class CouponServiceImpl implements ICouponService {
     @Transactional
     public void distributeCouponToAllUsers(Long couponId) {
         Coupon coupon = validateCouponsExist(couponId);
-        List<Users> users = userRepository.findAll();
+        List<Users> users = userRepository.findAllByRole(Roles.USER);
         List<UserCoupon> userCoupons = users.stream()
                 .map(user -> UserCoupon.createUserCoupon(user, coupon))
                 .collect(Collectors.toList());
