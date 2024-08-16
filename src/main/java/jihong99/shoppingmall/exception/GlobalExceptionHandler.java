@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
@@ -194,8 +193,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request The web request.
      * @return The ResponseEntity containing the error message.
      */
-    @ExceptionHandler(HasRelationException.class)
-    public ResponseEntity<ErrorResponseDto> handleHasRelationException(HasRelationException exception, WebRequest request) {
+    @ExceptionHandler(HasRelatedEntitiesException.class)
+    public ResponseEntity<ErrorResponseDto> handleHasRelatedEntitiesException(HasRelatedEntitiesException exception, WebRequest request) {
         ErrorResponseDto errorResponseDto = buildErrorResponseDto(request, HttpStatus.CONFLICT, exception.getMessage(), null);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.CONFLICT);
     }

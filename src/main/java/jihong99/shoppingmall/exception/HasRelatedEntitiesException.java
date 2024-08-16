@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
-public class HasRelationException extends RuntimeException{
+public class HasRelatedEntitiesException extends RuntimeException{
 
-    public HasRelationException(String message){
+    public HasRelatedEntitiesException(String message){
         super(message);
     }
 }
