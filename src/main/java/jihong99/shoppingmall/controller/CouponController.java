@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,8 @@ public class CouponController {
      * Response Code: 201
      * @throws MethodArgumentNotValidException Validation failed
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
@@ -64,6 +67,8 @@ public class CouponController {
      * Response Code: 400
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws NotFoundException The coupon is not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
@@ -91,6 +96,8 @@ public class CouponController {
      * Response Code: 200
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws NotFoundException The coupon is not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
@@ -118,6 +125,8 @@ public class CouponController {
      * Response Code: 200
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws NotFoundException Coupon or user not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
@@ -145,6 +154,8 @@ public class CouponController {
      * Response Code: 200
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws NotFoundException The coupon is not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
@@ -172,6 +183,8 @@ public class CouponController {
      * Response Code: 200
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
@@ -201,6 +214,8 @@ public class CouponController {
      * Response Code: 200
      * @throws TypeMismatchException Method argument (path variable or query parameter) cannot be converted to the expected type
      * Response Code: 400
+     * @throws AccessDeniedException           Thrown if the user does not have ADMIN role
+     *                                         Response Code: 403
      * @throws NotFoundException The user is not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
