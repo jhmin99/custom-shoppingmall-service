@@ -149,7 +149,7 @@ public class ItemController {
      * @throws Exception if any other internal server error occurs
      * Response Code: 500
      */
-    @PatchMapping(path= "/admin/items/{itemId}/invalid")
+    @PatchMapping("/admin/items/{itemId}/invalid")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDto> invalidateItem(@PathVariable Long itemId) {
         iitemService.markItemAsInvalid(itemId);
@@ -182,7 +182,7 @@ public class ItemController {
      * @throws Exception if any other internal server error occurs
      * Response Code: 500
      */
-    @PatchMapping(path= "/admin/items/{itemId}/valid")
+    @PatchMapping( "/admin/items/{itemId}/valid")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDto> validateItem(@PathVariable Long itemId) {
         iitemService.markItemAsValid(itemId);
