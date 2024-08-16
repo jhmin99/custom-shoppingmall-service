@@ -7,7 +7,7 @@ import jihong99.shoppingmall.dto.response.CategoryResponseDto;
 import jihong99.shoppingmall.dto.response.PaginatedResponseDto;
 import jihong99.shoppingmall.dto.response.ResponseDto;
 import jihong99.shoppingmall.exception.DuplicateNameException;
-import jihong99.shoppingmall.exception.HasRelationException;
+import jihong99.shoppingmall.exception.HasRelatedEntitiesException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.ICategoryService;
 import lombok.RequiredArgsConstructor;
@@ -129,7 +129,7 @@ public class CategoryController {
      *                                         Response Code: 400
      * @throws NotFoundException Category not found
      * Response Code: 404
-     * @throws HasRelationException Relation conflict, cannot delete category
+     * @throws HasRelatedEntitiesException Relation conflict, cannot delete category
      * Response Code: 409
      * @throws AccessDeniedException Thrown if the user does not have ADMIN role
      * Response Code: 403

@@ -6,7 +6,7 @@ import jihong99.shoppingmall.dto.request.PutCategoryRequestDto;
 import jihong99.shoppingmall.dto.response.CategoryResponseDto;
 import jihong99.shoppingmall.entity.Category;
 import jihong99.shoppingmall.exception.DuplicateNameException;
-import jihong99.shoppingmall.exception.HasRelationException;
+import jihong99.shoppingmall.exception.HasRelatedEntitiesException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.CategoryItemRepository;
 import jihong99.shoppingmall.repository.CategoryRepository;
@@ -104,7 +104,7 @@ public class CategoryServiceImpl implements ICategoryService {
         if(categoryItemRepository.findByCategoryId(categoryId).isEmpty()){
             categoryRepository.delete(category);
         } else {
-            throw new HasRelationException(MESSAGE_409_RelationConflict);
+            throw new HasRelatedEntitiesException(MESSAGE_409_RelationConflict);
         }
     }
 }
