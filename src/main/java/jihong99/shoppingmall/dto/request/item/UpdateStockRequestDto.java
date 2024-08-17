@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.item;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

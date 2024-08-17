@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.response;
+package jihong99.shoppingmall.dto.response.user;
 
 import jihong99.shoppingmall.entity.DeliveryAddress;
 import jihong99.shoppingmall.entity.Users;
@@ -38,7 +38,7 @@ public class UserDetailsResponseDto {
     }
 
     private static Set<Address> getAddresses(Set<DeliveryAddress> deliveryAddresses) {
-        Set<Address> deliveryAddressDtos = deliveryAddresses.stream()
+        return deliveryAddresses.stream()
                 .map(address -> new Address(
                         address.getId(),
                         address.getZipCode(),
@@ -46,7 +46,6 @@ public class UserDetailsResponseDto {
                         address.getAddressDetail()
                 ))
                 .collect(Collectors.toSet());
-        return deliveryAddressDtos;
     }
 
 }

@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.response;
+package jihong99.shoppingmall.dto.response.coupon;
 
 import jihong99.shoppingmall.entity.enums.DiscountType;
 import lombok.AllArgsConstructor;

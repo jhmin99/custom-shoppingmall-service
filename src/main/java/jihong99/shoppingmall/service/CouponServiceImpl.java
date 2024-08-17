@@ -2,10 +2,10 @@ package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.Constants;
-import jihong99.shoppingmall.dto.request.CouponRequestDto;
-import jihong99.shoppingmall.dto.request.PatchCouponRequestDto;
-import jihong99.shoppingmall.dto.response.CouponResponseDto;
-import jihong99.shoppingmall.dto.response.UserCouponsResponseDto;
+import jihong99.shoppingmall.dto.request.coupon.CouponRequestDto;
+import jihong99.shoppingmall.dto.request.coupon.PatchCouponRequestDto;
+import jihong99.shoppingmall.dto.response.coupon.CouponResponseDto;
+import jihong99.shoppingmall.dto.response.coupon.UserCouponsResponseDto;
 import jihong99.shoppingmall.entity.Coupon;
 import jihong99.shoppingmall.entity.UserCoupon;
 import jihong99.shoppingmall.entity.Users;

@@ -1,9 +1,9 @@
 package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.request.CategoryRequestDto;
-import jihong99.shoppingmall.dto.request.PutCategoryRequestDto;
-import jihong99.shoppingmall.dto.response.CategoryResponseDto;
+import jihong99.shoppingmall.dto.request.category.CategoryRequestDto;
+import jihong99.shoppingmall.dto.request.category.PutCategoryRequestDto;
+import jihong99.shoppingmall.dto.response.category.CategoryResponseDto;
 import jihong99.shoppingmall.entity.Category;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.HasRelatedEntitiesException;

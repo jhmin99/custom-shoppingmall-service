@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

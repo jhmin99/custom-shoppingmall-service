@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.coupon;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;

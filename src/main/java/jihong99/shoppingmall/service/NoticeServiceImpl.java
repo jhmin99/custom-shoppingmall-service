@@ -2,8 +2,8 @@ package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.Constants;
-import jihong99.shoppingmall.dto.request.NoticeRequestDto;
-import jihong99.shoppingmall.dto.request.PatchNoticeRequestDto;
+import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
+import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
 import jihong99.shoppingmall.entity.*;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.*;

@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.category;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

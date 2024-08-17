@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.notice;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

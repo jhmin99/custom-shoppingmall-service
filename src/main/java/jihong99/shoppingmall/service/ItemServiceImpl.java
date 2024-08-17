@@ -1,9 +1,9 @@
 package jihong99.shoppingmall.service;
 
 import jakarta.transaction.Transactional;
-import jihong99.shoppingmall.dto.request.ItemRequestDto;
-import jihong99.shoppingmall.dto.request.PatchItemRequestDto;
-import jihong99.shoppingmall.dto.request.UpdateStockRequestDto;
+import jihong99.shoppingmall.dto.request.item.ItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.PatchItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.UpdateStockRequestDto;
 import jihong99.shoppingmall.entity.Category;
 import jihong99.shoppingmall.entity.CategoryItem;
 import jihong99.shoppingmall.entity.Image;
@@ -61,7 +61,7 @@ public class ItemServiceImpl implements IItemService {
     private void validateCategoriesExist(List<Long> categoryIds) {
         categoryIds.forEach(categoryId -> {
             if (!categoryRepository.existsById(categoryId)) {
-                throw new NotFoundException(String.format(MESSAGE_404_CategoryNotFound, categoryId));  // Category not found
+                throw new NotFoundException(String.format(MESSAGE_404_CategoryNotFound + " " + categoryId));
             }
         });
     }
@@ -145,10 +145,9 @@ public class ItemServiceImpl implements IItemService {
      * @return The created CategoryItem entity
      */
     private static CategoryItem getCategoryItem(Item item, Category category) {
-        CategoryItem categoryItem = CategoryItem.builder()
+        return CategoryItem.builder()
                 .category(category)
                 .item(item).build();
-        return categoryItem;
     }
 
     /**
@@ -251,9 +250,8 @@ public class ItemServiceImpl implements IItemService {
      * @throws NotFoundException if the image does not exist
      */
     private Image validateImagesExist(Long imageId) {
-        Image image = imageRepository.findById(imageId)
+        return imageRepository.findById(imageId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_ImageNotFound));
-        return image;
     }
 
     /**

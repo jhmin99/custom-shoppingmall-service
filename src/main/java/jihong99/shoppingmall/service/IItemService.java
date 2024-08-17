@@ -1,8 +1,8 @@
 package jihong99.shoppingmall.service;
 
-import jihong99.shoppingmall.dto.request.ItemRequestDto;
-import jihong99.shoppingmall.dto.request.PatchItemRequestDto;
-import jihong99.shoppingmall.dto.request.UpdateStockRequestDto;
+import jihong99.shoppingmall.dto.request.item.ItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.PatchItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.UpdateStockRequestDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

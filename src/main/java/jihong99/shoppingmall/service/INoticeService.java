@@ -1,7 +1,7 @@
 package jihong99.shoppingmall.service;
 
-import jihong99.shoppingmall.dto.request.NoticeRequestDto;
-import jihong99.shoppingmall.dto.request.PatchNoticeRequestDto;
+import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
+import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
 
 public interface INoticeService {
     void createNotice(NoticeRequestDto noticeRequestDto);
