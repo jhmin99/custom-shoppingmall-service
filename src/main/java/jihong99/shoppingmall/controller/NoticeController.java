@@ -1,9 +1,9 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.request.NoticeRequestDto;
-import jihong99.shoppingmall.dto.request.PatchNoticeRequestDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
+import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
+import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.INoticeService;
 import lombok.RequiredArgsConstructor;

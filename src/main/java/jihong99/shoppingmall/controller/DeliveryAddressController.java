@@ -1,15 +1,14 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.request.DeliveryAddressRequestDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
+import jihong99.shoppingmall.dto.request.deliveryAddress.DeliveryAddressRequestDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IDeliveryAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static jihong99.shoppingmall.constants.Constants.*;

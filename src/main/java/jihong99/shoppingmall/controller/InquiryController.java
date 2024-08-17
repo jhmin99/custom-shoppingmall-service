@@ -1,9 +1,9 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.request.PatchRespondRequestDto;
-import jihong99.shoppingmall.dto.request.RespondRequestDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
+import jihong99.shoppingmall.dto.request.inquiry.PatchResponseRequestDto;
+import jihong99.shoppingmall.dto.request.inquiry.ResponseRequestDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.HasRelatedEntitiesException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IInquiryService;
@@ -33,7 +33,7 @@ public class InquiryController {
      * as a path variable, and the response details are provided in the request body.</p>
      *
      * @param inquiryId The ID of the inquiry to respond to
-     * @param respondRequestDto DTO containing response details such as content
+     * @param responseRequestDto DTO containing response details such as content
      * @return A ResponseEntity containing the status of the response creation operation
      *
      * @success Response successfully created
@@ -58,9 +58,9 @@ public class InquiryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDto> respondToInquiry(
             @PathVariable Long inquiryId,
-            @Valid @RequestBody RespondRequestDto respondRequestDto
+            @Valid @RequestBody ResponseRequestDto responseRequestDto
     ) {
-        iinquiryService.respondToInquiry(inquiryId, respondRequestDto);
+        iinquiryService.respondToInquiry(inquiryId, responseRequestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(STATUS_201, MESSAGE_201_createRespondSuccess));
@@ -100,7 +100,7 @@ public class InquiryController {
     public ResponseEntity<ResponseDto> editInquiryResponse(
             @PathVariable Long inquiryId,
             @PathVariable Long respondId,
-            @Valid @RequestBody PatchRespondRequestDto patchRepondRequestDto
+            @Valid @RequestBody PatchResponseRequestDto patchRepondRequestDto
     ) {
         iinquiryService.editInquiryResponse(inquiryId, respondId, patchRepondRequestDto);
         return ResponseEntity

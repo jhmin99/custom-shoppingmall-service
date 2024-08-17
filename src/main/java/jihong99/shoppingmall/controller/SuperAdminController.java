@@ -1,10 +1,10 @@
 package jihong99.shoppingmall.controller;
 
-import jihong99.shoppingmall.dto.request.PatchAdminRequestDto;
-import jihong99.shoppingmall.dto.response.AdminSummaryResponseDto;
-import jihong99.shoppingmall.dto.response.PaginatedResponseDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
-import jihong99.shoppingmall.dto.request.SignUpRequestDto;
+import jihong99.shoppingmall.dto.request.user.PatchAdminRequestDto;
+import jihong99.shoppingmall.dto.response.user.AdminSummaryResponseDto;
+import jihong99.shoppingmall.dto.response.shared.PaginatedResponseDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
+import jihong99.shoppingmall.dto.request.auth.SignUpRequestDto;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;

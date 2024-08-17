@@ -1,10 +1,10 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.request.ItemRequestDto;
-import jihong99.shoppingmall.dto.request.PatchItemRequestDto;
-import jihong99.shoppingmall.dto.request.UpdateStockRequestDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
+import jihong99.shoppingmall.dto.request.item.ItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.PatchItemRequestDto;
+import jihong99.shoppingmall.dto.request.item.UpdateStockRequestDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.ImageUploadException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.IItemService;

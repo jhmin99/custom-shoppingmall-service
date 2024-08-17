@@ -1,11 +1,11 @@
 package jihong99.shoppingmall.controller;
 
 import jakarta.validation.Valid;
-import jihong99.shoppingmall.dto.request.CategoryRequestDto;
-import jihong99.shoppingmall.dto.request.PutCategoryRequestDto;
-import jihong99.shoppingmall.dto.response.CategoryResponseDto;
-import jihong99.shoppingmall.dto.response.PaginatedResponseDto;
-import jihong99.shoppingmall.dto.response.ResponseDto;
+import jihong99.shoppingmall.dto.request.category.CategoryRequestDto;
+import jihong99.shoppingmall.dto.request.category.PutCategoryRequestDto;
+import jihong99.shoppingmall.dto.response.category.CategoryResponseDto;
+import jihong99.shoppingmall.dto.response.shared.PaginatedResponseDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.HasRelatedEntitiesException;
 import jihong99.shoppingmall.exception.NotFoundException;

@@ -2,10 +2,14 @@ package jihong99.shoppingmall.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jihong99.shoppingmall.dto.request.LoginRequestDto;
-import jihong99.shoppingmall.dto.request.PatchUserRequestDto;
-import jihong99.shoppingmall.dto.request.SignUpRequestDto;
-import jihong99.shoppingmall.dto.response.*;
+import jihong99.shoppingmall.dto.request.auth.LoginRequestDto;
+import jihong99.shoppingmall.dto.request.user.PatchUserRequestDto;
+import jihong99.shoppingmall.dto.request.auth.SignUpRequestDto;
+import jihong99.shoppingmall.dto.response.auth.LoginResponseDto;
+import jihong99.shoppingmall.dto.response.shared.ResponseDto;
+import jihong99.shoppingmall.dto.response.shared.PaginatedResponseDto;
+import jihong99.shoppingmall.dto.response.user.UserDetailsResponseDto;
+import jihong99.shoppingmall.dto.response.user.UserSummaryResponseDto;
 import jihong99.shoppingmall.entity.Users;
 import jihong99.shoppingmall.exception.DuplicateNameException;
 import jihong99.shoppingmall.exception.PasswordMismatchException;
