@@ -2,12 +2,17 @@ package jihong99.shoppingmall.entity;
 
 import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
+import jihong99.shoppingmall.entity.enums.InquiryStatus;
 import jihong99.shoppingmall.entity.enums.InquiryType;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static jihong99.shoppingmall.entity.enums.InquiryStatus.*;
 
 /**
  * Represents an inquiry made by a user regarding an item or general customer service.
@@ -43,16 +48,6 @@ public class Inquiry extends BaseEntity {
     private Item item;
 
     /**
-     * Parent inquiry if this is a response to another inquiry.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_inquiry_id")
-    private Inquiry parent;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "top_parent_inquiry_id")
-    private Inquiry topParent;
-    /**
      * Type of the inquiry.
      */
     @Enumerated(EnumType.STRING)
@@ -72,26 +67,14 @@ public class Inquiry extends BaseEntity {
     /**
      * Indicates if the inquiry is resolved.
      */
-    @Column(name = "is_resolved")
-    private boolean isResolved;
-
-    /**
-     * Indicates if this inquiry is a question.
-     */
-    @Column(name = "is_question")
-    private boolean isQuestion;
-
+    private InquiryStatus status;
 
     @CreatedDate
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
-    /**
-     * Add a method to set the top parent
-     */
-    public void setTopParent(Inquiry topParent) {
-        this.topParent = topParent;
-    }
+    @OneToMany(mappedBy = "inquiry", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InquiryResponse> responses = new ArrayList<>();
 
     /**
      * Updates the title of the inquiry.
@@ -112,12 +95,17 @@ public class Inquiry extends BaseEntity {
     }
 
     /**
-     * Updates the resolved status of the inquiry.
+     * Updates the status of the inquiry.
      *
-     * @param isResolved new resolved status of the inquiry
+     * @param status new resolved status of the inquiry
      */
-    public void updateIsResolved(boolean isResolved){
-        this.isResolved = isResolved;
+    public void updateInquiryStatus(InquiryStatus status){
+        this.status = status;
+    }
+
+    public void addResponse(InquiryResponse response) {
+        this.responses.add(response);
+        response.setInquiry(this);
     }
 
     /**
@@ -136,8 +124,7 @@ public class Inquiry extends BaseEntity {
                 .title(title)
                 .content(content)
                 .type(InquiryType.ITEM)
-                .isQuestion(true)
-                .isResolved(false)
+                .status(UNRESOLVED)
                 .build();
     }
 
@@ -157,28 +144,8 @@ public class Inquiry extends BaseEntity {
                 .title(title)
                 .content(content)
                 .type(InquiryType.CUSTOMER)
-                .isQuestion(true)
-                .isResolved(false)
+                .status(UNRESOLVED)
                 .build();
     }
-
-    /**
-     * Adds a response to an existing inquiry.
-     *
-     * @param parent the parent inquiry to which this is a response
-     * @param title the title of the response
-     * @param content the content of the response
-     * @return a new Inquiry instance representing the response
-     */
-    public static Inquiry addResponse(Inquiry parent, String title, String content){
-        return Inquiry.builder()
-                .parent(parent)
-                .title(title)
-                .content(content)
-                .isQuestion(false)
-                .isResolved(true)
-                .build();
-    }
-
 
 }
