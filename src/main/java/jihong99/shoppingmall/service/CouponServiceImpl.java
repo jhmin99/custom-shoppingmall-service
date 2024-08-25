@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.service;
 
-import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.request.coupon.CouponRequestDto;
 import jihong99.shoppingmall.dto.request.coupon.PatchCouponRequestDto;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.service;
 
-import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
 import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
@@ -9,6 +8,7 @@ import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;

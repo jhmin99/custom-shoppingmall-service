@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.service;
 
-import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.config.auth.UserDetailsDto;
 import jihong99.shoppingmall.config.auth.providers.JwtTokenProvider;
 import jihong99.shoppingmall.dto.request.auth.LoginRequestDto;
@@ -26,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;

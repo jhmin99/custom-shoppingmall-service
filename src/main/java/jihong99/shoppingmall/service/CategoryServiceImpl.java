@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.service;
 
-import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.request.category.CategoryRequestDto;
 import jihong99.shoppingmall.dto.request.category.PutCategoryRequestDto;
 import jihong99.shoppingmall.dto.response.category.CategoryResponseDto;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

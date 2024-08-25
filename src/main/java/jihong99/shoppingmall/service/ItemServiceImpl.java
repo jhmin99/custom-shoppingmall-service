@@ -1,6 +1,5 @@
 package jihong99.shoppingmall.service;
 
-import jakarta.transaction.Transactional;
 import jihong99.shoppingmall.dto.request.item.ItemRequestDto;
 import jihong99.shoppingmall.dto.request.item.PatchItemRequestDto;
 import jihong99.shoppingmall.dto.request.item.UpdateStockRequestDto;
@@ -16,6 +15,7 @@ import jihong99.shoppingmall.repository.ImageRepository;
 import jihong99.shoppingmall.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
