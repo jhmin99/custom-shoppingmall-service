@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jihong99.shoppingmall.entity.enums.InquiryStatus.*;
-
 /**
  * Represents an inquiry made by a user regarding an item or general customer service.
  */
@@ -35,6 +34,7 @@ public class Inquiry extends BaseEntity {
 
     /**
      * User who made the inquiry.
+     * It is a foreign key referencing the Users entity.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -42,13 +42,14 @@ public class Inquiry extends BaseEntity {
 
     /**
      * Item related to the inquiry, if applicable.
+     * It is a foreign key referencing the Item entity.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
     /**
-     * Type of the inquiry.
+     * Type of the inquiry (e.g., ITEM, CUSTOMER).
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "inquiry_type")
@@ -67,19 +68,27 @@ public class Inquiry extends BaseEntity {
     /**
      * Indicates if the inquiry is resolved.
      */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "inquiry_status")
     private InquiryStatus status;
 
+    /**
+     * The date when the inquiry was created.
+     */
     @CreatedDate
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
+    /**
+     * A list of responses associated with this inquiry.
+     */
     @OneToMany(mappedBy = "inquiry", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InquiryResponse> responses = new ArrayList<>();
 
     /**
      * Updates the title of the inquiry.
      *
-     * @param title new title of the inquiry
+     * @param title The new title of the inquiry.
      */
     public void updateTitle(String title){
         this.title = title;
@@ -88,7 +97,7 @@ public class Inquiry extends BaseEntity {
     /**
      * Updates the content of the inquiry.
      *
-     * @param content new content of the inquiry
+     * @param content The new content of the inquiry.
      */
     public void updateContent(String content){
         this.content = content;
@@ -97,12 +106,17 @@ public class Inquiry extends BaseEntity {
     /**
      * Updates the status of the inquiry.
      *
-     * @param status new resolved status of the inquiry
+     * @param status The new status of the inquiry.
      */
     public void updateInquiryStatus(InquiryStatus status){
         this.status = status;
     }
 
+    /**
+     * Adds a response to this inquiry.
+     *
+     * @param response The response to add.
+     */
     public void addResponse(InquiryResponse response) {
         this.responses.add(response);
         response.setInquiry(this);
@@ -111,11 +125,11 @@ public class Inquiry extends BaseEntity {
     /**
      * Creates a new item-related inquiry.
      *
-     * @param users the user making the inquiry
-     * @param item the item related to the inquiry
-     * @param title the title of the inquiry
-     * @param content the content of the inquiry
-     * @return a new Inquiry instance
+     * @param users The user making the inquiry.
+     * @param item The item related to the inquiry.
+     * @param title The title of the inquiry.
+     * @param content The content of the inquiry.
+     * @return A new Inquiry instance.
      */
     public static Inquiry createItemInquiry(Users users, Item item, String title, String content){
         return Inquiry.builder()
@@ -131,11 +145,11 @@ public class Inquiry extends BaseEntity {
     /**
      * Creates a new customer service inquiry.
      *
-     * @param users the user making the inquiry
-     * @param item the item related to the inquiry
-     * @param title the title of the inquiry
-     * @param content the content of the inquiry
-     * @return a new Inquiry instance
+     * @param users The user making the inquiry.
+     * @param item The item related to the inquiry, if applicable.
+     * @param title The title of the inquiry.
+     * @param content The content of the inquiry.
+     * @return A new Inquiry instance.
      */
     public static Inquiry createCustomerInquiry(Users users, Item item, String title, String content){
         return Inquiry.builder()
