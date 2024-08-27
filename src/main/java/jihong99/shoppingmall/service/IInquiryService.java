@@ -21,5 +21,6 @@ public interface IInquiryService {
 
     InquiryDetailsResponseDto getInquiryDetails(Long inquiryId);
 
-    void respondToParentResponse(Long inquiryId, ChildResponseRequestDto responseRequestDto);
+    void respondToParentResponse(Long inquiryId, Long responseId, ChildResponseRequestDto responseRequestDto);
+
 }
