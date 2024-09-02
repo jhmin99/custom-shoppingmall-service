@@ -47,15 +47,10 @@ public class CategoryServiceImpl implements ICategoryService {
         if (findCategory.isPresent()){
             throw new DuplicateNameException(MESSAGE_400_duplicatedName);
         }
-        Category category = getCategory(categoryRequestDto);
+        Category category = convertToCategoryEntity(categoryRequestDto);
         categoryRepository.save(category);
     }
 
-    private static Category getCategory(CategoryRequestDto categoryRequestDto) {
-        return Category.builder()
-                .name(categoryRequestDto.getName())
-                .build();
-    }
 
     /**
      * Retrieves a paginated list of categories.
@@ -83,11 +78,11 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @Transactional
     public void editCategory(Long categoryId, PutCategoryRequestDto putCategoryRequestDto) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_CategoryNotFound));
+        Category category = findCategoryOrThrow(categoryId);
         category.updateName(putCategoryRequestDto.getName());
         categoryRepository.save(category);
     }
+
 
     /**
      * Deletes a category.
@@ -99,13 +94,23 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new NotFoundException(MESSAGE_404_CategoryNotFound));
+        Category category = findCategoryOrThrow(categoryId);
         if(categoryItemRepository.findByCategoryId(categoryId).isEmpty()){
             categoryRepository.delete(category);
         } else {
             throw new HasRelatedEntitiesException(MESSAGE_409_RelationConflict);
         }
     }
+
+    private static Category convertToCategoryEntity(CategoryRequestDto categoryRequestDto) {
+        return Category.builder()
+                .name(categoryRequestDto.getName())
+                .build();
+    }
+    private Category findCategoryOrThrow(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(
+                () -> new NotFoundException(MESSAGE_404_CategoryNotFound));
+    }
 }
+
 

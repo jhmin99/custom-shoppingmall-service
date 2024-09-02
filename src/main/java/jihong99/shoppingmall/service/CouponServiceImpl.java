@@ -40,18 +40,9 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     public Page<UserCouponsResponseDto> getUserCoupons(Long userId, Pageable pageable) {
         return userCouponRepository.findAll(pageable)
-                .map(userCoupon -> UserCouponsResponseDto.of(
-                        userCoupon.getCoupon().getId(),
-                        userCoupon.getCoupon().getCode(),
-                        userCoupon.getCoupon().getDiscountType(),
-                        userCoupon.getCoupon().getDiscountValue(),
-                        userCoupon.getCoupon().getExpirationDate(),
-                        userCoupon.getIsValid(),
-                        userCoupon.getIsUsed(),
-                        userCoupon.getCreationTime(),
-                        userCoupon.getLastModifiedTime()
-                ));
+                .map(CouponServiceImpl::convertToUserCouponsResponseDto);
     }
+
 
     /**
      * Creates a new coupon.
@@ -78,15 +69,9 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     public Page<CouponResponseDto> getAllCoupons(Pageable pageable) {
         return couponRepository.findAll(pageable)
-                .map(coupon -> CouponResponseDto.of(
-                        coupon.getId(),
-                        coupon.getCode(),
-                        coupon.getDiscountType(),
-                        coupon.getDiscountValue(),
-                        coupon.getExpirationDate(),
-                        coupon.getCreationTime(),
-                        coupon.getLastModifiedTime()));
+                .map(CouponServiceImpl::convertToCouponResponseDto);
     }
+
 
     /**
      * Distributes a coupon to a specific user.
@@ -97,36 +82,10 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     @Transactional
     public void distributeCouponToUser(Long couponId, Long userId) {
-        Coupon coupon = validateCouponsExist(couponId);
-        Users user = validateUsersExist(userId);
+        Coupon coupon = findCouponOrThrow(couponId);
+        Users user = findUserOrThrow(userId);
         UserCoupon userCoupon = UserCoupon.createUserCoupon(user, coupon);
         userCouponRepository.save(userCoupon);
-    }
-
-    /**
-     * Validates if the user with the specified ID exists.
-     *
-     * @param userId The ID of the user.
-     * @return The found user.
-     * @throws NotFoundException if the user does not exist.
-     */
-    private Users validateUsersExist(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_UserNotFound)
-        );
-    }
-
-    /**
-     * Validates if the coupon with the specified ID exists.
-     *
-     * @param couponId The ID of the coupon.
-     * @return The found coupon.
-     * @throws NotFoundException if the coupon does not exist.
-     */
-    private Coupon validateCouponsExist(Long couponId) {
-        return couponRepository.findById(couponId).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_CouponNotFound)
-        );
     }
 
     /**
@@ -137,11 +96,9 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     @Transactional
     public void distributeCouponToAllUsers(Long couponId) {
-        Coupon coupon = validateCouponsExist(couponId);
+        Coupon coupon = findCouponOrThrow(couponId);
         List<Users> users = userRepository.findAllByRole(Roles.USER);
-        List<UserCoupon> userCoupons = users.stream()
-                .map(user -> UserCoupon.createUserCoupon(user, coupon))
-                .collect(Collectors.toList());
+        List<UserCoupon> userCoupons = createUserCoupons(users, coupon);
         userCouponRepository.saveAll(userCoupons);
     }
 
@@ -153,7 +110,7 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     @Transactional
     public void deleteCoupon(Long couponId) {
-        Coupon coupon = validateCouponsExist(couponId);
+        Coupon coupon = findCouponOrThrow(couponId);
         userCouponRepository.deleteAllByCouponId(coupon.getId());
         couponRepository.delete(coupon);
     }
@@ -167,19 +124,58 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     @Transactional
     public void patchCoupon(Long couponId, PatchCouponRequestDto patchCouponRequestDto) {
-        Coupon coupon = validateCouponsExist(couponId);
-
+        Coupon coupon = findCouponOrThrow(couponId);
         if (patchCouponRequestDto.getDiscountType() != null) {
             coupon.updateDiscountType(patchCouponRequestDto.getDiscountType());
         }
-
         if (patchCouponRequestDto.getDiscountValue() != null) {
             coupon.updateDiscountValue(patchCouponRequestDto.getDiscountValue());
         }
-
         if (patchCouponRequestDto.getExpirationDate() != null) {
             coupon.updateExpirationDate(patchCouponRequestDto.getExpirationDate());
         }
         couponRepository.save(coupon);
+    }
+
+
+    private Users findUserOrThrow(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(Constants.MESSAGE_404_UserNotFound)
+        );
+    }
+
+    private Coupon findCouponOrThrow(Long couponId) {
+        return couponRepository.findById(couponId).orElseThrow(
+                () -> new NotFoundException(Constants.MESSAGE_404_CouponNotFound)
+        );
+    }
+    private static List<UserCoupon> createUserCoupons(List<Users> users, Coupon coupon) {
+        return users.stream()
+                .map(user -> UserCoupon.createUserCoupon(user, coupon))
+                .collect(Collectors.toList());
+    }
+    private static UserCouponsResponseDto convertToUserCouponsResponseDto(UserCoupon userCoupon) {
+        return UserCouponsResponseDto.of(
+                userCoupon.getCoupon().getId(),
+                userCoupon.getCoupon().getCode(),
+                userCoupon.getCoupon().getDiscountType(),
+                userCoupon.getCoupon().getDiscountValue(),
+                userCoupon.getCoupon().getExpirationDate(),
+                userCoupon.getIsValid(),
+                userCoupon.getIsUsed(),
+                userCoupon.getCreationTime(),
+                userCoupon.getLastModifiedTime()
+        );
+    }
+
+    private static CouponResponseDto convertToCouponResponseDto(Coupon coupon) {
+        return CouponResponseDto.of(
+                coupon.getId(),
+                coupon.getCode(),
+                coupon.getDiscountType(),
+                coupon.getDiscountValue(),
+                coupon.getExpirationDate(),
+                coupon.getCreationTime(),
+                coupon.getLastModifiedTime());
     }
 }

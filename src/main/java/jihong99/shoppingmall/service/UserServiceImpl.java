@@ -62,26 +62,12 @@ public class UserServiceImpl implements IUserService {
         if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
-        Users user = getUsers(signUpRequestDto);
-        encodePassword(user, signUpRequestDto.getPassword());
-        createCartAndWishList(user);
+        Users user = createUserFromSignUpRequest(signUpRequestDto);
+        hashAndSetUserPassword(user, signUpRequestDto.getPassword());
+        initializeCartAndWishListForUser(user);
         userRepository.save(user);
     }
 
-    /**
-     * Helper method to map SignUpRequestDto to a Users entity.
-     *
-     * @param signUpRequestDto the data transfer object containing user sign up details
-     * @return a Users entity populated with data from the SignUpRequestDto
-     */
-    private static Users getUsers(SignUpRequestDto signUpRequestDto) {
-        return Users.createUsers(signUpRequestDto.getIdentification(),
-                signUpRequestDto.getPassword(),
-                signUpRequestDto.getName(),
-                LocalDate.parse(signUpRequestDto.getBirthDate()),
-                signUpRequestDto.getPhoneNumber()
-        );
-    }
 
     /**
      * Checks if the provided identification is already in use.
@@ -91,7 +77,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public void checkDuplicateIdentification(String identification) {
-        if (isIdentificationExist(identification)) {
+        if (doesIdentificationExist(identification)) {
             throw new DuplicateNameException("The ID already exists.");
         }
     }
@@ -159,61 +145,11 @@ public class UserServiceImpl implements IUserService {
         if (!signUpRequestDto.getPassword().equals(signUpRequestDto.getConfirmPassword())) {
             throw new PasswordMismatchException(MESSAGE_400_MisMatchPw);
         }
-        Users user = getAdmin(signUpRequestDto);
-        encodePassword(user, signUpRequestDto.getPassword());
+        Users user = createAdminFromSignUpRequest(signUpRequestDto);
+        hashAndSetUserPassword(user, signUpRequestDto.getPassword());
         userRepository.save(user);
     }
 
-    /**
-     * Helper method to map SignUpRequestDto to an Admin Users entity.
-     *
-     * @param signUpRequestDto the data transfer object containing admin sign up details
-     * @return a Users entity populated with admin data from the SignUpRequestDto
-     */
-    private static Users getAdmin(SignUpRequestDto signUpRequestDto) {
-        return Users.createAdmin(
-                signUpRequestDto.getIdentification(),
-                signUpRequestDto.getPassword(),
-                signUpRequestDto.getName(),
-                LocalDate.parse(signUpRequestDto.getBirthDate()),
-                signUpRequestDto.getPhoneNumber());
-    }
-
-
-    /**
-     * Creates a shopping cart and wishlist for the user.
-     *
-     * @param user the user for whom to create the cart and wishlist
-     */
-    private void createCartAndWishList(Users user) {
-        Cart cart = Cart.createCart();
-        WishList wishList = WishList.createWishList();
-        cartRepository.save(cart);
-        wishListRepository.save(wishList);
-        user.updateCart(cart);
-        user.updateWishList(wishList);
-    }
-
-    /**
-     * Encodes the user's password.
-     *
-     * @param user the user whose password to encode
-     * @param password the password to encode
-     */
-    private void encodePassword(Users user, String password) {
-        String hashPassword = passwordEncoder.encode(password);
-        user.updatePassword(hashPassword);
-    }
-
-    /**
-     * Checks if the identification exists in the repository.
-     *
-     * @param identification the identification to check
-     * @return true if the identification exists, false otherwise
-     */
-    private boolean isIdentificationExist(String identification) {
-        return userRepository.findByIdentification(identification).isPresent();
-    }
 
     /**
      * Retrieves a paginated list of user summaries.
@@ -224,27 +160,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Page<UserSummaryResponseDto> getUsers(Pageable pageable) {
         Page<Users> users = userRepository.findAllByRole(Roles.USER, pageable);
-        return getUserSummaryResponseDtos(users);
+        return mapUsersToUserSummaryResponseDtos(users);
 
     }
 
-    /**
-     * Helper method to map Users entities to UserSummaryResponseDto.
-     *
-     * @param users the page of Users entities
-     * @return a page of UserSummaryResponseDto
-     */
-    private static Page<UserSummaryResponseDto> getUserSummaryResponseDtos(Page<Users> users) {
-        return users.map(user -> UserSummaryResponseDto.of(
-                user.getId(),
-                user.getIdentification(),
-                user.getName(),
-                user.getBirthDate(),
-                user.getPhoneNumber(),
-                user.getCreationTime(),
-                user.getLastModifiedTime()
-        ));
-    }
 
     /**
      * Retrieves a paginated list of admin summaries.
@@ -255,26 +174,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Page<AdminSummaryResponseDto> getAdmins(Pageable pageable) {
         Page<Users> users = userRepository.findAllByRole(Roles.ADMIN, pageable);
-        return getAdminSummaryResponseDtos(users);
+        return mapUsersToAdminSummaryResponseDtos(users);
 
-    }
-
-    /**
-     * Helper method to map Users entities to AdminSummaryResponseDto.
-     *
-     * @param users the page of Users entities
-     * @return a page of AdminSummaryResponseDto
-     */
-    private static Page<AdminSummaryResponseDto> getAdminSummaryResponseDtos(Page<Users> users) {
-        return users.map(user -> AdminSummaryResponseDto.of(
-                user.getId(),
-                user.getIdentification(),
-                user.getName(),
-                user.getBirthDate(),
-                user.getPhoneNumber(),
-                user.getCreationTime(),
-                user.getLastModifiedTime()
-        ));
     }
 
     /**
@@ -287,7 +188,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public void patchAdminAccount(Long userId, PatchAdminRequestDto patchAdminRequestDto) {
-        Users user = validateUsersExist(userId);
+        Users user = findUserOrThrow(userId);
         if (patchAdminRequestDto.getName() != null && !patchAdminRequestDto.getName().isEmpty()) {
             user.updateName(patchAdminRequestDto.getName());
         }
@@ -314,7 +215,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public void deleteAdminAccount(Long userId) {
-        Users user = validateUsersExist(userId);
+        Users user = findUserOrThrow(userId);
         userRepository.delete(user);
     }
 
@@ -328,7 +229,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public void patchUserAccount(Long userId, PatchUserRequestDto patchUserRequestDto) {
-        Users user = validateUsersExist(userId);
+        Users user = findUserOrThrow(userId);
         if (patchUserRequestDto.getName() != null && !patchUserRequestDto.getName().isEmpty()) {
             user.updateName(patchUserRequestDto.getName());
         }
@@ -352,20 +253,71 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public UserDetailsResponseDto getUserDetails(Long userId) {
-        Users findUser = validateUsersExist(userId);
+        Users findUser = findUserOrThrow(userId);
         Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
         return UserDetailsResponseDto.of(findUser, deliveryAddresses);
     }
 
-    /**
-     * Validates that a user exists by ID.
-     *
-     * @param userId the ID of the user to validate
-     * @return the Users entity if found
-     * @throws NotFoundException if the user with the specified ID is not found
-     */
-    private Users validateUsersExist(Long userId) {
+
+
+    private Users findUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+    }
+
+    private static Page<AdminSummaryResponseDto> mapUsersToAdminSummaryResponseDtos(Page<Users> users) {
+        return users.map(user -> AdminSummaryResponseDto.of(
+                user.getId(),
+                user.getIdentification(),
+                user.getName(),
+                user.getBirthDate(),
+                user.getPhoneNumber(),
+                user.getCreationTime(),
+                user.getLastModifiedTime()
+        ));
+    }
+
+    private static Users createUserFromSignUpRequest(SignUpRequestDto signUpRequestDto) {
+        return Users.createUsers(signUpRequestDto.getIdentification(),
+                signUpRequestDto.getPassword(),
+                signUpRequestDto.getName(),
+                LocalDate.parse(signUpRequestDto.getBirthDate()),
+                signUpRequestDto.getPhoneNumber()
+        );
+    }
+    private static Page<UserSummaryResponseDto> mapUsersToUserSummaryResponseDtos(Page<Users> users) {
+        return users.map(user -> UserSummaryResponseDto.of(
+                user.getId(),
+                user.getIdentification(),
+                user.getName(),
+                user.getBirthDate(),
+                user.getPhoneNumber(),
+                user.getCreationTime(),
+                user.getLastModifiedTime()
+        ));
+    }
+    private static Users createAdminFromSignUpRequest(SignUpRequestDto signUpRequestDto) {
+        return Users.createAdmin(
+                signUpRequestDto.getIdentification(),
+                signUpRequestDto.getPassword(),
+                signUpRequestDto.getName(),
+                LocalDate.parse(signUpRequestDto.getBirthDate()),
+                signUpRequestDto.getPhoneNumber());
+    }
+    private void initializeCartAndWishListForUser(Users user) {
+        Cart cart = Cart.createCart();
+        WishList wishList = WishList.createWishList();
+        cartRepository.save(cart);
+        wishListRepository.save(wishList);
+        user.updateCart(cart);
+        user.updateWishList(wishList);
+    }
+    private void hashAndSetUserPassword(Users user, String password) {
+        String hashPassword = passwordEncoder.encode(password);
+        user.updatePassword(hashPassword);
+    }
+
+    private boolean doesIdentificationExist(String identification) {
+        return userRepository.findByIdentification(identification).isPresent();
     }
 }

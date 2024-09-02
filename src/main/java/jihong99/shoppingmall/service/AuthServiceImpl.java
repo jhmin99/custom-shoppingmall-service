@@ -36,8 +36,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         String identification = jwtTokenProvider.getIdentificationFromToken(refreshToken);
-        Users user = userRepository.findByIdentification(identification)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
+        Users user = findUserOrThrow(identification);
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(user);
 
@@ -46,6 +45,8 @@ public class AuthServiceImpl implements IAuthService {
 
         return response;
     }
+
+
     /**
      * Checks if the authenticated user has the specified user ID.
      *
@@ -62,5 +63,12 @@ public class AuthServiceImpl implements IAuthService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
         return user.getIdentification().equals(name);
+    }
+
+
+
+    private Users findUserOrThrow(String identification) {
+        return userRepository.findByIdentification(identification)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_UserNotFound));
     }
 }

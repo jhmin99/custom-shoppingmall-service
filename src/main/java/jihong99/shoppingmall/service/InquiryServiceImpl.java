@@ -42,7 +42,7 @@ public class InquiryServiceImpl implements IInquiryService {
     @Override
     @Transactional
     public void respondToInquiry(Long inquiryId, ResponseRequestDto responseRequestDto) {
-        Inquiry inquiry = validateInquiriesExist(inquiryId);
+        Inquiry inquiry = findInquiryOrThrow(inquiryId);
         InquiryResponse response = InquiryResponse.createResponse(inquiry, responseRequestDto.getContent());
         inquiryResponseRepository.save(response);
     }
@@ -59,8 +59,8 @@ public class InquiryServiceImpl implements IInquiryService {
     @Override
     @Transactional
     public void editInquiryResponse(Long inquiryId, Long responseId, PatchResponseRequestDto patchResponseRequestDto) {
-        validateInquiriesExist(inquiryId);
-        InquiryResponse response = validateInquiryResponseExist(responseId);
+        findInquiryOrThrow(inquiryId);
+        InquiryResponse response = findInquiryResponseOrThrow(responseId);
 
         if (!response.getChildResponses().isEmpty()) {
             throw new HasRelatedEntitiesException(MESSAGE_409_RelationConflict);
@@ -81,8 +81,8 @@ public class InquiryServiceImpl implements IInquiryService {
     @Override
     @Transactional
     public void deleteInquiryResponse(Long inquiryId, Long responseId) {
-        validateInquiriesExist(inquiryId);
-        InquiryResponse response = validateInquiryResponseExist(responseId);
+        findInquiryOrThrow(inquiryId);
+        InquiryResponse response = findInquiryResponseOrThrow(responseId);
 
         if (!response.getChildResponses().isEmpty()) {
             throw new HasRelatedEntitiesException(MESSAGE_409_RelationConflict);
@@ -108,13 +108,7 @@ public class InquiryServiceImpl implements IInquiryService {
                             ? inquiry.getItem().getName()
                             : null;
 
-                    return InquiryResponseDto.of(
-                            inquiry.getId(),
-                            itemName,
-                            inquiry.getTitle(),
-                            inquiry.getType(),
-                            inquiry.getStatus()
-                    );
+                    return getInquiryResponseDto(inquiry, itemName);
                 });
     }
 
@@ -128,24 +122,12 @@ public class InquiryServiceImpl implements IInquiryService {
     @Override
     @Transactional(readOnly = true)
     public InquiryDetailsResponseDto getInquiryDetails(Long inquiryId) {
-        Inquiry inquiry = validateInquiriesExist(inquiryId);
+        Inquiry inquiry = findInquiryOrThrow(inquiryId);
 
-        List<InquiryDetailsResponseDto.ResponseDto> responses = inquiry.getResponses().stream()
-                .map(this::convertInquiryResponseToDto)
-                .collect(Collectors.toList());
+        List<InquiryDetailsResponseDto.ResponseDto> responses = mapInquiryResponsesToDtoList(inquiry);
 
         String itemName = inquiry.getItem() != null ? inquiry.getItem().getName() : null;
-
-        return InquiryDetailsResponseDto.of(
-                inquiry.getId(),
-                inquiry.getType(),
-                itemName,
-                inquiry.getTitle(),
-                inquiry.getContent(),
-                inquiry.getStatus(),
-                inquiry.getRegistrationDate(),
-                responses
-        );
+        return buildInquiryDetailsResponseDto(inquiry, itemName, responses);
     }
 
     /**
@@ -159,50 +141,74 @@ public class InquiryServiceImpl implements IInquiryService {
     @Override
     @Transactional
     public void respondToParentResponse(Long inquiryId, Long responseId, ChildResponseRequestDto responseRequestDto) {
-        validateInquiriesExist(inquiryId);
-        InquiryResponse parentResponse = validateInquiryResponseExist(responseId);
+        findInquiryOrThrow(inquiryId);
+        InquiryResponse parentResponse = findInquiryResponseOrThrow(responseId);
 
         InquiryResponse childResponse = InquiryResponse.createChildResponse(parentResponse, responseRequestDto.getContent());
         inquiryResponseRepository.save(childResponse);
     }
 
-    /**
-     * Validates that an inquiry with the given ID exists.
-     *
-     * @param inquiryId The ID of the inquiry to validate.
-     * @return The Inquiry entity if found.
-     * @throws NotFoundException if the inquiry is not found.
-     */
-    private Inquiry validateInquiriesExist(Long inquiryId) {
+
+
+
+    private List<InquiryDetailsResponseDto.ResponseDto> mapInquiryResponsesToDtoList(Inquiry inquiry) {
+        return inquiry.getResponses().stream()
+                .map(this::mapInquiryResponseToDto)
+                .collect(Collectors.toList());
+    }
+
+    private static InquiryDetailsResponseDto buildInquiryDetailsResponseDto(Inquiry inquiry, String itemName, List<InquiryDetailsResponseDto.ResponseDto> responses) {
+        return InquiryDetailsResponseDto.of(
+                inquiry.getId(),
+                inquiry.getType(),
+                itemName,
+                inquiry.getTitle(),
+                inquiry.getContent(),
+                inquiry.getStatus(),
+                inquiry.getRegistrationDate(),
+                responses
+        );
+    }
+
+    private Inquiry findInquiryOrThrow(Long inquiryId) {
         return inquiryRepository.findById(inquiryId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_InquiryNotFound));
     }
 
-    /**
-     * Validates that an inquiry response with the given ID exists.
-     *
-     * @param responseId The ID of the response to validate.
-     * @return The InquiryResponse entity if found.
-     * @throws NotFoundException if the response is not found.
-     */
-    private InquiryResponse validateInquiryResponseExist(Long responseId) {
+    private InquiryResponse findInquiryResponseOrThrow(Long responseId) {
         return inquiryResponseRepository.findById(responseId)
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_ResponseNotFound));
     }
 
-    /**
-     * Converts an InquiryResponse entity to an InquiryDetailsResponseDto.ResponseDto.
-     *
-     * @param response The InquiryResponse entity to convert.
-     * @return The converted InquiryDetailsResponseDto.ResponseDto.
-     */
-    private InquiryDetailsResponseDto.ResponseDto convertInquiryResponseToDto(InquiryResponse response) {
-        List<InquiryDetailsResponseDto.ResponseDto> childResponses = response.getChildResponses() != null ?
+    private InquiryDetailsResponseDto.ResponseDto mapInquiryResponseToDto(InquiryResponse response) {
+        List<InquiryDetailsResponseDto.ResponseDto> childResponses = mapInquiryResponsesToDtoList(response);
+        return getResponseDto(response, childResponses);
+    }
+
+
+
+    private List<InquiryDetailsResponseDto.ResponseDto> mapInquiryResponsesToDtoList(InquiryResponse response) {
+        return getResponseDtoList(response);
+    }
+
+    private List<InquiryDetailsResponseDto.ResponseDto> getResponseDtoList(InquiryResponse response) {
+        return response.getChildResponses() != null ?
                 response.getChildResponses().stream()
-                        .map(this::convertInquiryResponseToDto)
+                        .map(this::mapInquiryResponseToDto)
                         .collect(Collectors.toList())
                 : Collections.emptyList();
+    }
 
+    private static InquiryResponseDto getInquiryResponseDto(Inquiry inquiry, String itemName) {
+        return InquiryResponseDto.of(
+                inquiry.getId(),
+                itemName,
+                inquiry.getTitle(),
+                inquiry.getType(),
+                inquiry.getStatus()
+        );
+    }
+    private static InquiryDetailsResponseDto.ResponseDto getResponseDto(InquiryResponse response, List<InquiryDetailsResponseDto.ResponseDto> childResponses) {
         return InquiryDetailsResponseDto.ResponseDto.of(
                 response.getId(),
                 response.getContent(),
