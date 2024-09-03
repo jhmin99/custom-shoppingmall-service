@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 public class UserDetailsResponseDto {
+    private Long id;
     private String identification;
     private String name;
     private LocalDate birthDate;
@@ -34,7 +35,7 @@ public class UserDetailsResponseDto {
 
     public static UserDetailsResponseDto of(Users findUser, Set<DeliveryAddress> deliveryAddresses) {
         Set<Address> deliveryAddressDtos = getAddresses(deliveryAddresses);
-        return new UserDetailsResponseDto(findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDtos, findUser.getCreationTime(), findUser.getLastModifiedTime());
+        return new UserDetailsResponseDto(findUser.getId(), findUser.getIdentification(), findUser.getName(), findUser.getBirthDate(), findUser.getPhoneNumber(), deliveryAddressDtos, findUser.getCreationTime(), findUser.getLastModifiedTime());
     }
 
     private static Set<Address> getAddresses(Set<DeliveryAddress> deliveryAddresses) {
