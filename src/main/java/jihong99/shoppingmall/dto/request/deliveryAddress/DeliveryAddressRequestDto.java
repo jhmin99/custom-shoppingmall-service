@@ -1,4 +1,4 @@
-package jihong99.shoppingmall.dto.request;
+package jihong99.shoppingmall.dto.request.deliveryAddress;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,10 +12,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DeliveryAddressRequestDto {
 
-    /**
-     * Delivery address ID.
-     */
-    private Long id;
 
     /**
      * Name of the recipient.
