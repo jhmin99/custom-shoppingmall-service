@@ -254,7 +254,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDetailsResponseDto getUserDetails(Long userId) {
         Users findUser = findUserOrThrow(userId);
-        Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.getDeliveryAddresses(findUser);
+        Set<DeliveryAddress> deliveryAddresses = deliveryAddressService.findDeliveryAddressesByUser(findUser);
         return UserDetailsResponseDto.of(findUser, deliveryAddresses);
     }
 
