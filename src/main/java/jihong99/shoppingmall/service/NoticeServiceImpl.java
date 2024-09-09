@@ -1,17 +1,22 @@
 package jihong99.shoppingmall.service;
 
-import jihong99.shoppingmall.constants.Constants;
 import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
 import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
+import jihong99.shoppingmall.dto.response.notice.NoticeDetailsResponseDto;
+import jihong99.shoppingmall.dto.response.notice.NoticeResponseDto;
 import jihong99.shoppingmall.entity.*;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static jihong99.shoppingmall.constants.Constants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -143,8 +148,34 @@ public class NoticeServiceImpl implements INoticeService {
         List<UserNotice> userNotices = createUserNotices(users, notice);
         userNoticeRepository.saveAll(userNotices);
     }
+    /**
+     * Retrieves a paginated list of all notices for a specific user.
+     *
+     * @param userId   The ID of the user whose notices are being retrieved.
+     * @param pageable The pagination information.
+     * @return A paginated list of NoticeResponseDto objects.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NoticeResponseDto> getAllNotices(Long userId, Pageable pageable) {
+        return userNoticeRepository.findAllByUsersId(userId, pageable)
+                .map(NoticeServiceImpl::convertToNoticeResponseDto);
+    }
 
 
+    /**
+     * Retrieves the details of a specific notice for a user.
+     *
+     * @param userId   The ID of the user associated with the notice.
+     * @param noticeId The ID of the notice to retrieve.
+     * @return A NoticeDetailsResponseDto containing detailed notice information.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public NoticeDetailsResponseDto getNoticeDetails(Long userId, Long noticeId) {
+        UserNotice userNotice = findUserNoticeOrThrow(userId, noticeId);
+        return convertToNoticeDetailsResponseDto(userNotice);
+    }
 
 
     private static List<UserNotice> createUserNoticesFromAlerts(List<ItemAlert> itemAlerts, Notice notice) {
@@ -174,19 +205,40 @@ public class NoticeServiceImpl implements INoticeService {
 
     private Item findItemOrThrow(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_ItemNotFound)
+                () -> new NotFoundException(MESSAGE_404_ItemNotFound)
         );
     }
 
     private Notice findNoticeOrThrow(Long noticeId) {
         return noticeRepository.findById(noticeId).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_NoticeNotFound)
+                () -> new NotFoundException(MESSAGE_404_NoticeNotFound)
         );
     }
 
     private Users findUserOrThrow(Long userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_UserNotFound)
+                () -> new NotFoundException(MESSAGE_404_UserNotFound)
+        );
+    }
+
+
+    private static NoticeResponseDto convertToNoticeResponseDto(UserNotice notice) {
+        return NoticeResponseDto.of(
+                notice.getNotice().getId(),
+                notice.getNotice().getTitle(),
+                notice.getNotice().getRegistrationDate());
+    }
+
+
+    private UserNotice findUserNoticeOrThrow(Long userId, Long noticeId) {
+        return userNoticeRepository.findByUsersIdAndNoticeId(userId, noticeId).orElseThrow(() -> new NotFoundException(MESSAGE_404_NoticeNotFound));
+    }
+
+    private static NoticeDetailsResponseDto convertToNoticeDetailsResponseDto(UserNotice userNotice) {
+        return NoticeDetailsResponseDto.of(
+                userNotice.getNotice().getTitle(),
+                userNotice.getNotice().getContent(),
+                userNotice.getNotice().getRegistrationDate()
         );
     }
 
