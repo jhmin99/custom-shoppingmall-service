@@ -47,7 +47,7 @@ public class OrderController {
      */
     @GetMapping("/admin/orders/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PaginatedResponseDto<OrderDetailsResponseDto>> getAllInquiries(
+    public ResponseEntity<PaginatedResponseDto<OrderDetailsResponseDto>> getAllOrderDetails(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
