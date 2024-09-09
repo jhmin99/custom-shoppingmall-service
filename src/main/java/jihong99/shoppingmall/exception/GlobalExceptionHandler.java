@@ -1,6 +1,6 @@
 package jihong99.shoppingmall.exception;
 
-import jihong99.shoppingmall.dto.response.ErrorResponseDto;
+import jihong99.shoppingmall.dto.response.shared.ErrorResponseDto;
 import org.hibernate.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
