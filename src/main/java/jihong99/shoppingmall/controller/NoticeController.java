@@ -3,11 +3,18 @@ package jihong99.shoppingmall.controller;
 import jakarta.validation.Valid;
 import jihong99.shoppingmall.dto.request.notice.NoticeRequestDto;
 import jihong99.shoppingmall.dto.request.notice.PatchNoticeRequestDto;
+import jihong99.shoppingmall.dto.response.notice.NoticeDetailsResponseDto;
+import jihong99.shoppingmall.dto.response.notice.NoticeResponseDto;
+import jihong99.shoppingmall.dto.response.shared.PaginatedResponseDto;
 import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.INoticeService;
+import jihong99.shoppingmall.utils.annotation.HasId;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.TypeMismatchException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -233,5 +240,70 @@ public class NoticeController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(STATUS_200, MESSAGE_200_NotifyUsersSuccess));
+    }
+
+    /**
+     * Retrieves a paginated list of all notices for a specific user.
+     *
+     * <p>This endpoint allows users to retrieve a list of notices assigned to them with pagination support.
+     * The user ID and pagination parameters (page, size) must be specified.</p>
+     *
+     * @param userId The ID of the user whose notices are being retrieved
+     * @param page The page number to retrieve (optional, default is 0)
+     * @param size The number of items per page (optional, default is 10)
+     * @return Paginated list of NoticeResponseDto objects
+     * Response Code: 200
+     * @throws TypeMismatchException Invalid query parameter types
+     * Response Code: 400
+     * @throws AccessDeniedException Unauthorized access
+     * Response Code: 403
+     * @throws NotFoundException User not found
+     * Response Code: 404
+     * @throws Exception Internal server error
+     * Response Code: 500
+     */
+    @HasId
+    @GetMapping("/users/{userId}/notices")
+    public ResponseEntity<PaginatedResponseDto<NoticeResponseDto>> getAllUserNotices(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NoticeResponseDto> notices = inoticeService.getAllNotices(userId, pageable);
+        PaginatedResponseDto<NoticeResponseDto> response = PaginatedResponseDto.of(notices);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    /**
+     * Retrieves the details of a specific notice for a user.
+     *
+     * <p>This endpoint allows users to retrieve details of a specific notice by providing the user ID and notice ID.</p>
+     *
+     * @param userId The ID of the user
+     * @param noticeId The ID of the notice
+     * @return NoticeDetailsResponseDto containing detailed notice information
+     * Response Code: 200
+     * @throws TypeMismatchException Invalid path variable types
+     * Response Code: 400
+     * @throws AccessDeniedException Unauthorized access
+     * Response Code: 403
+     * @throws NotFoundException User or notice not found
+     * Response Code: 404
+     * @throws Exception Internal server error
+     * Response Code: 500
+     */
+    @HasId
+    @GetMapping("/users/{userId}/notices/{noticeId}")
+    public ResponseEntity<NoticeDetailsResponseDto> getNoticeDetails(
+            @PathVariable Long userId,
+            @PathVariable Long noticeId
+    ){
+        NoticeDetailsResponseDto noticeDetail = inoticeService.getNoticeDetails(userId, noticeId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(noticeDetail);
     }
 }
