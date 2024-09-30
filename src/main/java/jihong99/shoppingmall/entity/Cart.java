@@ -26,6 +26,9 @@ public class Cart extends BaseEntity {
     @Column(name = "cart_id")
     private Long id;
 
+    @Column(name = "original_total_price")
+    private Long OriginalTotalPrice = 0L;
+
     /**
      * Estimated total price of items in the cart.
      * Default value: 0.
