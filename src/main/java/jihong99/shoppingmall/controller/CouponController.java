@@ -3,12 +3,16 @@ package jihong99.shoppingmall.controller;
 import jakarta.validation.Valid;
 import jihong99.shoppingmall.dto.request.coupon.CouponRequestDto;
 import jihong99.shoppingmall.dto.request.coupon.PatchCouponRequestDto;
+import jihong99.shoppingmall.dto.response.coupon.CouponDetailsResponseDto;
+import jihong99.shoppingmall.dto.response.coupon.CouponSummaryResponseDto;
 import jihong99.shoppingmall.dto.response.shared.ResponseDto;
 import jihong99.shoppingmall.dto.response.coupon.CouponResponseDto;
 import jihong99.shoppingmall.dto.response.coupon.UserCouponsResponseDto;
 import jihong99.shoppingmall.dto.response.shared.PaginatedResponseDto;
+import jihong99.shoppingmall.exception.InvalidOperationException;
 import jihong99.shoppingmall.exception.NotFoundException;
 import jihong99.shoppingmall.service.ICouponService;
+import jihong99.shoppingmall.utils.annotation.HasId;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.TypeMismatchException;
 import org.springframework.data.domain.Page;
@@ -237,4 +241,100 @@ public class CouponController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+    /**
+     * Retrieves a paginated list of all coupon summaries for a specific user.
+     *
+     * <p>This endpoint allows users to retrieve a list of coupon summaries assigned to them with pagination support.
+     * The user ID and optional status parameter (such as available, invalid, or used) can be provided.</p>
+     *
+     * @param userId The ID of the user whose coupons are being retrieved
+     * @param status The status of the coupons to filter by (optional)
+     * @param page The page number to retrieve (optional, default is 0)
+     * @param size The number of items per page (optional, default is 10)
+     * @return Paginated list of CouponSummaryResponseDto objects
+     * Response Code: 200
+     * @throws TypeMismatchException Invalid query parameter types
+     * Response Code: 400
+     * @throws AccessDeniedException Unauthorized access
+     * Response Code: 403
+     * @throws NotFoundException User not found
+     * Response Code: 404
+     * @throws Exception Internal server error
+     * Response Code: 500
+     */
+    @GetMapping("/users/{userId}/coupons")
+    @HasId
+    public ResponseEntity<PaginatedResponseDto<CouponSummaryResponseDto>> getAllCouponSummaries(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CouponSummaryResponseDto> summaries = icouponService.getAllCouponSummaries(userId, status, pageable);
+        PaginatedResponseDto<CouponSummaryResponseDto> response = PaginatedResponseDto.of(summaries);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    /**
+     * Retrieves the details of a specific coupon for a user.
+     *
+     * <p>This endpoint allows users to retrieve details of a specific coupon by providing the user ID and coupon ID.</p>
+     *
+     * @param userId The ID of the user
+     * @param couponId The ID of the coupon
+     * @return CouponDetailsResponseDto containing detailed coupon information
+     * Response Code: 200
+     * @throws TypeMismatchException Invalid path variable types
+     * Response Code: 400
+     * @throws AccessDeniedException Unauthorized access
+     * Response Code: 403
+     * @throws NotFoundException User or coupon not found
+     * Response Code: 404
+     * @throws Exception Internal server error
+     * Response Code: 500
+     */
+    @GetMapping("/users/{userId}/coupons/{couponId}")
+    @HasId
+    public ResponseEntity<CouponDetailsResponseDto> getCouponDetails(
+            @PathVariable Long userId,
+            @PathVariable Long couponId) {
+        CouponDetailsResponseDto couponDetails = icouponService.getCouponDetails(userId, couponId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(couponDetails);
+    }
+
+    /**
+     * Applies a specific coupon to the user's cart.
+     *
+     * <p>This endpoint allows a user to apply a specific coupon to their cart. The user ID and coupon ID must be provided.</p>
+     *
+     * @param userId The ID of the user applying the coupon
+     * @param couponId The ID of the coupon being applied
+     * @return Response object indicating the result of the operation
+     * Response Code: 200
+     * @throws TypeMismatchException Invalid path variable types
+     * Response Code: 400
+     * @throws InvalidOperationException Coupon is expired or already used
+     * Response Code: 400
+     * @throws AccessDeniedException Unauthorized access
+     * Response Code: 403
+     * @throws NotFoundException User or coupon not found
+     * Response Code: 404
+     * @throws Exception Internal server error
+     * Response Code: 500
+     */
+    @PostMapping("/users/{userId}/coupons/{couponId}/apply")
+    @HasId
+    public ResponseEntity<ResponseDto> applyCoupon(
+            @PathVariable Long userId,
+            @PathVariable Long couponId) {
+        icouponService.applyCoupon(userId, couponId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_ApplyCouponSuccess));
+    }
+
 }
