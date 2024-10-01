@@ -196,20 +196,15 @@ public class CouponServiceImpl implements ICouponService {
         UserCoupon userCoupon = findUserCouponOrThrow(userId, couponId);
         Users user = findUserOrThrow(userId);
         Cart cart = findCartOrThrow(user);
-        if (!userCoupon.getIsValid()) {
-            throw new InvalidOperationException(Constants.MESSAGE_400_InvalidCoupon);
-        }
-        if (userCoupon.getIsUsed()) {
-            throw new InvalidOperationException(Constants.MESSAGE_400_UsedCoupon);
-        }
-        if (cart.getAppliedCoupon() != null) {
-            cart.setEstimatedTotalPrice(cart.getOriginalTotalPrice());
+        if (!userCoupon.getIsValid() || userCoupon.getIsUsed()) {
+            throw new InvalidOperationException(Constants.MESSAGE_400_InvalidOrUsedCoupon);
         }
         cart.updateAppliedCoupon(userCoupon.getCoupon());
-        applyCouponDiscount(cart, userCoupon.getCoupon());
-
+        cart.recalculateTotalPrices();
         cartRepository.save(cart);
     }
+
+
     private Cart findCartOrThrow(Users user) {
         return cartRepository.findById(user.getId()).orElseThrow(
                 () -> new NotFoundException(Constants.MESSAGE_404_CartNotFound)
