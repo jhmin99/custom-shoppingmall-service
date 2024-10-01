@@ -12,7 +12,7 @@ public class PatchItemRequestDto {
     private String name;
 
     @Min(value = 0, message = "Price must be greater than or equal to 0.")
-    private Integer price;
+    private Long price;
 
     @Min(value = 0, message = "Stock must be greater than or equal to 0.")
     private Integer stock;

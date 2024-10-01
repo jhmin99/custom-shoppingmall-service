@@ -36,7 +36,7 @@ public class Item extends BaseEntity {
     /**
      * Price of the item.
      */
-    private Integer price;
+    private Long price;
 
     /**
      * Stock quantity of the item.
@@ -92,7 +92,7 @@ public class Item extends BaseEntity {
      *
      * @param price the new price of the item
      */
-    public void updatePrice(Integer price) {
+    public void updatePrice(Long price) {
         this.price = price;
     }
 
@@ -161,7 +161,7 @@ public class Item extends BaseEntity {
      * @param images the list of images associated with the item
      * @return a new Item instance
      */
-    public static Item createItem(String name, Integer price, Integer stock, String keyword, List<Image> images) {
+    public static Item createItem(String name, Long price, Integer stock, String keyword, List<Image> images) {
         Item item = Item.builder()
                 .name(name)
                 .price(price)

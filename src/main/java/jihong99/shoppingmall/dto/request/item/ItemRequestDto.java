@@ -14,7 +14,7 @@ public class ItemRequestDto {
 
     @NotNull(message = "Price is a required field.")
     @Min(value = 0, message = "Price must be greater than or equal to 0.")
-    private Integer price;
+    private Long price;
 
     @NotNull(message = "Stock is a required field.")
     @Min(value = 0, message = "Stock must be greater than or equal to 0.")
