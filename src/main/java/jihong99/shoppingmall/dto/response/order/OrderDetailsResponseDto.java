@@ -29,12 +29,12 @@ public class OrderDetailsResponseDto {
     @AllArgsConstructor
     public static class OrderItemResponseDto {
         private String name;
-        private Integer price;
+        private Long price;
         private Integer quantity;
         private Long totalPrice;
     }
 
-    public static OrderItemResponseDto of(String name, Integer price, Integer quantity, Long totalPrice){
+    public static OrderItemResponseDto of(String name, Long price, Integer quantity, Long totalPrice){
         return new OrderItemResponseDto(name, price, quantity, totalPrice);
     }
 }
