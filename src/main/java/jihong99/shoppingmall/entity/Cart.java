@@ -31,7 +31,7 @@ public class Cart extends BaseEntity {
     private Long id;
 
     @Column(name = "original_total_price")
-    private Long OriginalTotalPrice = 0L;
+    private Long originalTotalPrice = 0L;
 
     /**
      * Estimated total price of items in the cart.
@@ -69,20 +69,11 @@ public class Cart extends BaseEntity {
         this.appliedCoupon = coupon;
     }
 
-    /**
-     * Sets the estimated total price for the cart.
-     *
-     * @param estimatedTotalPrice the new estimated total price
-     */
-    public void setEstimatedTotalPrice(Long estimatedTotalPrice) {
-        this.estimatedTotalPrice = estimatedTotalPrice;
-    }
-
     public void recalculateTotalPrices() {
-        this.OriginalTotalPrice = cartItems.stream()
+        this.originalTotalPrice = cartItems.stream()
                 .mapToLong(cartItem -> cartItem.getPrice() * cartItem.getQuantity())
                 .sum();
-        this.estimatedTotalPrice = this.OriginalTotalPrice;
+        this.estimatedTotalPrice = this.originalTotalPrice;
 
         applyCouponDiscount();
     }
@@ -90,9 +81,12 @@ public class Cart extends BaseEntity {
     private void applyCouponDiscount() {
         if (this.appliedCoupon != null) {
             if (this.appliedCoupon.getDiscountType() == DiscountType.PERCENTAGE) {
-                this.estimatedTotalPrice -= (this.OriginalTotalPrice * this.appliedCoupon.getDiscountValue()) / 100;
+                this.estimatedTotalPrice -= (this.originalTotalPrice * this.appliedCoupon.getDiscountValue()) / 100;
             } else if (this.appliedCoupon.getDiscountType() == DiscountType.FIXED) {
                 this.estimatedTotalPrice -= this.appliedCoupon.getDiscountValue();
+            }
+            if (this.estimatedTotalPrice < 0) {
+                this.estimatedTotalPrice = 0L;
             }
         }
     }
