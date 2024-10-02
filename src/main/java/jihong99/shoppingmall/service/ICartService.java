@@ -10,4 +10,8 @@ public interface ICartService {
     void addCartItem(Long userId, Long itemId, CartItemRequestDto cartItemRequestDto);
 
     void removeCartItem(Long userId, Long itemId);
+
+    void applyCoupon(Long userId, Long couponId);
+
+    void removeAppliedCoupon(Long userId);
 }
