@@ -51,7 +51,7 @@ public class CartController {
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
-    @PostMapping("/users/{userId}/cart/{itemId}")
+    @PostMapping("/users/{userId}/carts/{itemId}")
     @HasId
     public ResponseEntity<ResponseDto> addItemToCart(
             @PathVariable Long userId,
@@ -89,7 +89,7 @@ public class CartController {
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
-    @PatchMapping("/users/{userId}/cart/{itemId}")
+    @PatchMapping("/users/{userId}/carts/{itemId}")
     @HasId
     public ResponseEntity<ResponseDto> updateItemQuantity(
             @PathVariable Long userId,
@@ -121,7 +121,7 @@ public class CartController {
      * @throws Exception Internal server error occurred
      * Response Code: 500
      */
-    @DeleteMapping("/users/{userId}/cart/{itemId}")
+    @DeleteMapping("/users/{userId}/carts/{itemId}")
     @HasId
     public ResponseEntity<ResponseDto> removeItemFromCart(
             @PathVariable Long userId,
@@ -132,4 +132,71 @@ public class CartController {
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(STATUS_200, MESSAGE_200_RemoveItemFromCartSuccess));
     }
+
+    /**
+     * Applies a coupon to the user's cart.
+     *
+     * <p>This endpoint allows a user to apply a coupon to their cart. The coupon is validated
+     * for expiration and usage status before applying.</p>
+     *
+     * @param userId The ID of the user
+     * @param couponId The ID of the coupon to be applied
+     * @return ResponseEntity<ResponseDto> Response object indicating the result of the coupon application
+     * @success Coupon successfully applied
+     * Response Code: 200
+     * @throws TypeMismatchException Thrown if the method argument (path variable) cannot be converted to the expected type
+     * Response Code: 400
+     * @throws InvalidOperationException Thrown if the coupon is expired or has already been used
+     * Response Code: 400
+     * @throws AccessDeniedException Thrown if the user does not have the required permissions
+     * Response Code: 403
+     * @throws NotFoundException Thrown if the user or coupon is not found
+     * Response Code: 404
+     * @throws Exception Internal server error occurred
+     * Response Code: 500
+     */
+    @PostMapping("/users/{userId}/carts/coupons/{couponId}/apply")
+    @HasId
+    public ResponseEntity<ResponseDto> applyCoupon(
+        @PathVariable Long userId,
+        @PathVariable Long couponId
+    ){
+        icartService.applyCoupon(userId, couponId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_ApplyCouponSuccess));
+    }
+
+    /**
+     * Removes the applied coupon from the user's cart.
+     *
+     * <p>This endpoint allows a user to remove a previously applied coupon from their cart.
+     * The cart total is recalculated without the coupon.</p>
+     *
+     * @param userId The ID of the user
+     * @return ResponseEntity<ResponseDto> Response object indicating the result of the coupon removal
+     * @success Coupon successfully removed
+     * Response Code: 200
+     * @throws TypeMismatchException Thrown if the method argument (path variable) cannot be converted to the expected type
+     * Response Code: 400
+     * @throws InvalidOperationException Thrown if there is no applied coupon to remove
+     * Response Code: 400
+     * @throws AccessDeniedException Thrown if the user does not have the required permissions
+     * Response Code: 403
+     * @throws NotFoundException Thrown if the user is not found
+     * Response Code: 404
+     * @throws Exception Internal server error occurred
+     * Response Code: 500
+     */
+    @DeleteMapping("/users/{userId}/carts/coupons/remove")
+    @HasId
+    public ResponseEntity<ResponseDto> removeAppliedCoupon(
+            @PathVariable Long userId
+    ){
+        icartService.removeAppliedCoupon(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(STATUS_200, MESSAGE_200_RemoveAppliedCouponSuccess));
+    }
+
 }
