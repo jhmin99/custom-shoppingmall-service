@@ -24,12 +24,9 @@ public class WishItem extends BaseEntity {
     @Column(name = "wish_item_id")
     private Long id;
 
-    /**
-     * The item associated with this wish item.
-     * It is a foreign key referencing the item entity.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", unique = true)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
     private Item item;
 
     /**
