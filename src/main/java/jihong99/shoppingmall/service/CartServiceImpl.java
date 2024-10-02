@@ -2,16 +2,10 @@ package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.dto.request.cart.CartItemRequestDto;
 import jihong99.shoppingmall.dto.request.cart.UpdateQuantityRequestDto;
-import jihong99.shoppingmall.entity.Cart;
-import jihong99.shoppingmall.entity.CartItem;
-import jihong99.shoppingmall.entity.Item;
-import jihong99.shoppingmall.entity.Users;
+import jihong99.shoppingmall.entity.*;
 import jihong99.shoppingmall.exception.InvalidOperationException;
 import jihong99.shoppingmall.exception.NotFoundException;
-import jihong99.shoppingmall.repository.CartItemRepository;
-import jihong99.shoppingmall.repository.CartRepository;
-import jihong99.shoppingmall.repository.ItemRepository;
-import jihong99.shoppingmall.repository.UserRepository;
+import jihong99.shoppingmall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +20,7 @@ public class CartServiceImpl implements ICartService{
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ItemRepository itemRepository;
+    private final UserCouponRepository userCouponRepository;
 
     /**
      * Adds an item to the user's cart. If the item is already in the cart, updates the quantity.
@@ -92,12 +87,49 @@ public class CartServiceImpl implements ICartService{
                 .orElseThrow(() -> new NotFoundException(MESSAGE_404_CartItemNotFound));
 
         cartItemRepository.delete(cartItem);
-
         cart.recalculateTotalPrices();
-
+        cartRepository.save(cart);
+    }
+    /**
+     * Applies a valid coupon to the user's cart.
+     * Recalculates the cart's total prices after applying the coupon.
+     *
+     * @param userId The ID of the user applying the coupon
+     * @param couponId The ID of the coupon to apply
+     */
+    @Override
+    @Transactional
+    public void applyCoupon(Long userId, Long couponId) {
+        Users user = findUserOrThrow(userId);
+        Cart cart = user.getCart();
+        UserCoupon userCoupon = findUserCouponOrThrow(userId, couponId);
+        if(!userCoupon.getIsValid() || userCoupon.getIsUsed()){
+            throw new InvalidOperationException(MESSAGE_400_InvalidOrUsedCoupon);
+        }
+        cart.updateAppliedCoupon(userCoupon.getCoupon());
+        cart.recalculateTotalPrices();
         cartRepository.save(cart);
     }
 
+
+    /**
+     * Removes the applied coupon from the user's cart.
+     * Recalculates the cart's total prices after removing the coupon.
+     *
+     * @param userId The ID of the user removing the coupon
+     */
+    @Override
+    @Transactional
+    public void removeAppliedCoupon(Long userId) {
+        Users user = findUserOrThrow(userId);
+        Cart cart = user.getCart();
+        if(cart.getAppliedCoupon() == null){
+            throw new InvalidOperationException(MESSAGE_400_NoAppliedCouponExists);
+        }
+        cart.updateAppliedCoupon(null);
+        cart.recalculateTotalPrices();
+        cartRepository.save(cart);
+    }
 
 
     private Users findUserOrThrow(Long userId) {
@@ -124,5 +156,12 @@ public class CartServiceImpl implements ICartService{
         if (item.getStock() < quantityRequested) {
             throw new InvalidOperationException(MESSAGE_400_StockUnavailable);
         }
+    }
+
+
+    private UserCoupon findUserCouponOrThrow(Long userId, Long couponId) {
+        return userCouponRepository.findByUsersIdAndCouponId(userId, couponId).orElseThrow(
+                () -> new NotFoundException(MESSAGE_404_UserCouponNotFound)
+        );
     }
 }
