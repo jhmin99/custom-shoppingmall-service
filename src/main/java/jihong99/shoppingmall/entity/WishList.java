@@ -5,6 +5,9 @@ import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a user's wish list.
  *
@@ -24,6 +27,9 @@ public class WishList extends BaseEntity {
     @Column(name = "wish_list_id")
     private Long id;
 
+
+    @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WishItem> wishItems = new ArrayList<>();
 
     /**
      * Static factory method to create a new wish list.
