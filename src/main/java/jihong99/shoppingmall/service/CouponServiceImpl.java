@@ -7,15 +7,11 @@ import jihong99.shoppingmall.dto.response.coupon.CouponDetailsResponseDto;
 import jihong99.shoppingmall.dto.response.coupon.CouponResponseDto;
 import jihong99.shoppingmall.dto.response.coupon.CouponSummaryResponseDto;
 import jihong99.shoppingmall.dto.response.coupon.UserCouponsResponseDto;
-import jihong99.shoppingmall.entity.Cart;
 import jihong99.shoppingmall.entity.Coupon;
 import jihong99.shoppingmall.entity.UserCoupon;
 import jihong99.shoppingmall.entity.Users;
-import jihong99.shoppingmall.entity.enums.DiscountType;
 import jihong99.shoppingmall.entity.enums.Roles;
-import jihong99.shoppingmall.exception.InvalidOperationException;
 import jihong99.shoppingmall.exception.NotFoundException;
-import jihong99.shoppingmall.repository.CartRepository;
 import jihong99.shoppingmall.repository.CouponRepository;
 import jihong99.shoppingmall.repository.UserCouponRepository;
 import jihong99.shoppingmall.repository.UserRepository;
@@ -36,7 +32,6 @@ public class CouponServiceImpl implements ICouponService {
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
     private final UserCouponRepository userCouponRepository;
-    private final CartRepository cartRepository;
 
     /**
      * Retrieves the coupons of a specific user.
@@ -184,32 +179,6 @@ public class CouponServiceImpl implements ICouponService {
         return convertToCouponDetailsResponseDto(userCoupon);
     }
 
-    /**
-     * Applies a coupon to a user's cart, adjusting the total price.
-     *
-     * @param userId The ID of the user.
-     * @param couponId The ID of the coupon to be applied.
-     */
-    @Override
-    @Transactional
-    public void applyCoupon(Long userId, Long couponId) {
-        UserCoupon userCoupon = findUserCouponOrThrow(userId, couponId);
-        Users user = findUserOrThrow(userId);
-        Cart cart = findCartOrThrow(user);
-        if (!userCoupon.getIsValid() || userCoupon.getIsUsed()) {
-            throw new InvalidOperationException(Constants.MESSAGE_400_InvalidOrUsedCoupon);
-        }
-        cart.updateAppliedCoupon(userCoupon.getCoupon());
-        cart.recalculateTotalPrices();
-        cartRepository.save(cart);
-    }
-
-
-    private Cart findCartOrThrow(Users user) {
-        return cartRepository.findById(user.getId()).orElseThrow(
-                () -> new NotFoundException(Constants.MESSAGE_404_CartNotFound)
-        );
-    }
 
     private UserCoupon findUserCouponOrThrow(Long userId, Long couponId) {
         return userCouponRepository.findByUsersIdAndCouponId(userId, couponId).orElseThrow(
@@ -280,17 +249,4 @@ public class CouponServiceImpl implements ICouponService {
         );
     }
 
-
-
-    private void applyCouponDiscount(Cart cart, Coupon coupon) {
-        if (coupon.getDiscountType() == DiscountType.PERCENTAGE) {
-            cart.setEstimatedTotalPrice(cart.getOriginalTotalPrice() - calculatePercentageDiscount(cart, coupon));
-        } else if (coupon.getDiscountType() == DiscountType.FIXED) {
-            cart.setEstimatedTotalPrice(cart.getOriginalTotalPrice() - coupon.getDiscountValue());
-        }
-    }
-
-    private Long calculatePercentageDiscount(Cart cart, Coupon coupon) {
-        return cart.getOriginalTotalPrice() * coupon.getDiscountValue() / 100;
-    }
 }

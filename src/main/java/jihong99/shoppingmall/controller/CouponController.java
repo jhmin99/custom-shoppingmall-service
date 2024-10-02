@@ -306,35 +306,4 @@ public class CouponController {
                 .body(couponDetails);
     }
 
-    /**
-     * Applies a specific coupon to the user's cart.
-     *
-     * <p>This endpoint allows a user to apply a specific coupon to their cart. The user ID and coupon ID must be provided.</p>
-     *
-     * @param userId The ID of the user applying the coupon
-     * @param couponId The ID of the coupon being applied
-     * @return Response object indicating the result of the operation
-     * Response Code: 200
-     * @throws TypeMismatchException Invalid path variable types
-     * Response Code: 400
-     * @throws InvalidOperationException Coupon is expired or already used
-     * Response Code: 400
-     * @throws AccessDeniedException Unauthorized access
-     * Response Code: 403
-     * @throws NotFoundException User or coupon not found
-     * Response Code: 404
-     * @throws Exception Internal server error
-     * Response Code: 500
-     */
-    @PostMapping("/users/{userId}/coupons/{couponId}/apply")
-    @HasId
-    public ResponseEntity<ResponseDto> applyCoupon(
-            @PathVariable Long userId,
-            @PathVariable Long couponId) {
-        icouponService.applyCoupon(userId, couponId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ResponseDto(STATUS_200, MESSAGE_200_ApplyCouponSuccess));
-    }
-
 }

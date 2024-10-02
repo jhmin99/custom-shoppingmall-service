@@ -26,6 +26,4 @@ public interface ICouponService {
     Page<CouponSummaryResponseDto> getAllCouponSummaries(Long userId, String status, Pageable pageable);
 
     CouponDetailsResponseDto getCouponDetails(Long userId, Long couponId);
-
-    void applyCoupon(Long userId, Long couponId);
 }
