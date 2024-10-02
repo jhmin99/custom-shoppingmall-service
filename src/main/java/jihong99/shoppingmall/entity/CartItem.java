@@ -26,11 +26,9 @@ public class CartItem extends BaseEntity {
     @Column(name = "cart_item_id")
     private Long id;
 
-    /**
-     * The item associated with this cart item.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", unique = true)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
     private Item item;
 
     /**
