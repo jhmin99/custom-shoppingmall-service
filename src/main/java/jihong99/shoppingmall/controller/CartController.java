@@ -116,7 +116,7 @@ public class CartController {
      * Response Code: 400
      * @throws AccessDeniedException Thrown if the user does not have the required permissions
      * Response Code: 403
-     * @throws NotFoundException Thrown if the user or item is not found
+     * @throws NotFoundException Thrown if the user or cartItem is not found
      * Response Code: 404
      * @throws Exception Internal server error occurred
      * Response Code: 500
