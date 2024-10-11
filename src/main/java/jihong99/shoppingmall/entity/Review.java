@@ -77,68 +77,6 @@ public class Review extends BaseEntity {
     private LocalDate registrationDate;
 
     /**
-     * Updates the rating of the review.
-     *
-     * @param rating The new rating
-     */
-    public void updateRating(Integer rating){
-        this.rating = rating;
-    }
-
-    /**
-     * Updates the title of the review.
-     *
-     * @param title The new title
-     */
-    public void updateTitle(String title){
-        this.title = title;
-    }
-
-    /**
-     * Updates the content of the review.
-     *
-     * @param content The new content
-     */
-    public void updateContent(String content){
-        this.content = content;
-    }
-
-    /**
-     * Updates the photo status of the review.
-     *
-     * @param hasPhoto Indicates if the review contains photos
-     */
-    public void updateHasPhoto(Boolean hasPhoto){
-        this.hasPhoto = hasPhoto;
-    }
-
-    /**
-     * Adds an image to the review.
-     *
-     * @param image The image to add
-     */
-    public void addImage(Image image) {
-        image.setReview(this);
-        images.add(image);
-        if(this.getHasPhoto() == false){
-            this.updateHasPhoto(true);
-        }
-    }
-
-    /**
-     * Removes an image from the review.
-     *
-     * @param image The image to remove
-     */
-    public void removeImage(Image image) {
-        images.remove(image);
-        image.setReview(null);
-        if(images.isEmpty()){
-            this.updateHasPhoto(false);
-        }
-    }
-
-    /**
      * Creates a new review with the provided details.
      *
      * @param users The user who wrote the review
