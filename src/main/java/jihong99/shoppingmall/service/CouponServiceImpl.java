@@ -41,8 +41,9 @@ public class CouponServiceImpl implements ICouponService {
      * @return A paginated list of the user's coupons.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<UserCouponsResponseDto> getUserCoupons(Long userId, Pageable pageable) {
-        return userCouponRepository.findAll(pageable)
+        return userCouponRepository.findAllByUsersId(userId, pageable)
                 .map(CouponServiceImpl::convertToUserCouponsResponseDto);
     }
 
@@ -70,6 +71,7 @@ public class CouponServiceImpl implements ICouponService {
      * @return A paginated list of all coupons.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<CouponResponseDto> getAllCoupons(Pageable pageable) {
         return couponRepository.findAll(pageable)
                 .map(CouponServiceImpl::convertToCouponResponseDto);
@@ -152,8 +154,13 @@ public class CouponServiceImpl implements ICouponService {
     @Transactional
     @Override
     public Page<CouponSummaryResponseDto> getAllCouponSummaries(Long userId, String status, Pageable pageable) {
-        Users user = findUserOrThrow(userId);
-        Page<UserCoupon> userCoupons = userCouponRepository.findAllByUsersIdAndStatus(user.getId(), status, pageable);
+        updateExpiredCouponsForUser(userId);
+        return userCouponRepository.findAllByUsersIdAndStatus(userId, status, pageable)
+                .map(this::convertToCouponSummaryResponseDto);
+    }
+
+    public List<UserCoupon> updateExpiredCouponsForUser(Long userId) {
+        List<UserCoupon> userCoupons = userCouponRepository.findAllByUsersId(userId);
 
         userCoupons.forEach(userCoupon -> {
             if (userCoupon.getCoupon().getExpirationDate().isBefore(LocalDate.now())) {
@@ -162,7 +169,7 @@ public class CouponServiceImpl implements ICouponService {
             }
         });
 
-        return userCoupons.map(this::convertToCouponSummaryResponseDto);
+        return userCoupons;
     }
 
     /**
