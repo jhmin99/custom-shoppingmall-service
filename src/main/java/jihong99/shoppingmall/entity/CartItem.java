@@ -83,4 +83,8 @@ public class CartItem extends BaseEntity {
                 .price(price)
                 .build();
     }
+
+    public void setCart(Cart cart){
+        this.cart = cart;
+    }
 }

@@ -91,5 +91,13 @@ public class Cart extends BaseEntity {
         }
     }
 
+    public void addCartItem(CartItem cartItem){
+        this.cartItems.add(cartItem);
+        cartItem.setCart(this);
+    }
+    public void removeCartItem(CartItem cartItem){
+        this.cartItems.remove(cartItem);
+        cartItem.setCart(null);
+    }
 
 }
