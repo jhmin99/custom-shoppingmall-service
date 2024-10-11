@@ -1,6 +1,7 @@
 package jihong99.shoppingmall.service;
 
 import jihong99.shoppingmall.dto.request.inquiry.ChildResponseRequestDto;
+import jihong99.shoppingmall.dto.request.inquiry.InquiryRequestDto;
 import jihong99.shoppingmall.dto.request.inquiry.PatchResponseRequestDto;
 import jihong99.shoppingmall.dto.request.inquiry.ResponseRequestDto;
 import jihong99.shoppingmall.dto.response.inquiry.InquiryDetailsResponseDto;
@@ -23,4 +24,19 @@ public interface IInquiryService {
 
     void respondToParentResponse(Long inquiryId, Long responseId, ChildResponseRequestDto responseRequestDto);
 
+    void submitItemInquiry(Long userId, Long itemId, InquiryRequestDto inquiryRequestDto);
+
+    void submitCustomerInquiry(Long userId, InquiryRequestDto inquiryRequestDto);
+
+    Page<InquiryResponseDto> getAllUserInquiries(Long userId, Pageable pageable);
+
+    InquiryDetailsResponseDto getUserInquiryDetails(Long userId, Long inquiryId);
+
+    void deleteInquiry(Long userId, Long inquiryId);
+
+    void respondToParentResponseForUser(Long userId, Long inquiryId, Long responseId, ChildResponseRequestDto responseRequestDto);
+
+    void editInquiryResponseForUser(Long userId, Long inquiryId, Long responseId, PatchResponseRequestDto patchRespondRequestDto);
+
+    void deleteInquiryResponseForUser(Long userId, Long inquiryId, Long responseId);
 }
