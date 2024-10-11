@@ -190,6 +190,7 @@ public class ItemServiceImpl implements IItemService {
 
     private Item createAndSaveItem(ItemRequestDto itemRequestDto, List<Image> imageEntities) {
         Item item = buildItemEntity(itemRequestDto, imageEntities);
+        imageEntities.forEach(item::addImage);
         return itemRepository.save(item);
     }
 
@@ -217,22 +218,12 @@ public class ItemServiceImpl implements IItemService {
     private Image uploadAndPersistSingleImage(MultipartFile image) {
         try {
             String imageUrl = fileStorageService.uploadFile(image.getOriginalFilename(), image.getInputStream(), image.getContentType());
-            Image savedImage = buildImageEntity(image, imageUrl);
+            Image savedImage = Image.createImage(image, imageUrl);
             return imageRepository.save(savedImage);
         } catch (IOException e) {
             throw new ImageUploadException(MESSAGE_500_ImageUploadFailed);
         }
     }
-
-    private static Image buildImageEntity(MultipartFile image, String imageUrl) {
-        return Image.builder()
-                .name(image.getOriginalFilename())
-                .url(imageUrl)
-                .type(image.getContentType())
-                .size(image.getSize())
-                .build();
-    }
-
 
 }
 
