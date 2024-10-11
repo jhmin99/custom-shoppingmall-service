@@ -40,4 +40,14 @@ public class WishList extends BaseEntity {
         return WishList.builder()
                 .build();
     }
+
+    public void addWishItem(WishItem wishItem) {
+        wishItems.add(wishItem);
+        wishItem.setWishList(this);
+    }
+
+    public void removeWishItem(WishItem wishItem) {
+        wishItems.remove(wishItem);
+        wishItem.setWishList(null);
+    }
 }

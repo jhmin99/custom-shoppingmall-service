@@ -36,4 +36,15 @@ public class WishItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wish_list_id")
     private WishList wishList;
+
+
+    public static WishItem createWishItem(Item item, WishList wishList){
+        return WishItem.builder()
+                .item(item)
+                .wishList(wishList)
+                .build();
+    }
+    public void setWishList(WishList wishList){
+        this.wishList = wishList;
+    }
 }
