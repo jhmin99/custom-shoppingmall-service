@@ -45,7 +45,7 @@ public class Inquiry extends BaseEntity {
      * It is a foreign key referencing the Item entity.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", nullable = true)
     private Item item;
 
     /**
@@ -146,15 +146,14 @@ public class Inquiry extends BaseEntity {
      * Creates a new customer service inquiry.
      *
      * @param users The user making the inquiry.
-     * @param item The item related to the inquiry, if applicable.
      * @param title The title of the inquiry.
      * @param content The content of the inquiry.
      * @return A new Inquiry instance.
      */
-    public static Inquiry createCustomerInquiry(Users users, Item item, String title, String content){
+    public static Inquiry createCustomerInquiry(Users users, String title, String content){
         return Inquiry.builder()
                 .users(users)
-                .item(item)
+                .item(null)
                 .title(title)
                 .content(content)
                 .type(InquiryType.CUSTOMER)
