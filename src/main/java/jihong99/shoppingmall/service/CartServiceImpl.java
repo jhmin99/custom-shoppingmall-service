@@ -42,7 +42,11 @@ public class CartServiceImpl implements ICartService{
         CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), item.getId())
                 .orElseGet(() -> createNewCartItem(cart, item, cartItemRequestDto.getQuantity()));
 
-        updateCartItemQuantity(cartItem, cartItemRequestDto.getQuantity());
+        if (cartItem.getId() != null) {
+            updateCartItemQuantity(cartItem, cartItemRequestDto.getQuantity());
+        }else{
+            cart.addCartItem(cartItem);
+        }
 
         cart.recalculateTotalPrices();
         cartItemRepository.save(cartItem);
@@ -62,8 +66,7 @@ public class CartServiceImpl implements ICartService{
         Users user = findUserOrThrow(userId);
         Cart cart = user.getCart();
         Item item = findItemOrThrow(itemId);
-        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), itemId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_CartItemNotFound));
+        CartItem cartItem = findCartItemOrThrow(itemId, cart);
 
         validateStockAvailability(item, updateQuantityRequestDto.getQuantity());
         cartItem.updateQuantity(updateQuantityRequestDto.getQuantity());
@@ -71,6 +74,8 @@ public class CartServiceImpl implements ICartService{
 
         cartItemRepository.save(cartItem);
     }
+
+
 
     /**
      * Removes an item from the user's cart and recalculates the total prices.
@@ -83,10 +88,10 @@ public class CartServiceImpl implements ICartService{
     public void removeCartItem(Long userId, Long itemId) {
         Users user = findUserOrThrow(userId);
         Cart cart = user.getCart();
-        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), itemId)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_404_CartItemNotFound));
+        CartItem cartItem = findCartItemOrThrow(itemId, cart);
 
         cartItemRepository.delete(cartItem);
+        cart.removeCartItem(cartItem);
         cart.recalculateTotalPrices();
         cartRepository.save(cart);
     }
@@ -163,5 +168,11 @@ public class CartServiceImpl implements ICartService{
         return userCouponRepository.findByUsersIdAndCouponId(userId, couponId).orElseThrow(
                 () -> new NotFoundException(MESSAGE_404_UserCouponNotFound)
         );
+    }
+
+    private CartItem findCartItemOrThrow(Long itemId, Cart cart) {
+        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), itemId)
+                .orElseThrow(() -> new NotFoundException(MESSAGE_404_CartItemNotFound));
+        return cartItem;
     }
 }
