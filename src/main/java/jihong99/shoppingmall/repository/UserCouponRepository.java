@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,4 +23,6 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
     Page<UserCoupon> findAllByUsersIdAndStatus(Long userId, String status, Pageable pageable);
 
     Optional<UserCoupon> findByUsersIdAndCouponId(Long userId, Long couponId);
+    Page<UserCoupon> findAllByUsersId(Long userId, Pageable pageable);
+    List<UserCoupon> findAllByUsersId(Long userId);
 }
