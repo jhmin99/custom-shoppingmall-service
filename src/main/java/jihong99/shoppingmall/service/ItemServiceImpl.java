@@ -194,13 +194,13 @@ public class ItemServiceImpl implements IItemService {
     }
 
     private static Item buildItemEntity(ItemRequestDto itemRequestDto, List<Image> imageEntities) {
-        return Item.builder()
-                .name(itemRequestDto.getName())
-                .price(itemRequestDto.getPrice())
-                .stock(itemRequestDto.getStock())
-                .keyword(itemRequestDto.getKeyword())
-                .images(imageEntities)
-                .build();
+        return Item.createItem(
+                itemRequestDto.getName(),
+                itemRequestDto.getPrice(),
+                itemRequestDto.getStock(),
+                itemRequestDto.getKeyword(),
+                imageEntities);
+
     }
 
 
