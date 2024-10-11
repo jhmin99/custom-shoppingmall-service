@@ -26,7 +26,7 @@ import static org.springframework.http.MediaType.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping
+@RequestMapping("/api")
 public class ItemController {
 
     private final IItemService iitemService;
