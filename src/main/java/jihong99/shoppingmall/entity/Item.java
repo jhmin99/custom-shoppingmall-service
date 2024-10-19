@@ -161,7 +161,7 @@ public class Item extends BaseEntity {
      * @param images the list of images associated with the item
      * @return a new Item instance
      */
-    public static Item createItem(String name, Long price, Integer stock, String keyword, List<Image> images) {
+    public static Item of(String name, Long price, Integer stock, String keyword, List<Image> images) {
         Item item = Item.builder()
                 .name(name)
                 .price(price)

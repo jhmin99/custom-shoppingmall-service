@@ -37,7 +37,7 @@ public class WishListServiceImpl implements  IWishListService{
 
                         },
                         () -> {
-                            WishItem newWishItem = WishItem.createWishItem(item, wishList);
+                            WishItem newWishItem = WishItem.of(item, wishList);
                             wishList.addWishItem(newWishItem);
                             wishItemRepository.save(newWishItem);
                         }

@@ -65,7 +65,7 @@ public class Coupon extends BaseEntity {
      * @param expirationDate The expiration date of the coupon.
      * @return A new instance of the Coupon entity.
      */
-    public static Coupon createCoupon(DiscountType discountType, Long discountValue, LocalDate expirationDate) {
+    public static Coupon of(DiscountType discountType, Long discountValue, LocalDate expirationDate) {
         String code = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) + "-" + UUID.randomUUID().toString().substring(0, 8);
         return Coupon.builder()
                 .code(code)

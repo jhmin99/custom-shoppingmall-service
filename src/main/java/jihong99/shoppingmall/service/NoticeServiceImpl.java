@@ -36,7 +36,7 @@ public class NoticeServiceImpl implements INoticeService {
      */
     @Override
     public void createNotice(NoticeRequestDto noticeRequestDto) {
-        Notice notice = Notice.createNotice(
+        Notice notice = Notice.of(
                 noticeRequestDto.getTitle(),
                 noticeRequestDto.getContent()
         );
@@ -54,7 +54,7 @@ public class NoticeServiceImpl implements INoticeService {
     public void postNoticeToUser(Long noticeId, Long userId) {
         Notice notice = findNoticeOrThrow(noticeId);
         Users user = findUserOrThrow(userId);
-        UserNotice userNotice = UserNotice.createUserNotice(user, notice);
+        UserNotice userNotice = UserNotice.of(user, notice);
         userNoticeRepository.save(userNotice);
     }
 
@@ -116,7 +116,7 @@ public class NoticeServiceImpl implements INoticeService {
         Item item = findItemOrThrow(itemId);
         String title = "Stock Alert: " + item.getName();
         String content = String.format("The item '%s' is back in stock. Don't miss out!", item.getName());
-        Notice notice = Notice.createNotice(title, content);
+        Notice notice = Notice.of(title, content);
         List<ItemAlert> itemAlerts = itemAlertRepository.findAllByItemId(itemId);
         if (itemAlerts.isEmpty()) {
             return;
@@ -137,7 +137,7 @@ public class NoticeServiceImpl implements INoticeService {
         Item item = findItemOrThrow(itemId);
         String title = "Cart Item Invalidation Notice: " + item.getName();
         String content = String.format("The item '%s' in your cart has been invalidated and is no longer available for purchase.", item.getName());
-        Notice notice = Notice.createNotice(title, content);
+        Notice notice = Notice.of(title, content);
         List<CartItem> cartItems = cartItemRepository.findByItemId(itemId);
 
         if (cartItems.isEmpty()) {
@@ -182,7 +182,7 @@ public class NoticeServiceImpl implements INoticeService {
         return itemAlerts.stream()
                 .map(itemAlert -> {
                     Users user = itemAlert.getUsers();
-                    return UserNotice.createUserNotice(user, notice);
+                    return UserNotice.of(user, notice);
                 })
                 .collect(Collectors.toList());
     }
@@ -199,7 +199,7 @@ public class NoticeServiceImpl implements INoticeService {
 
     private static List<UserNotice> createUserNotices(List<Users> users, Notice notice) {
         return users.stream()
-                .map(user -> UserNotice.createUserNotice(user, notice))
+                .map(user -> UserNotice.of(user, notice))
                 .collect(Collectors.toList());
     }
 

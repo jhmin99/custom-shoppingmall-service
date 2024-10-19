@@ -278,7 +278,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     private static Users createUserFromSignUpRequest(SignUpRequestDto signUpRequestDto) {
-        return Users.createUsers(signUpRequestDto.getIdentification(),
+        return Users.of(signUpRequestDto.getIdentification(),
                 signUpRequestDto.getPassword(),
                 signUpRequestDto.getName(),
                 LocalDate.parse(signUpRequestDto.getBirthDate()),
@@ -297,7 +297,7 @@ public class UserServiceImpl implements IUserService {
         ));
     }
     private static Users createAdminFromSignUpRequest(SignUpRequestDto signUpRequestDto) {
-        return Users.createAdmin(
+        return Users.ofAdmin(
                 signUpRequestDto.getIdentification(),
                 signUpRequestDto.getPassword(),
                 signUpRequestDto.getName(),
@@ -305,8 +305,8 @@ public class UserServiceImpl implements IUserService {
                 signUpRequestDto.getPhoneNumber());
     }
     private void initializeCartAndWishListForUser(Users user) {
-        Cart cart = Cart.createCart();
-        WishList wishList = WishList.createWishList();
+        Cart cart = Cart.of();
+        WishList wishList = WishList.of();
         cartRepository.save(cart);
         wishListRepository.save(wishList);
         user.updateCart(cart);

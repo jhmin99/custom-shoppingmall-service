@@ -34,7 +34,7 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
     @Transactional
     public void addDeliveryAddress(Long userId, DeliveryAddressRequestDto requestDto) {
         Users findUser = findUserOrThrow(userId);
-        DeliveryAddress deliveryAddress = getDeliveryAddress(requestDto, findUser);
+        DeliveryAddress deliveryAddress = buildDeliveryAddressEntity(requestDto, findUser);
         deliveryAddressRepository.save(deliveryAddress);
     }
 
@@ -102,8 +102,8 @@ public class DeliveryAddressServiceImpl implements IDeliveryAddressService {
     }
 
 
-    private static DeliveryAddress getDeliveryAddress(DeliveryAddressRequestDto requestDto, Users findUser) {
-        return DeliveryAddress.createDeliveryAddress(
+    private static DeliveryAddress buildDeliveryAddressEntity(DeliveryAddressRequestDto requestDto, Users findUser) {
+        return DeliveryAddress.of(
                 findUser,
                 requestDto.getName(),
                 requestDto.getPhoneNumber(),

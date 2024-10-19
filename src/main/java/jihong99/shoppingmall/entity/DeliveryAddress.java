@@ -114,7 +114,7 @@ public class DeliveryAddress extends BaseEntity {
      * @param addressDetail the detailed address information
      * @return a new DeliveryAddress instance
      */
-    public static DeliveryAddress createDeliveryAddress(Users users, String name, String phoneNumber, Integer zipCode,
+    public static DeliveryAddress of(Users users, String name, String phoneNumber, Integer zipCode,
                                                         String address, String addressDetail){
         return DeliveryAddress.builder()
                 .users(users)

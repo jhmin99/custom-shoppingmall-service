@@ -131,7 +131,7 @@ public class Inquiry extends BaseEntity {
      * @param content The content of the inquiry.
      * @return A new Inquiry instance.
      */
-    public static Inquiry createItemInquiry(Users users, Item item, String title, String content){
+    public static Inquiry of(Users users, Item item, String title, String content){
         return Inquiry.builder()
                 .users(users)
                 .item(item)

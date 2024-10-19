@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements ICategoryService {
         if (findCategory.isPresent()){
             throw new DuplicateNameException(MESSAGE_400_duplicatedName);
         }
-        Category category = convertToCategoryEntity(categoryRequestDto);
+        Category category = Category.of(categoryRequestDto.getName());
         categoryRepository.save(category);
     }
 
@@ -102,11 +102,7 @@ public class CategoryServiceImpl implements ICategoryService {
         }
     }
 
-    private static Category convertToCategoryEntity(CategoryRequestDto categoryRequestDto) {
-        return Category.builder()
-                .name(categoryRequestDto.getName())
-                .build();
-    }
+
     private Category findCategoryOrThrow(Long categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(
                 () -> new NotFoundException(MESSAGE_404_CategoryNotFound));

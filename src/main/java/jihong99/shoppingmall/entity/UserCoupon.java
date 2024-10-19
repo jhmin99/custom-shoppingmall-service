@@ -65,7 +65,7 @@ public class UserCoupon extends BaseEntity {
      * @param coupon The coupon associated with the user
      * @return A new UserCoupon instance
      */
-    public static UserCoupon createUserCoupon(Users user, Coupon coupon){
+    public static UserCoupon of(Users user, Coupon coupon){
         return UserCoupon.builder()
                 .users(user)
                 .coupon(coupon)

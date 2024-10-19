@@ -66,7 +66,7 @@ public class OrderDetails {
      * @param discountAmount  The discount amount applied.
      * @return A new OrderDetails instance.
      */
-    public static OrderDetails createOrderDetails(DeliveryAddress deliveryAddress, Coupon appliedCoupon, Long totalAmount, Long discountAmount) {
+    public static OrderDetails of(DeliveryAddress deliveryAddress, Coupon appliedCoupon, Long totalAmount, Long discountAmount) {
         return OrderDetails.builder()
                 .deliveryAddress(deliveryAddress)
                 .appliedCoupon(appliedCoupon)

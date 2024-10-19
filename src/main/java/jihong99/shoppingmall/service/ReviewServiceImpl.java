@@ -48,7 +48,7 @@ public class ReviewServiceImpl implements IReviewService{
     }
 
     private static Review buildReviewEntity(ReviewRequestDto reviewRequestDto, Users user, Item item, List<Image> imageEntities) {
-        return Review.createReview(user,
+        return Review.of(user,
                 item,
                 reviewRequestDto.getTitle(),
                 reviewRequestDto.getContent(),
@@ -83,7 +83,7 @@ public class ReviewServiceImpl implements IReviewService{
     private Image uploadAndPersistSingleImage(MultipartFile image) {
         try {
             String imageUrl = fileStorageService.uploadFile(image.getOriginalFilename(), image.getInputStream(), image.getContentType());
-            Image savedImage = Image.createImage(image, imageUrl);
+            Image savedImage = Image.of(image, imageUrl);
             return imageRepository.save(savedImage);
         } catch (IOException e) {
             throw new ImageUploadException(MESSAGE_500_ImageUploadFailed);

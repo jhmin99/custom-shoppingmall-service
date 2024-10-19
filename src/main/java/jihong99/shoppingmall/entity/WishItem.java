@@ -38,7 +38,7 @@ public class WishItem extends BaseEntity {
     private WishList wishList;
 
 
-    public static WishItem createWishItem(Item item, WishList wishList){
+    public static WishItem of(Item item, WishList wishList){
         return WishItem.builder()
                 .item(item)
                 .wishList(wishList)

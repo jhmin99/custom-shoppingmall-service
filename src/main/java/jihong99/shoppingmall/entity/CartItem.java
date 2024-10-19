@@ -75,7 +75,7 @@ public class CartItem extends BaseEntity {
         return this.quantity * this.price;
     }
 
-    public static CartItem createCartItem(Cart cart, Item item, Integer quantity, long price){
+    public static CartItem of(Cart cart, Item item, Integer quantity, long price){
         return CartItem.builder()
                 .cart(cart)
                 .item(item)

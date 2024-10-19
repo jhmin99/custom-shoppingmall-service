@@ -56,7 +56,7 @@ public class CouponServiceImpl implements ICouponService {
     @Override
     @Transactional
     public void createCoupon(CouponRequestDto couponRequestDto) {
-        Coupon coupon = Coupon.createCoupon(
+        Coupon coupon = Coupon.of(
                 couponRequestDto.getDiscountType(),
                 couponRequestDto.getDiscountValue(),
                 couponRequestDto.getExpirationDate()
@@ -89,7 +89,7 @@ public class CouponServiceImpl implements ICouponService {
     public void distributeCouponToUser(Long couponId, Long userId) {
         Coupon coupon = findCouponOrThrow(couponId);
         Users user = findUserOrThrow(userId);
-        UserCoupon userCoupon = UserCoupon.createUserCoupon(user, coupon);
+        UserCoupon userCoupon = UserCoupon.of(user, coupon);
         userCouponRepository.save(userCoupon);
     }
 
@@ -206,7 +206,7 @@ public class CouponServiceImpl implements ICouponService {
     }
     private static List<UserCoupon> createUserCoupons(List<Users> users, Coupon coupon) {
         return users.stream()
-                .map(user -> UserCoupon.createUserCoupon(user, coupon))
+                .map(user -> UserCoupon.of(user, coupon))
                 .collect(Collectors.toList());
     }
     private static UserCouponsResponseDto convertToUserCouponsResponseDto(UserCoupon userCoupon) {

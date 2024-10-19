@@ -95,7 +95,7 @@ public class InquiryResponse extends BaseEntity {
      * @param content The content of the response.
      * @return A new InquiryResponse instance.
      */
-    public static InquiryResponse createResponse(Inquiry inquiry, String content) {
+    public static InquiryResponse ofInquiry(Inquiry inquiry, String content) {
         InquiryResponse response = InquiryResponse.builder()
                 .inquiry(inquiry)
                 .content(content)
@@ -111,7 +111,7 @@ public class InquiryResponse extends BaseEntity {
      * @param content The content of the child response.
      * @return A new child InquiryResponse instance.
      */
-    public static InquiryResponse createChildResponse(InquiryResponse parentResponse, String content) {
+    public static InquiryResponse ofParentResponse(InquiryResponse parentResponse, String content) {
         InquiryResponse response = InquiryResponse.builder()
                 .content(content)
                 .build();

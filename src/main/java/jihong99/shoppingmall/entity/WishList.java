@@ -36,7 +36,7 @@ public class WishList extends BaseEntity {
      *
      * @return A new WishList instance
      */
-    public static WishList createWishList() {
+    public static WishList of() {
         return WishList.builder()
                 .build();
     }

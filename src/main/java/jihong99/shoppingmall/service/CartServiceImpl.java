@@ -148,7 +148,7 @@ public class CartServiceImpl implements ICartService{
     }
 
     private CartItem createNewCartItem(Cart cart, Item item, int quantity) {
-        CartItem newCartItem = CartItem.createCartItem(cart, item, quantity, item.getPrice());
+        CartItem newCartItem = CartItem.of(cart, item, quantity, item.getPrice());
         cartItemRepository.save(newCartItem);
         return newCartItem;
     }

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import jihong99.shoppingmall.entity.enums.Roles;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -107,7 +106,7 @@ public class Users extends BaseEntity {
      * @param phoneNumber The user's phone number
      * @return A new user instance
      */
-    public static Users createUsers(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
+    public static Users of(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
         return Users.builder()
                 .identification(identification)
                 .password(password)
@@ -128,7 +127,7 @@ public class Users extends BaseEntity {
      * @param phoneNumber The admin's phone number
      * @return A new admin user instance
      */
-    public static Users createAdmin(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
+    public static Users ofAdmin(String identification, String password, String name, LocalDate birthDate, String phoneNumber){
         return Users.builder()
                 .identification(identification)
                 .password(password)
@@ -146,7 +145,7 @@ public class Users extends BaseEntity {
      * @param password The super admin's password
      * @return A new super admin user instance
      */
-    public static Users createSuperAdmin(String identification, String password){
+    public static Users ofSuperAdmin(String identification, String password){
         return Users.builder()
                 .identification(identification)
                 .password(password)

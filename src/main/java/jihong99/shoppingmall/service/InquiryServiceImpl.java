@@ -50,7 +50,7 @@ public class InquiryServiceImpl implements IInquiryService {
     @Transactional
     public void respondToInquiry(Long inquiryId, ResponseRequestDto responseRequestDto) {
         Inquiry inquiry = findInquiryOrThrow(inquiryId);
-        InquiryResponse response = InquiryResponse.createResponse(inquiry, responseRequestDto.getContent());
+        InquiryResponse response = InquiryResponse.ofInquiry(inquiry, responseRequestDto.getContent());
         inquiryResponseRepository.save(response);
     }
 
@@ -161,7 +161,7 @@ public class InquiryServiceImpl implements IInquiryService {
 
         validateInquiryResponseBelongsToInquiry(parentResponse, inquiryId);
 
-        InquiryResponse childResponse = InquiryResponse.createChildResponse(parentResponse, responseRequestDto.getContent());
+        InquiryResponse childResponse = InquiryResponse.ofParentResponse(parentResponse, responseRequestDto.getContent());
         inquiryResponseRepository.save(childResponse);
     }
 
@@ -178,7 +178,7 @@ public class InquiryServiceImpl implements IInquiryService {
     public void submitItemInquiry(Long userId, Long itemId, InquiryRequestDto inquiryRequestDto) {
         Users user = findUserOrThrow(userId);
         Item item = findItemOrThrow(itemId);
-        Inquiry inquiry = Inquiry.createItemInquiry(user, item, inquiryRequestDto.getTitle(), inquiryRequestDto.getContent());
+        Inquiry inquiry = Inquiry.of(user, item, inquiryRequestDto.getTitle(), inquiryRequestDto.getContent());
         inquiryRepository.save(inquiry);
     }
 
@@ -271,7 +271,7 @@ public class InquiryServiceImpl implements IInquiryService {
 
         validateInquiryResponseBelongsToInquiry(parentResponse, inquiryId);
 
-        InquiryResponse childResponse = InquiryResponse.createChildResponse(parentResponse, responseRequestDto.getContent());
+        InquiryResponse childResponse = InquiryResponse.ofParentResponse(parentResponse, responseRequestDto.getContent());
         inquiryResponseRepository.save(childResponse);
     }
 

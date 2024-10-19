@@ -70,15 +70,14 @@ public class Orders extends BaseEntity {
      * @param finalAmount The final amount of the order
      * @return A new Orders instance
      */
-    public static Orders createOrder(String orderNumber, Users users, LocalDate orderDate, OrderStatus orderStatus, Long finalAmount) {
-        Orders order = Orders.builder()
+    public static Orders of(String orderNumber, Users users, LocalDate orderDate, OrderStatus orderStatus, Long finalAmount) {
+        return Orders.builder()
                 .orderNumber(orderNumber)
                 .users(users)
                 .orderDate(orderDate)
                 .orderStatus(orderStatus)
                 .finalAmount(finalAmount)
                 .build();
-        return order;
     }
 
     /**

@@ -51,7 +51,7 @@ public class Notice extends BaseEntity {
      * @param content The content of the notice.
      * @return A new Notice instance.
      */
-    public static Notice createNotice(String title, String content) {
+    public static Notice of(String title, String content) {
         return Notice.builder()
                 .title(title)
                 .content(content)

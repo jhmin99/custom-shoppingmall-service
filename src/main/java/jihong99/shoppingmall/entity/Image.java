@@ -58,7 +58,7 @@ public class Image extends BaseEntity {
      * Size of the image file in bytes.
      */
     private Long size;
-    public static Image createImage(MultipartFile image, String imageUrl) {
+    public static Image of(MultipartFile image, String imageUrl) {
         return Image.builder()
                 .name(image.getOriginalFilename())
                 .url(imageUrl)

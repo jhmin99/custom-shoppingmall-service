@@ -87,7 +87,7 @@ public class Review extends BaseEntity {
      * @param images List of images associated with the review
      * @return A new Review instance
      */
-    public static Review createReview(Users users, Item item, String title,String content, Integer rating, List<Image> images) {
+    public static Review of(Users users, Item item, String title, String content, Integer rating, List<Image> images) {
         Review review = Review.builder()
                 .users(users)
                 .item(item)

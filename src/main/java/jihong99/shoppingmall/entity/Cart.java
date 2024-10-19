@@ -55,7 +55,7 @@ public class Cart extends BaseEntity {
      *
      * @return a new Cart instance
      */
-    public static Cart createCart() {
+    public static Cart of() {
         return Cart.builder()
                 .build();
     }

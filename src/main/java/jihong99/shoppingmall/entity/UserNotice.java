@@ -38,7 +38,7 @@ public class UserNotice extends BaseEntity {
     @JoinColumn(name = "notice_id")
     private Notice notice;
 
-    public static UserNotice createUserNotice(Users user, Notice notice){
+    public static UserNotice of(Users user, Notice notice){
         return UserNotice.builder()
                 .users(user)
                 .notice(notice)

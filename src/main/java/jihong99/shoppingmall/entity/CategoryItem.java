@@ -40,4 +40,9 @@ public class CategoryItem extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    public static CategoryItem of(Item item, Category category) {
+        return CategoryItem.builder()
+                .category(category)
+                .item(item).build();
+    }
 }

@@ -167,17 +167,11 @@ public class ItemServiceImpl implements IItemService {
     }
 
 
-    private static CategoryItem buildCategoryItem(Item item, Category category) {
-        return CategoryItem.builder()
-                .category(category)
-                .item(item).build();
-    }
-
 
     private void associateCategoriesWithItem(List<Long> categoryIds, Item item) {
         for (Long categoryId : categoryIds) {
             Category category = findCategoryOrThrow(categoryId);
-            CategoryItem categoryItem = buildCategoryItem(item, category);
+            CategoryItem categoryItem = CategoryItem.of(item, category);
             categoryItemRepository.save(categoryItem);
         }
     }
@@ -195,7 +189,7 @@ public class ItemServiceImpl implements IItemService {
     }
 
     private static Item buildItemEntity(ItemRequestDto itemRequestDto, List<Image> imageEntities) {
-        return Item.createItem(
+        return Item.of(
                 itemRequestDto.getName(),
                 itemRequestDto.getPrice(),
                 itemRequestDto.getStock(),
@@ -218,7 +212,7 @@ public class ItemServiceImpl implements IItemService {
     private Image uploadAndPersistSingleImage(MultipartFile image) {
         try {
             String imageUrl = fileStorageService.uploadFile(image.getOriginalFilename(), image.getInputStream(), image.getContentType());
-            Image savedImage = Image.createImage(image, imageUrl);
+            Image savedImage = Image.of(image, imageUrl);
             return imageRepository.save(savedImage);
         } catch (IOException e) {
             throw new ImageUploadException(MESSAGE_500_ImageUploadFailed);

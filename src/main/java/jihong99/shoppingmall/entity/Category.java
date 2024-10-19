@@ -1,6 +1,7 @@
 package jihong99.shoppingmall.entity;
 
 import jakarta.persistence.*;
+import jihong99.shoppingmall.dto.request.category.CategoryRequestDto;
 import jihong99.shoppingmall.entity.base.BaseEntity;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,4 +42,9 @@ public class Category extends BaseEntity {
         this.name = name;
     }
 
+    public static Category of(String name) {
+        return Category.builder()
+                .name(name)
+                .build();
+    }
 }
